@@ -1,6 +1,12 @@
 # Fertil app
 
 
+* Para instalar los paquetes
+```bash
+    pnpm  i
+```
+
+
 * Para desarrollar utilizar 
 
 ```bash
