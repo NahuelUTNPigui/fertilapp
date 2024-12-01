@@ -22,12 +22,16 @@
     let idrodeo = $state("")
     let nombre = $state("")
 
+    function ordenar(lista){
+        lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
+    }
     async function getRodeos(){
         const records = await pb.collection('rodeos').getFullList({
             filter:`active=true && cab='${cab.id}'`,
             sort: 'nombre',
         });
         rodeos = records
+        ordenar(rodeos)
         rodeosrows = rodeos
     }
     function openNewModal(){
@@ -44,7 +48,7 @@
             }
             const record = await pb.collection('rodeos').create(data);
             rodeos.push(record)
-            rodeos.sort((r1,r2)=>r1.nombre>r2.nombre?-1:1)
+            ordenar(rodeos)
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el rodeo","success")
         }catch(err){
@@ -66,6 +70,10 @@
                 nombre
             }
             const record = await pb.collection('rodeos').update(idrodeo, data);
+            let idx = rodeos.findIndex(r=>r.id==idrodeo)
+            rodeos[idx]=record
+            ordenar(rodeos)
+            filterUpdate()
             Swal.fire("Éxito editar","Se pudo editar el rodeo","success")
         }
         catch(err){
@@ -92,6 +100,9 @@
                         active : false
                     }
                     const record = await pb.collection('rodeos').update(idrodeo, data);
+                    rodeos = rodeos.filter(r=>r.id!=idrodeo)
+                    ordenar(rodeos)
+                    filterUpdate()
                     //ver como hago para actualizar la lista
                     Swal.fire('Rodeo eliminado!', 'Se eliminó el rodeo correctamente.', 'success');
                 }
@@ -205,8 +216,13 @@
             </div>
             <div class="modal-action justify-start ">
                 <form method="dialog" >
-                  <!-- if there is a button, it will close the modal -->
-                  <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                    <!-- if there is a button, it will close the modal -->
+                    {#if idrodeo==""}
+                        <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>  
+                    {:else}
+                        <button class="btn btn-success text-white" onclick={editar} >Editar</button>  
+                    {/if}
+                  
                   <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
                 </form>
             </div>

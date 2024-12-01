@@ -30,6 +30,7 @@
     let buscar = $state("")
     let rodeobuscar = $state("")
     let sexobuscar = $state("")
+    
 
     //Datos animal
     let animal = $state(null)
@@ -40,6 +41,7 @@
     let sexo = $state("F")
     let conparicion = $state(false)
     let peso = $state("")
+    let rodeo = $state("")
     //Datos paricion
     let madre = $state("")
     let padre = $state("")
@@ -51,6 +53,9 @@
     let malfechanacimiento = $state(false)
     let malpeso = $state(false)
     let botonhabilitado=$state(false)
+    function ordenarNombre(lista){
+        lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
+    }
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -59,6 +64,7 @@
             sort: 'nombre',
         });
         rodeos = records
+        ordenarNombre(rodeos)
     }
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
@@ -434,7 +440,24 @@
                         `}
                         bind:value={peso}
                     />
-                </label>    
+                </label>
+                <label for = "rodeo" class="label">
+                    <span class="label-text text-base">Rodeo</span>
+                </label>
+                <label class="input-group">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2}
+                        `} bind:value={rodeo}>
+                        {#each rodeos as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
                 <label for = "fechanacimiento" class="label">
                     <span class="label-text text-base">Fecha nacimiento</span>
                 </label>

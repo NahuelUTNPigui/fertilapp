@@ -59,14 +59,11 @@
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}' && sexo='F'`,
+            filter:`active=true && cab='${cab.id}' && sexo='H' || sexo ='F'`,
             expand:"nacimiento"
         })
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
-        
-        
-        
     }
     function openNewModal(){
         tacto = null
@@ -173,6 +170,30 @@
             }
             const record = await pb.collection('tactos').create(data);
             await getTactos()
+            filterUpdate()
+            Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
+        }
+        catch(err){
+            console.error(err)
+            Swal.fire("Error guardar","No se pudo guardar el tacto","error")
+        }
+    }
+    async function editarTacto(){
+        try{
+            let data = {
+               fecha:fecha +" 03:00:00" ,
+               observacion,
+               animal,
+               categoria,
+               prenada,
+               pp:pppc,
+               tipo,
+               nombreveterinario
+            }
+            const record = await pb.collection('tactos').update(idtacto,data);
+            let idx = tactos.findIndex(t=>t.id==idtacto)
+            tactos[idx] = record
+
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }
@@ -438,7 +459,11 @@
             <div class="modal-action justify-start ">
                 <form method="dialog" >
                   <!-- if there is a button, it will close the modal -->
-                  <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                  {#if idtacto==""}
+                    <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                  {:else}
+                    <button class="btn btn-success text-white" onclick={editarTacto} >Editar</button>
+                  {/if}
                   <button class="btn btn-error text-white" onclick={cerrar}>Cancelar</button>
                 </form>
             </div>

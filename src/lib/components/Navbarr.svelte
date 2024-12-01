@@ -224,7 +224,27 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18" />
               </svg>
               
-              <span class="px-3"> Rodeos </span>       
+              <span class="px-3"> Rodeos </span>
+            </a>
+          </li>
+          <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("tratamientos")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+            <a class = {classtext} href="/tratamientos">
+              <span class="px-3">Tratamientos</span>
+            </a>
+          </li>
+          <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("inseminaciones")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+            <a class = {classtext} href="/inseminaciones">
+              <span class="px-3">Inseminaciones</span>
+            </a>
+          </li>
+          <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("observaciones")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+            <a class = {classtext} href="/observaciones">
+              <span class="px-3">Observaciones</span>
+            </a>
+          </li>
+          <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("tareas")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+            <a class = {classtext} href="/tareas">
+              <span class="px-3">Tareas</span>
             </a>
           </li>
           {/if}

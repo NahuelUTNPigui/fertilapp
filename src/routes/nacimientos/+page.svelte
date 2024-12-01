@@ -47,7 +47,7 @@
             filter:`active=true && cab='${cab.id}'`,
             expand:"nacimiento"
         })
-        madres = recordsa.filter(a=>a.sexo == "F")
+        madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
         padres = recordsa.filter(a=>a.sexo == "M")
     }
     async function getNacimientos(){
@@ -83,9 +83,18 @@
             }
             let recorda = await pb.collection('animales').create(data); 
             Swal.fire("Éxito guardar","Se pudo guardar la paricion con exito","success")
-            let paricion = recordparicion
-            paricion.expand = {animal:recorda}
-            nacimientos.push(paricion)
+            let item = {
+                caravana,
+                observacion,
+                cab,
+                nombremadre,
+                nombrepadre,
+                madre,
+                padre,
+                fecha:fecha +" 03:00:00"
+            }
+            nacimientos.push(item)
+            
             nacimientos.sort((n1,n2)=>n1.fecha<n2.fecha?-1:1)
             filterUpdate()
 
@@ -124,14 +133,14 @@
     function openEditModal(id){
         idnacimiento = id
         nacimiento = nacimientos.filter(n=>n.id == id)[0]
-        if(nacimiento.expand && nacimiento.expand.padre){
-            padre = nacimiento.expand.padre.id
+        if(nacimiento.padre){
+            padre = nacimiento.padre
         }
         else{
             padre = ""
         }
-        if(nacimiento.expand && nacimiento.expand.madre){
-            madre = nacimiento.expand.madre.id
+        if(nacimiento.madre ){
+            madre = nacimiento.madre
         }
         else{
             madre = ""

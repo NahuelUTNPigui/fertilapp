@@ -61,9 +61,13 @@
     }
     function openEditar(){
         modoedicion = true
+        pesoviejo = peso
+        sexoviejo = sexo
     }
     function cancelarEditar(){
         modoedicion = false
+        peso = pesoviejo
+        sexo = sexoviejo
     }
     function openNewModal(){
         fecha  = fechanacimiento
@@ -103,6 +107,9 @@
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]
         nombrepadre = p.caravana
+    }
+    function editarAnimal(){
+        
     }
     function cerrarModal(){
         fecha = ""

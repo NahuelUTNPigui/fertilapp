@@ -226,7 +226,7 @@
             </div>
         </CardBase>
     {:else}
-        <CardBase titulo="Registra tu cabaña">
+        <CardBase titulo="Registra tu establecimiento">
             <div class="space-y-4">
                 
                 <div>

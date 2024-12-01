@@ -1,4 +1,4 @@
 export default [
-    {id:"F",nombre:"Femenino"},
-    {id:"M",nombre:"Maculino"}
+    {id:"H",nombre:"Hembra"},
+    {id:"M",nombre:"Macho"}
 ]
