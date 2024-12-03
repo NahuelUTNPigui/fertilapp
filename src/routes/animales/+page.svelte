@@ -38,7 +38,7 @@
     let caravana = $state("")
     let fechanacimiento = $state("")
     let nacimiento = $state("")
-    let sexo = $state("F")
+    let sexo = $state("H")
     let conparicion = $state(false)
     let peso = $state("")
     let rodeo = $state("")
@@ -226,7 +226,7 @@
         caravana = ""
         conparicion = false
         peso = ""
-        sexo = "F"
+        sexo = "H"
         fechanacimiento = ""
         nombremadre = ""
         nombrepadre = ""

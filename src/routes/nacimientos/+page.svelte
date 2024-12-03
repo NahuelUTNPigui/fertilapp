@@ -34,6 +34,7 @@
     let fecha = $state("")
     let madres = $state([])
     let padres = $state([])
+    let idanimal = $state("")
     let observacion = $state("")
     //Validacion
     let malmadre = $state(false)
@@ -91,7 +92,9 @@
                 nombrepadre,
                 madre,
                 padre,
-                fecha:fecha +" 03:00:00"
+                fecha:fecha +" 03:00:00",
+                animalid:recorda.id
+
             }
             nacimientos.push(item)
             
@@ -103,6 +106,56 @@
         catch(err){
             console.error(err)
             Swal.fire("Error guardar","Hubo un error para guardar la parición","error")
+        }
+    }
+    async function editar(){
+        let datanimal={
+            fechanacimiento:fecha+" 03:00:00"
+        }
+        let dataparicion = {
+            madre,
+            padre,
+            fecha:fecha + " 03:00:00",
+            nombremadre,
+            nombrepadre,
+            observacion,    
+        }
+        try{
+            const recorda = await pb.collection('animales').update(idanimal, datanimal);
+            const record = await pb.collection('nacimientos').update(idnacimiento, dataparicion);
+            Swal.fire("Éxito editar","Se pudo editar la paricion con exito","success")
+            let item = {
+                caravana,
+                observacion,
+                cab,
+                nombremadre,
+                nombrepadre,
+                madre,
+                padre,
+                fecha:fecha +" 03:00:00",
+                animalid:recorda.id
+
+            }
+            nacimientos = nacimientos.filter(n=>n.id!=idnacimiento)
+            nacimientos.push(item)
+            nacimientos.sort((n1,n2)=>n1.fecha<n2.fecha?-1:1)
+            filterUpdate()
+            idnacimiento = ""
+            caravana = ""
+            sexo = ""
+            padre = ""
+            madre = ""
+            nombremadre = ""
+            nombrepadre = ""
+            fecha = ""
+            observacion = ""
+            peso=""
+            idanimal = ""
+            
+
+        }catch(err){
+            console.error(err)
+            Swal.fire("Error editar","Hubo un error para editar la parición","error")
         }
     }
     function filterUpdate(){
@@ -128,6 +181,7 @@
         fecha = ""
         observacion = ""
         peso=""
+        idanimal = ""
         nuevoModal.showModal()
     }
     function openEditModal(id){
@@ -150,6 +204,7 @@
         nombrepadre = nacimiento.nombrepadre
         observacion = nacimiento.observacion
         caravana = nacimiento.caravana
+        idanimal = nacimiento.animalid
         nuevoModal.showModal()
 
     }
@@ -334,7 +389,9 @@
                             focus:ring-green-500 
                             focus:border-green-500
                             ${estilos.bgdark2} 
+                            
                         `}
+                        disabled={idnacimiento!=""}
                         bind:value={caravana}
                     />
                 </label>
@@ -504,7 +561,11 @@
             <div class="modal-action justify-start ">
                 <form method="dialog" >
                   <!-- if there is a button, it will close the modal -->
-                  <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                  {#if idnacimiento == ""}
+                    <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                    {:else}
+                    <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                  {/if}
                   <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
                 </form>
             </div>

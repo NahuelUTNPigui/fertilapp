@@ -14,6 +14,7 @@
     import Tactos from "$lib/components/animal/Tactos.svelte";
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
+    import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
     
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -130,6 +131,31 @@
     })
 </script>
 <Navbarr>
+    <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
+        <DatosBasicos peso={peso} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+    </CardAnimal>
+    <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
+        <Pariciones cabid={cab.id}/>
+    </CardAnimal>
+    {#if sexo=="H"}
+    <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
+        <Tactos />
+    </CardAnimal>
+    <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
+        <Inseminaciones/>
+    </CardAnimal>
+    {/if}
+    <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
+        <Acciones 
+            caravana = {caravana}
+            bajar={async (fechafallecimiento)=>await darBaja(fechafallecimiento)}
+            eliminar={eliminar}
+            transferir={(newcab)=>transferir(newcab)}
+        />
+    </CardAnimal>
+    <!--
+    
+    
     <CardAnimal cardsize="max-w-7xl" titulo="Detalles animal">
         <div role="tablist" class="tabs tabs-bordered">
             <input 
@@ -184,5 +210,6 @@
         </div>
         
     </CardAnimal>
+    -->
 
 </Navbarr>

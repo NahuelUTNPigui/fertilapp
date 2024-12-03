@@ -26,8 +26,8 @@
     }
     onMount(async ()=>{
         id = $page.params.slug
-        fechadesde = DESDE.toISOString().split("T")[0]
-        fechahasta = HASTA.toISOString().split("T")[0]
+        //fechadesde = DESDE.toISOString().split("T")[0]
+        //fechahasta = HASTA.toISOString().split("T")[0]
         
         await getPariciones()
         filterUpdate()
@@ -47,6 +47,7 @@
     
 </script>
 <div class="p-2">
+    <!--
     <div class="grid grid-cols-2 lg:grid-cols-3 mx-1 lg:mx-10 mb-2 lg:mb-3 gap-2" >
         <div class="">
             <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
@@ -87,6 +88,7 @@
             </label>
         </div>
     </div>
+    -->
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
         <table class="table table-lg w-full" >
             <thead>

@@ -6,6 +6,10 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
     import estilos from '$lib/stores/estilos';
+
+    let ruta = import.meta.env.VITE_RUTA
+
+    const pb = new PocketBase(ruta);
 </script>
 <Navbarr>
     tareas

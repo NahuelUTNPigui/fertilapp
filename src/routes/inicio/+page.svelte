@@ -200,7 +200,7 @@
                             focus:ring-2 focus:ring-offset-2 focus:ring-green-500
                         "
                     >
-                        Editar cabaña
+                        Editar establecimiento
                     </button>    
                 {:else}
                     <button 
