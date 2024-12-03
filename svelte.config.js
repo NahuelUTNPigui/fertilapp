@@ -27,6 +27,10 @@ const config = {
 				"/tactos/cab",
 				"/tactos/vet",
 				"/user/config",
+				"/inseminaciones",
+				"/observaciones",
+				"/tareas",
+				"/tratamientos",
 				"/user/new"]
 		}
 	}
