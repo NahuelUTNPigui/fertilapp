@@ -5,7 +5,6 @@
     import { createRoler } from '$lib/stores/defaultrol.svelte';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    
     let ruta = import.meta.env.VITE_RUTA
     onMount(()=>{
         let roler = createRoler()

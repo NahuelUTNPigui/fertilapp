@@ -7,18 +7,20 @@
     import { goto } from "$app/navigation";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
-    let {caravana,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
+    let {caravana,tropa,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
     let cab = caber.cab
     let id = $state("")
+    let nombretropa = $state("")
     let modoedicion = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
     let caravanavieja = $state("")
+    let tropavieja = $state("")
     //Datos nacimiento
     let idnacimiento = $state("")
     let padre = $state("")
@@ -28,14 +30,31 @@
     let fecha = $state("")
     let madres = $state([])
     let padres = $state([])
+    
     let observacion = $state("") 
+    let tropas = $state([])
+
+    //Tropas
+    async function getTropas(){
+        const records = await pb.collection('rodeos').getFullList({
+            filter:`active = true && cab ='${cab.id}'`,
+            sort: '-nombre',
+        });
+        tropas = records
+        if(tropa != ""){
+            nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+        }
+        else{
+            nombretropa = ""
+        }
+    }
     //Animales
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
             filter:`active=true && cab='${cab.id}'`,
             expand:"nacimiento"
         })
-        madres = recordsa.filter(a=>a.sexo == "F")
+        madres = recordsa.filter(a=>a.sexo == "H")
         padres = recordsa.filter(a=>a.sexo == "M")
     }
     function getSexo(sex){
@@ -59,6 +78,7 @@
         modoedicion = true
         pesoviejo = peso
         sexoviejo = sexo
+        tropavieja = tropa
         caravanavieja = caravana
     }
     function cancelarEditar(){
@@ -66,6 +86,13 @@
         peso = pesoviejo
         sexo = sexoviejo
         caravana = caravanavieja
+        tropa = tropavieja
+        if(tropa != ""){
+            nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+        }
+        else{
+            nombretropa = ""
+        }
     }
     function openNewModal(){
         fecha  = fechanacimiento
@@ -110,13 +137,21 @@
         let data = {
             peso,
             sexo,
-            caravana
+            caravana,
+            tropa
         }
         try{
             const record = await pb.collection('animales').update(id, data);
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana
+            tropa = data.tropa
+            if(tropa != ""){
+                nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+            }
+            else{
+                nombretropa = ""
+            }
             Swal.fire("Éxito editar","Se pudo editar el animal","success")
             modoedicion = false
 
@@ -132,19 +167,23 @@
         madre = ""
         padre = ""
         observacion = ""
+        
         nuevoModal.close()
     }
     onMount(async ()=>{
         id = $page.params.slug
         
         await getAnimales()
+        await getTropas()
     })
+    //cancelar class="btn btn-error text-white font-medium text-lg "
+    //Editar animal class="btn text-lg px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
 </script>
 
 <h2 class="text-2xl mx-1 font-bold mb-2 text-left mt-2">
     Caravana: {caravana}
 </h2>
-<div class="grid grid-cols-3 lg:grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
+<div class="grid grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
     <div class="mb-1 lg:mb-0">
         <label for = "peso" class="label">
             <span class="label-text text-base">Peso(KG)</span>
@@ -152,7 +191,7 @@
         {#if modoedicion}
             <label class="input-group">
                 <input id ="peso" type="text"  
-                    class={`input input-bordered w-full `}
+                    class={`input input-bordered w-full ${estilos.bgdark2}`}
                     bind:value={peso}
                 />
             </label>
@@ -195,6 +234,36 @@
             </label>
         {/if}
     </div>
+    <div class="mb-1 lg:mb-0">
+        {#if modoedicion}
+        <label for = "tropa" class="label">
+            <span class="label-text text-base">Tropa</span>
+        </label>
+        <label class="input-group ">
+            <select 
+                class={`
+                    select select-bordered w-full
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 
+                    focus:ring-green-500 focus:border-green-500
+                    ${estilos.bgdark2}
+                `} bind:value={tropa}>
+                {#each tropas as t}
+                    <option value={t.id}>{t.nombre}</option>    
+                {/each}
+            </select>
+        </label>
+        {:else}
+            <label for = "tropa" class="label">
+                <span class="label-text text-base">Tropa</span>
+            </label>
+            <label for="tropa" 
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+            >
+                {nombretropa}
+            </label>
+        {/if}
+    </div>
     {#if modoedicion}
         <div class="mb-1 lg:mb-0">
             <label for = "caravana" class="label">
@@ -202,14 +271,14 @@
             </label>
             <label class="input-group">
                 <input id ="caravana" type="text"  
-                    class={`input input-bordered w-full `}
+                    class={`input input-bordered w-full ${estilos.bgdark2}`}
                     bind:value={caravana}
                 />
             </label>
         </div>
     {/if}
 </div>
-<div class="mt-3 flex justify-center gap-2">
+<div class="mt-3 flex justify-start gap-2">
     {#if  !modoedicion}
         <div class="flex w-11/12">
             <button
@@ -228,23 +297,36 @@
         </div>
     {:else}
         <div class="grid grid-cols-2 gap-3">
-            <button 
-                onclick={cancelarEditar}
-                class="btn btn-error text-white font-medium text-lg "
-            >
-                Cancelar
-            </button>   
-            <button
-                onclick={editarAnimal}
-                class="
-                    btn text-lg px-6 py-2 bg-green-600 
-                    hover:bg-green-700 rounded-md text-white font-medium focus:outline-none 
-                    focus:ring-2 focus:ring-offset-2 focus:ring-green-500 
-                    
-                    "
+            <div>
+                <button
+                    aria-label="guardar"
+                    onclick={editarAnimal}
+                    class={`
+                        ${estilos.basico} ${estilos.chico} ${estilos.primario}
+                    `}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+                            <path d="M11 2H9v3h2z"/>
+                            <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+                        </svg>
+                </button>
+            </div>
+            <div>
+                <button 
+                    aria-label="cancelar"
+                    onclick={cancelarEditar}
+                    class={`
+                        ${estilos.basico} ${estilos.chico} ${estilos.danger}
+                    `}
                 >
-                Guadar
-            </button>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  
+                </button>   
+            </div>
+            
+            
         </div>
     {/if}
 </div>
@@ -289,18 +371,22 @@
     {:else}
         <div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-10 m-1  mb-2 lg:mx-10" >
-                <h3 class="text-xl mx-1 font-bold mb-6 text-left">
+                <h3 class="text-xl mx-1 font-bold mb-1 text-left">
                     No tiene un nacimiento registrado
                 </h3>
-                <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                    <span  class="text-xl">Crear nacimiento</span>
+                <button class={`w-11/12 ${estilos.basico} ${estilos.medio} ${estilos.primario}`} onclick={()=>openNewModal()}>
+                    <span class="text-lg">Crear nacimiento</span>
                 </button>
             </div>
             
         </div>
 {/if}
 <div class="flex justify-start p-0 m-0">
-    <button class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>Volver</button>
+    <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>          
+    </button>
 </div>
 
 <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">

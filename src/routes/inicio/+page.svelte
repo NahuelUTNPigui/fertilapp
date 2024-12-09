@@ -88,7 +88,7 @@
  
 </script>
 <Navbarr>
-
+    
     {#if cab.exist}
         <CardBase titulo="Bievenido a fertil" cardsize="max-w-5xl">
             <div class="space-y-6">

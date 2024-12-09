@@ -15,6 +15,8 @@
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
     import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
+    import Tratamientos from "$lib/components/animal/Tratamientos.svelte";
+    import Observaciones from "$lib/components/animal/Observaciones.svelte";
     
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -28,11 +30,11 @@
     let fechanacimiento = ""
     let sexo = ""
     let nacimiento = ""
+    let tropa = ""
     let peso = 0
     let pariciones = []
     let nacimientoobj = {}
     let tactos = []
-
     async function  getPariciones(id){
         const recordpariciones =  await pb.collection('nacimientos').getFullList({
             filter:`madre='${id}' || padre='${id}'`,
@@ -119,8 +121,10 @@
                 }
                 peso = recorda.peso
                 sexo = recorda.sexo
+                tropa = recorda.rodeo
                 //await getPariciones(slug)
                 //await getTactos(slug)
+                
             }
             catch(err){
                 console.log(err)
@@ -132,17 +136,23 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+        <DatosBasicos peso={peso} {tropa} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
-        <Pariciones cabid={cab.id}/>
+        <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
+    </CardAnimal>
+    <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
+        <Tratamientos cabid={cab.id}></Tratamientos>
+    </CardAnimal>
+    <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
+        <Observaciones cabid={cab.id} />
     </CardAnimal>
     {#if sexo=="H"}
     <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-        <Tactos />
+        <Tactos cabid={cab.id}  />
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
-        <Inseminaciones/>
+        <Inseminaciones cabid={cab.id} />
     </CardAnimal>
     {/if}
     <CardAnimal cardsize="max-w-7xl" titulo="Acciones">

@@ -299,7 +299,8 @@
                 modal-box w-11/12 max-w-xl
                 bg-gradient-to-br from-white to-gray-100 
                 dark:from-gray-900 dark:to-gray-800
-            ">
+            "
+        >
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
             </form>
@@ -350,7 +351,7 @@
                     <span class="label-text">Preñada</span>  
                     <br>
                     <input type="checkbox" class="toggle" bind:checked={prenada} />
-                  </div>
+                </div>
                 <label for = "fecha" class="label">
                     <span class="label-text text-base">Fecha </span>
                 </label>

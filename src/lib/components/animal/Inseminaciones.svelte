@@ -10,7 +10,7 @@
     async function getInseminaciones(){
         const records = await pb.collection('inseminacion').getFullList({
             sort: '-created ',
-            filter :`animal = '${id}'`,
+            filter :`animal = '${id}' && active=true`,
             
         });
         inseminaciones = records
@@ -20,7 +20,34 @@
         await getInseminaciones()
     })
 </script>
+<div class="w-full flex justify-items-start gap-2">
+    <div>
+        <button
+            aria-label="Expandir"
+            
+            class={`
+                ${estilos.basico} ${estilos.chico} ${estilos.primario}
+            `}
+        >
+            Expandir                
+        </button>
+    </div>
+    <div>
+        <button
+            aria-label="Nuevo"
+            
+            class={`
+                ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+            `}
+        >
+            + Nuevo
+        </button>
+    </div>
+</div>
 <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+    {#if inseminaciones.length == 0}
+        <p>No hay inseminaciones</p>
+    {:else}
     <table class="table table-lg w-full" >
         <thead>
             <tr>
@@ -39,4 +66,6 @@
             {/each}
         </tbody>
     </table>
+    {/if}
+    
 </div>

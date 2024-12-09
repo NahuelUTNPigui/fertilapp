@@ -59,6 +59,7 @@
             sort: '-created',
         });
         tipotratamientos = records
+        tipotratamientos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
     }
     async function guardar(){
         try{
@@ -74,7 +75,7 @@
             
             const  record = await pb.collection("tratamientos").create(data)
             
-            await getTratamienos()
+            await getTratamientos()
             Swal.fire("Éxito guardar","Se pudo guardar el tratamiento con exito","success")
         }
         catch(err){
@@ -129,28 +130,47 @@
     function openTiposModal(){
         tiposmodal.showModal()
     }
+    function openEditTipoModal(id){
+        idtipotratamiento = id
+        let tipotratamiento = tipotratamientos.filter(tp => tp.id == id)[0]
+        nombretipotratamiento = tipotratamiento.nombre
+        addtipo = true
+
+    }
+    function cerrarTipoModal(){
+        idtipotratamiento = ""
+        nombretipotratamiento = ""
+        addtipo = false
+    }
     function nuevoTipo(){
         idtipotratamiento = ""
         nombretipotratamiento = ""
         addtipo = true
     }
     async function guardarTipo(){
-        try{
-            let data = {
-                nombre:nombretipotratamiento,
-                active : true,
-                cab:cab.id
+        if(idtipotratamiento == ""){
+            try{
+                let data = {
+                    nombre:nombretipotratamiento,
+                    active : true,
+                    cab:cab.id
 
+                }
+                const  record = await pb.collection("tipotratamientos").create(data)
+                tipotratamientos.push(record)
+                tipotratamientos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
+                
+                cerrarTipoModal()
             }
-            const  record = await pb.collection("tipotratamientos").create(data)
-            tipotratamientos.push(record)
-            
-            Swal.fire("Éxito guardar","Se pudo guardar el tipo de tratamiento con exito","success")
+            catch(err){
+                console.error(err)
+                
+            }
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","Hubo un error para guardar el tratamiento","error")
+        else{
+            await editarTipo()
         }
+        
     }
     async function editarTipo(){
         try{
@@ -158,41 +178,33 @@
                 nombre:nombretipotratamiento,
             }
             const  record = await pb.collection("tipotratamientos").update(idtipotratamiento,data)
-            tipotratamientos.push(record)
+            let item = {...data,id:idtipotratamiento}
+            tipotratamientos = tipotratamientos.filter(tp => tp.id != idtipotratamiento)
+            tipotratamientos.push(item)
+            tipotratamientos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-11)
             
-            Swal.fire("Éxito editar","Se pudo editar el tipo de tratamiento con exito","success")
+            
+            cerrarTipoModal()
         }
         catch(err){
             console.error(err)
-            Swal.fire("Error editar","Hubo un error para editar el tratamiento","error")
+            
         }
     }
     async function eliminarTipo(id){
-        Swal.fire({
-            title: 'Eliminar tratamiento',
-            text: '¿Seguro que deseas eliminar el tratamiento?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'No'
-        }).then(async result=>{
-            if(result.value){
-                idtipotratamiento = id
-                try{
-                    let data = {
-                        active:false
-                    }
-                    const  record = await pb.collection("tipotratamientos").update(idtipotratamiento,data)
-                    tipotratamientos.push(record)
-                    
-                    Swal.fire("Éxito eliminar","Se pudo eliminar el tipo de tratamiento con exito","success")
-                }
-                catch(err){
-                    console.error(err)
-                    Swal.fire("Error eliminar","Hubo un error para eliminar el tratamiento","error")
-                }
+        idtipotratamiento = id
+        try{
+            let data = {
+                active:false
             }
-        })
+            const  record = await pb.collection("tipotratamientos").update(idtipotratamiento,data)
+            tipotratamientos = tipotratamientos.filter(tp => tp.id != idtipotratamiento)
+            tipotratamientos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-11)
+        }
+        catch(err){
+            console.error(err)
+        }
+        
     }
     function cerrarModal(){
         idtratamiento = ""
@@ -280,7 +292,7 @@
             </button>
         </div>
     </div>
-    <div class="hidden grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12 lg:w-1/2">
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openTiposModal()}>
                 <span  class="text-xl">Tipo tratamientos</span>
@@ -452,7 +464,7 @@
                         <span  class="text-xl">Nuevo tipo</span>
                     </button>
                     {#if addtipo}
-                    <div class="grid grid-cols-2">
+                    <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label for = "nombre" class="label">
                                 <span class="label-text text-base">Nombre</span>
@@ -473,13 +485,71 @@
                                 />
                             </label>
                         </div>
-                        <div>
-                            <button class="btn btn-secondary">Guardar</button>
-                            <button class="btn btn-secondary">Cerrar</button>
+                        
+                        <div class="flex flex-row gap-1 mt-10">
+                            
+                            <button
+                                aria-label="guardar"
+                                class={`
+                                    btn flex btn-primary ${estilos.btntext}
+                                `}
+                                onclick={guardarTipo}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+                                    <path d="M11 2H9v3h2z"/>
+                                    <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+                                </svg>
+                            </button>
+                            <button 
+                                aria-label="cerrar"
+                                class="
+                                    btn btn-error text-white
+                                "
+                                onclick={cerrarTipoModal}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                     
                     {/if}
+                    
+                        <table class="table table-lg w-full" >
+                            <thead>
+                                <tr>
+                                    <th class="text-base w-3/12"  >Nombre</th>
+                                    <th class="text-base w-3/12"  >Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each tipotratamientos as tp}
+                                    <tr>
+                                        <td class="text-base">
+                                            {tp.nombre}
+                                        </td>
+                                        <td class="flex gap-2">
+                                            <div class="tooltip" data-tip="Editar">
+                                                <button aria-label="Editar" onclick={()=>openEditTipoModal(tp.id)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div class="tooltip" data-tip="Eliminar">
+                                                <button aria-label="Eliminar" onclick={()=>eliminarTipo(tp.id)}>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                    </svg>                              
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/each}            
+                            </tbody>
+                        </table>
+                    
                 </div>
             </div>  
             

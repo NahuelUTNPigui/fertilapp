@@ -4,7 +4,7 @@
     export let titulo = ""
     export let cardsize = "max-w-5xl"
 </script>
-<div class="dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 p-2">
+<div class="bg-transparent p-2">
     <div class="flex items-center justify-center">
         <div 
             class={`
@@ -12,7 +12,7 @@
                 ${cardsize}
             `}
         >
-            <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">{titulo}</h1>
+            <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-3 text-start">{titulo}</h1>
             <slot/>
         </div>
     </div>
