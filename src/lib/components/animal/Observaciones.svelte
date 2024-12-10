@@ -155,7 +155,7 @@
 <dialog id="nuevaObservacion" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
     <div 
         class="
-            modal-box w-11/12 max-w-xl
+            modal-box w-11/12 max-w-5xl
             bg-gradient-to-br from-white to-gray-100 
             dark:from-gray-900 dark:to-gray-800
         "

@@ -164,7 +164,6 @@
                pp:pppc,
                tipo,
                nombreveterinario,
-               user:usuarioid,
                cab:cab.id,
                active:true
             }

@@ -92,7 +92,7 @@
         
     }
     function filterUpdateCabs(){
-        console.log(buscar)
+        
         cabanasrow = cabanas
         if(buscar != ""){
             cabanasrow = cabanasrow.filter(c=>c.nombre.startsWith(buscar))

@@ -41,7 +41,7 @@
         pppc = "PP"
         tipo = "tacto"
         nombreveterinario = ""
-        nuevoTacto.showModal()
+        nuevoTactoAnimal.showModal()
 
     }
     async function guardarTacto(){
@@ -55,7 +55,6 @@
                pp:pppc,
                tipo,
                nombreveterinario,
-               user:usuarioid,
                cab:cabid,
                active:true
             }
@@ -64,8 +63,9 @@
         }
         catch(err){
             console.error(err)
-            Swal.fire("Error guardar","No se pudo guardar el tacto","error")
+            
         }
+        nuevoTactoAnimal.close()
     }
     function getTipoNombre(tipo){
         return tipostacto.filter(t=>t.id==tipo)[0].nombre
@@ -114,7 +114,7 @@
         </button>
     </div>
 </div>
-<div class="w-full grid justify-items-center mx-1 lg:w-3/4 overflow-x-auto">
+<div class="w-full flex justify-items-center mx-1 lg:w-3/4 overflow-x-auto">
     {#if tactos.length == 0}
         <p class="mt-5 text-lg">No tiene tactos</p>
     {:else}
@@ -213,5 +213,143 @@
         </div>
     </div>
 </dialog>
-
+<dialog id="nuevoTactoAnimal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div 
+        class="
+            modal-box w-11/12 max-w-5xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Nueva observacion</h3>  
+        <div class="form-control">
+            <label for = "tipo" class="label">
+                <span class="label-text text-base">Categoria</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={categoria}
+                >
+                    {#each tiposanimal as t}
+                        <option value={t.id}>{t.nombre}</option>    
+                    {/each}
+                  </select>
+            </label>
+            <div class="form-group">
+                <br>
+                <span class="label-text">Preñada</span>  
+                <br>
+                <input type="checkbox" class="toggle" bind:checked={prenada} />
+            </div>
+            <label for = "fecha" class="label">
+                <span class="label-text text-base">Fecha </span>
+            </label>
+            <label class="input-group ">
+                <input id ="fecha" type="date" max={HOY}  
+                    class={`
+                        input input-bordered 
+                        w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={fecha}
+                />
+            </label>
+            <label for = "tipo" class="label">
+                <span class="label-text text-base">Tacto/Ecografia</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={tipo}
+                >
+                    {#each tipostacto as t}
+                        <option value={t.id}>{t.nombre}</option>    
+                    {/each}
+                  </select>
+            </label>
+            <label for = "tipo" class="label">
+                <span class="label-text text-base">PP/PC</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={pppc}
+                >
+                    {#each pp as p}
+                        <option value={p.id}>{p.nombre}</option>    
+                    {/each}
+                  </select>
+            </label>
+            <label for = "vete" class="label">
+                <span class="label-text text-base">Veterinario</span>
+            </label>
+            <label class="input-group">
+                <input 
+                    id ="vete" 
+                    type="text"  
+                    class={`
+                        input input-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={nombreveterinario}
+                />
+            </label>
+            <label for="obs" class="label">
+                <span class="label-text">Observacion</span>                    
+            </label>
+            <label for="input-group">
+                <input 
+                id ="observacion" 
+                type="text"  
+                class={`
+                    input 
+                    input-bordered 
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                    w-full
+                    ${estilos.bgdark2}
+                `}
+                bind:value={observacion}
+            />
+            </label>
+            
+        </div>
+        <div class="modal-action justify-start ">
+            <button class="btn btn-success text-white" onclick={guardarTacto} >Guardar</button>
+            <button class="btn btn-error text-white" onclick={()=>nuevoTactoAnimal.close()}>Cancelar</button>
+        </div>
+    </div>
+</dialog>
 

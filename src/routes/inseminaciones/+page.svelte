@@ -58,6 +58,7 @@
         pcpp = ""
         fechadesdeins = ""
         fechahastains = ""
+        pajuela = ""
         nuevoModal.showModal()
     }
     function cerrarModal(){
@@ -69,7 +70,9 @@
         pcpp = ""
         fechadesdeins = ""
         fechahastains = ""
+        pajuela = ""
         nuevoModal.close()
+        
     }
     function openEditModal(id){
         idins = id
