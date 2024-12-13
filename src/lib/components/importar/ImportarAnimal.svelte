@@ -17,12 +17,14 @@
             caravana:"AAA",
             peso:"0",
             sexo:"H/F",
-            rodeo:""
+            rodeo:"",
+            fecha:"2024-12-13"
         }].map(item=>({
             CARAVANA:item.caravana,
             PESO:item.peso,
             SEXO:item.sexo,
-            RODEO:item.rodeo
+            RODEO:item.rodeo,
+            FECHANACIMIENTO:item.fecha
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -68,6 +70,9 @@
                 if(firstLetter=="D"){
                     animaleshashmap[tail].rodeo = value.v
                 }
+                if(firstLetter=="E"){
+                    animaleshashmap[tail].fechanacimiento = value.v+" 03:00:00"
+                }
             }
             else{
                 animaleshashmap[tail]={
@@ -84,6 +89,9 @@
                 }
                 if(firstLetter=="D"){
                     animaleshashmap[tail].rodeo = value.v
+                }
+                if(firstLetter=="E"){
+                    animaleshashmap[tail].fechanacimiento = value.v+" 03:00:00"
                 }
             }
         }
