@@ -17,12 +17,20 @@
     let nombretropa = $state("")
     let nombrelote = $state("")
     let modoedicion = $state(false)
+    let modoedicionnacimiento = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
     let caravanavieja = $state("")
     let tropavieja = $state("")
     let loteviejo = $state("")
+    //Nacimiento
+    let fechaviejo = $state("")
+    let nombremadreviejo = $state("")
+    let nombrepadreviejo = $state("")
+    let padreviejo = $state("")
+    let madreviejo = $state("")
+    
     //Datos nacimiento
     let idnacimiento = $state("")
     let padre = $state("")
@@ -123,6 +131,9 @@
         fecha  = fechanacimiento
         nuevoModal.showModal()
     }
+    function openEditModal(){
+
+    }
     async function guardarNaciminento(){
         try{
             let dataparicion = {
@@ -209,6 +220,9 @@
         await getAnimales()
         await getTropas()
         await getLotes()
+        if(connacimiento){
+            console.log(nacimiento)
+        }
     })
     //cancelar class="btn btn-error text-white font-medium text-lg "
     //Editar animal class="btn text-lg px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
