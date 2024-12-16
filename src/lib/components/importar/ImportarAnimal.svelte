@@ -21,15 +21,13 @@
             peso:"0",
             sexo:"H/M",
             rodeo:"",
-            lote:"",
-            fecha:"2024-12-13"
+            lote:""
         }].map(item=>({
             CARAVANA:item.caravana,
             PESO:item.peso,
             SEXO:item.sexo,
             RODEO:item.rodeo,
-            LOTE:item.lote,
-            FECHANACIMIENTO:item.fecha
+            LOTE:item.lote
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -181,7 +179,7 @@
         `}
         onclick={exportarTemplate}
     >
-        Exportar modelo
+       Descargar Plantilla
     </button>
     <div class={`
         w-full
