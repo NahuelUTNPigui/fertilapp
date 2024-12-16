@@ -13,18 +13,18 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
-    let rodeos = $state([])
+    let lotes = $state([])
     function exportarTemplate(){
         let csvData = [{
             nombre:"",
         }].map(item=>({
-            NOMBRE_RODEO:item.nombre,
+            NOMBRE_LOTE:item.nombre,
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
-        XLSX.utils.book_append_sheet(wb, ws, 'Rodeos');
+        XLSX.utils.book_append_sheet(wb, ws, 'Lotes');
         
-        XLSX.writeFile(wb, 'Modelo rodeos.xlsx');
+        XLSX.writeFile(wb, 'Modelo lotes.xlsx');
     }
     function importarArchivo(event){
         let file = event.target.files[0];
@@ -44,67 +44,67 @@
             Swal.fire("Error","Seleccione un archivo","error")
         }
 
-        let sheetrodeos = wkbk.Sheets.Rodeos
-        console.log(wkbk.Sheets.Rodeos)
-        if(!sheetrodeos){
+        let sheetlotes = wkbk.Sheets.Lotes
+        console.log(wkbk.Sheets.Lotes)
+        if(!sheetlotes){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
         
-        let rodeos = []
-        let rodeoshashmap = {}
-        for (const [key, value ] of Object.entries(sheetrodeos)) {
+        let lotes = []
+        let loteshashmap = {}
+        for (const [key, value ] of Object.entries(sheetlotes)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
             if(key == "!ref" || key == "!margins" || tail == "1"){
                 continue
             }
-            if(rodeoshashmap[tail]){
+            if(loteshashmap[tail]){
                 if(firstLetter=="A"){
-                    rodeoshashmap[tail].nombre = value.v
+                    loteshashmap[tail].nombre = value.v
                 }
                 
             }
             else{
-                rodeoshashmap[tail]={
+                loteshashmap[tail]={
                     nombre:''
                 }
                 if(firstLetter=="A"){
-                    rodeoshashmap[tail].nombre = value.v
+                    loteshashmap[tail].nombre = value.v
                 }
                 
             }
         }
-        for (const [key, value ] of Object.entries(rodeoshashmap)) {
-            rodeos.push(value)
+        for (const [key, value ] of Object.entries(loteshashmap)) {
+            lotes.push(value)
         }
-        for(let i = 0;i<rodeos.length;i++){
-            let ro = rodeos[i]
+        for(let i = 0;i<lotes.length;i++){
+            let lo = lotes[i]
 
             let dataadd = {
-                nombre:ro.nombre,
+                nombre:lo.nombre,
                 active:true,
                 delete:false,
                 cab:cab.id
             }
 
             let datamod = {
-                nombre:ro.nombre 
+                nombre:lo.nombre 
             }
 
             try{
-                const record = await pb.collection('rodeos').getFirstListItem(`nombre="${ro.nombre}"`,{});
+                const record = await pb.collection('lotes').getFirstListItem(`nombre="${lo.nombre}"`,{});
                 console.log("mod")
-                await pb.collection('rodeos').update(record.id, datamod);               
+                await pb.collection('lotes').update(record.id, datamod);               
             }
             catch(err){
                 console.log("Add")
-                await pb.collection('rodeos').create(dataadd);
+                await pb.collection('lotes').create(dataadd);
 
             }
         }
     }
     onMount(async ()=>{
-        rodeos = await pb.collection('rodeos').getFullList({
+        lotes = await pb.collection('lotes').getFullList({
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
         })
@@ -128,11 +128,11 @@
             type="file"
             accept=".xlsx, .xls"  
             class="sr-only"
-            id="rodeos-upload"
+            id="lotes-upload"
             onchange={(e)=>importarArchivo(e)}
         />
         <label
-              for="rodeos-upload"
+              for="lotes-upload"
               class={`
                 w-full flex items-center justify-center px-4 py-4 
                 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-lg
