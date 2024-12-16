@@ -134,7 +134,6 @@
         for(let i = 0;i<animales.length;i++){
             let an = animales[i]
             let conlote = false
-            let contropa = false
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
             
