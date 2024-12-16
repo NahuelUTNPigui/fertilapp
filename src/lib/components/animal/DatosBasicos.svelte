@@ -7,21 +7,21 @@
     import { goto } from "$app/navigation";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
-    let {caravana,tropa,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
+    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
     let cab = caber.cab
     let id = $state("")
-    let nombretropa = $state("")
+    let nombrerodeo = $state("")
     let nombrelote = $state("")
     let modoedicion = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
     let caravanavieja = $state("")
-    let tropavieja = $state("")
+    let rodeovieja = $state("")
     let loteviejo = $state("")
     //Datos nacimiento
     let idnacimiento = $state("")
@@ -34,21 +34,21 @@
     let padres = $state([])
     
     let observacion = $state("") 
-    let tropas = $state([])
+    let rodeos = $state([])
     let lotes = $state([])
 
-    //Tropas
-    async function getTropas(){
+    //rodeos
+    async function getrodeos(){
         const records = await pb.collection('rodeos').getFullList({
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
         });
-        tropas = records
-        if(tropa != ""){
-            nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+        rodeos = records
+        if(rodeo != ""){
+            nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
         }
         else{
-            nombretropa = ""
+            nombrerodeo = ""
         }
     }
     //Lotes
@@ -96,7 +96,7 @@
         pesoviejo = peso
         sexoviejo = sexo
         loteviejo = lote
-        tropavieja = tropa
+        rodeovieja = rodeo
         caravanavieja = caravana
     }
     function cancelarEditar(){
@@ -104,13 +104,13 @@
         peso = pesoviejo
         sexo = sexoviejo
         caravana = caravanavieja
-        tropa = tropavieja
+        rodeo = rodeovieja
         lote = loteviejo
-        if(tropa != ""){
-            nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+        if(rodeo != ""){
+            nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
         }
         else{
-            nombretropa = ""
+            nombrerodeo = ""
         }
         if(lote != ""){
             nombrelote = lotes.filter(l=>l.id==lote)[0].nombre
@@ -163,7 +163,7 @@
             peso,
             sexo,
             caravana,
-            rodeo:tropa,
+            rodeo:rodeo,
             lote
         }
         try{
@@ -171,13 +171,13 @@
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana
-            tropa = data.rodeo
+            rodeo = data.rodeo
             lote = data.lote
-            if(tropa != ""){
-                nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
+            if(rodeo != ""){
+                nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
             }
             else{
-                nombretropa = ""
+                nombrerodeo = ""
             }
             if(lote != ""){
                 nombrelote = lotes.filter(l=>l.id==lote)[0].nombre
@@ -207,7 +207,7 @@
         id = $page.params.slug
         
         await getAnimales()
-        await getTropas()
+        await getRodeos()
         await getLotes()
     })
     //cancelar class="btn btn-error text-white font-medium text-lg "
@@ -270,8 +270,8 @@
     </div>
     <div class="mb-1 lg:mb-0">
         {#if modoedicion}
-        <label for = "tropa" class="label">
-            <span class="label-text text-base">Tropa</span>
+        <label for = "rodeo" class="label">
+            <span class="label-text text-base">Rodeo</span>
         </label>
         <label class="input-group ">
             <select 
@@ -281,20 +281,20 @@
                     focus:outline-none focus:ring-2 
                     focus:ring-green-500 focus:border-green-500
                     ${estilos.bgdark2}
-                `} bind:value={tropa}>
-                {#each tropas as t}
+                `} bind:value={rodeo}>
+                {#each rodeos as t}
                     <option value={t.id}>{t.nombre}</option>    
                 {/each}
             </select>
         </label>
         {:else}
-            <label for = "tropa" class="label">
-                <span class="label-text text-base">Tropa</span>
+            <label for = "rodeo" class="label">
+                <span class="label-text text-base">Rodeo</span>
             </label>
-            <label for="tropa" 
+            <label for="rodeo" 
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
             >
-                {nombretropa}
+                {nombrerodeo}
             </label>
         {/if}
     </div>
@@ -318,10 +318,10 @@
             </select>
         </label>
         {:else}
-            <label for = "tropa" class="label">
+            <label for = "lote" class="label">
                 <span class="label-text text-base">Lote</span>
             </label>
-            <label for="tropa" 
+            <label for="lote" 
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
             >
                 {nombrelote}
