@@ -211,7 +211,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18" />
               </svg>
               
-              <span class="px-3"> Tropas </span>
+              <span class="px-3"> Rodeos </span>
             </a>
           </li>
           <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("tratamientos")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>

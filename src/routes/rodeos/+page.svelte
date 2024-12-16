@@ -50,10 +50,10 @@
             rodeos.push(record)
             ordenar(rodeos)
             filterUpdate()
-            Swal.fire("Éxito guardar","Se pudo guardar la tropa","success")
+            Swal.fire("Éxito guardar","Se pudo guardar el rodeo","success")
         }catch(err){
             console.error(err)
-            Swal.fire("Error guardar","No se pudo guardar la tropa","error")
+            Swal.fire("Error guardar","No se pudo guardar el rodeo","error")
         }
     }
     function openEditModal(id){
@@ -74,11 +74,11 @@
             rodeos[idx]=record
             ordenar(rodeos)
             filterUpdate()
-            Swal.fire("Éxito editar","Se pudo editar la tropa","success")
+            Swal.fire("Éxito editar","Se pudo editar el rodeo","success")
         }
         catch(err){
             console.error(err)
-            Swal.fire("Error editar","No se pudo editar la tropa","error")
+            Swal.fire("Error editar","No se pudo editar el rodeo","error")
         }
         idrodeo = ""
         nombre = ""
@@ -86,8 +86,8 @@
     }
     async function eliminar(id){
         Swal.fire({
-            title: 'Eliminar tropa',
-            text: '¿Seguro que deseas eliminar la tropa?',
+            title: 'Eliminar rodeo',
+            text: '¿Seguro que deseas eliminar el rodeo?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si',
@@ -104,10 +104,10 @@
                     ordenar(rodeos)
                     filterUpdate()
                     //ver como hago para actualizar la lista
-                    Swal.fire('Tropa eliminada!', 'Se eliminó la tropa correctamente.', 'success');
+                    Swal.fire('Rodeo eliminado!', 'Se eliminó el rodeo correctamente.', 'success');
                 }
                 catch(e){
-                    Swal.fire('Acción cancelada', 'No se pudo eliminar la tropa', 'error');
+                    Swal.fire('Acción cancelada', 'No se pudo eliminar el rodeo', 'error');
                 }
                 idrodeo = ""
                 nombre = ""
@@ -133,7 +133,7 @@
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-start mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Tropa</h1>  
+        <h1 class="text-2xl">Rodeo</h1>  
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-1  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12 lg:w-1/2">
@@ -143,7 +143,7 @@
         </div>
         <div class="w-11/12 lg:w-1/2">
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nueva tropa</span>
+                <span  class="text-xl">Nuevo rodeo</span>
             </button>
         </div>
     </div>
@@ -191,9 +191,9 @@
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
             </form>
             {#if idrodeo == ""}
-                <h3 class="text-lg font-bold">Nuevo tropa</h3>  
+                <h3 class="text-lg font-bold">Nuevo rodeo</h3>  
             {:else}
-                <h3 class="text-lg font-bold">Ver tropa</h3>  
+                <h3 class="text-lg font-bold">Ver rodeo</h3>  
             {/if}
             <div class="form-control">
                 <label for = "nombre" class="label">
