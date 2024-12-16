@@ -45,6 +45,7 @@
         }
 
         let sheetrodeos = wkbk.Sheets.Rodeos
+        console.log(wkbk.Sheets.Rodeos)
         if(!sheetrodeos){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
@@ -59,16 +60,16 @@
             }
             if(rodeoshashmap[tail]){
                 if(firstLetter=="A"){
-                    rodeoshashmap[tail].rodeo = value.v
+                    rodeoshashmap[tail].nombre = value.v
                 }
                 
             }
             else{
                 rodeoshashmap[tail]={
-                    rodeo:''
+                    nombre:''
                 }
                 if(firstLetter=="A"){
-                    rodeoshashmap[tail].rodeo = value.v
+                    rodeoshashmap[tail].nombre = value.v
                 }
                 
             }
@@ -78,14 +79,16 @@
         }
         for(let i = 0;i<rodeos.length;i++){
             let ro = rodeos[i]
-            
 
             let dataadd = {
-                rodeo:ro.nombre
+                nombre:ro.nombre,
+                active:true,
+                delete:false,
+                cab:cab.id
             }
 
             let datamod = {
-                rodeo:ro.nombre     
+                nombre:ro.nombre 
             }
 
             try{
