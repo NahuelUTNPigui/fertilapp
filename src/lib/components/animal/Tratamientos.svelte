@@ -235,7 +235,7 @@
         <div class="modal-action justify-start ">
             <form method="dialog">
                 <button class="btn btn-success text-white" onclick={guardarTratamiento} >Guardar</button>
-                <button class="btn btn-error text-white" >Cancelar</button>
+                <button class="btn btn-error text-white">Cancelar</button>
             </form>
         </div>
     </div>

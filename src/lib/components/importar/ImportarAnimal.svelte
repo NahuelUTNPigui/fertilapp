@@ -4,6 +4,7 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
+    import { onMount } from "svelte";
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
@@ -12,18 +13,22 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
+    let lotes = $state([])
+    let rodeos = $state([])
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
             peso:"0",
-            sexo:"H/F",
+            sexo:"H/M",
             rodeo:"",
+            lote:"",
             fecha:"2024-12-13"
         }].map(item=>({
             CARAVANA:item.caravana,
             PESO:item.peso,
             SEXO:item.sexo,
             RODEO:item.rodeo,
+            LOTE:item.lote,
             FECHANACIMIENTO:item.fecha
         }))
         const wb = XLSX.utils.book_new();
@@ -46,8 +51,14 @@
         reader.readAsBinaryString(file);
     }
     async function procesarArchivo(){
+        if(filename == ""){
+            Swal.fire("Error","Seleccione un archivo","error")
+        }
+
         let sheetanimales = wkbk.Sheets.Animales
-        
+        if(!sheetanimales){
+            Swal.fire("Error","Debe subir un archivo válido","error")
+        }
         
         let animales = []
         let animaleshashmap = {}
@@ -71,12 +82,13 @@
                     animaleshashmap[tail].rodeo = value.v
                 }
                 if(firstLetter=="E"){
-                    animaleshashmap[tail].fechanacimiento = value.v+" 03:00:00"
+                    animaleshashmap[tail].lote = value.v
                 }
+                
             }
             else{
                 animaleshashmap[tail]={
-                    caravana:'',peso:'',sexo:'',rodeo:''
+                    caravana:'',peso:'',sexo:'',rodeo:'',lote:""
                 }
                 if(firstLetter=="A"){
                     animaleshashmap[tail].caravana = value.v
@@ -91,8 +103,9 @@
                     animaleshashmap[tail].rodeo = value.v
                 }
                 if(firstLetter=="E"){
-                    animaleshashmap[tail].fechanacimiento = value.v+" 03:00:00"
+                    animaleshashmap[tail].lote = value.v
                 }
+                
             }
         }
         for (const [key, value ] of Object.entries(animaleshashmap)) {
@@ -100,27 +113,65 @@
         }
         for(let i = 0;i<animales.length;i++){
             let an = animales[i]
+            let conlote = false
+            let contropa = false
+            let lote = lotes.filter(l=>l.nombre==an.lote)[0]
+            let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
+            
+
+            let dataadd = {
+                caravana:an.caravana,
+                active:true,
+                delete:false,
+                sexo:an.sexo,
+                peso:an.peso,
+                cab:cab.id
+            }
+
+            let datamod = {
+                caravana:an.caravana,
+                sexo:an.sexo,
+                peso:an.peso,
+                    
+            }
+            if(lote){
+                dataadd.lote = lote.id
+                datamod.lote = lote.id
+            }
+            if(rodeo){
+                dataadd.rodeo = rodeo.id
+                datamod.rodeo = rodeo.id
+            }
             try{
-                let data = {
-                    caravana:an.caravana,
-                    active:true,
-                    delete:false,
-                    sexo:an.sexo,
-                    peso:an.peso,
-                    cab:cab.id
-                }
-                let recorda = await pb.collection('animales').create(data); 
-                console.log("Todo bien")
+                
+                
+                const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,
+                {});
+                console.log("mod")
+                await pb.collection('animales').update(record.id, datamod);
+
+                
             }
             catch(err){
-                console.error(err)
-                Swal.fire("Error","No se pudo importar todos los animales","error")
+                console.log("Add")
+                await pb.collection('animales').create(dataadd);
+
             }
         }
         
         
     }
-    
+    onMount(async ()=>{
+        rodeos = await pb.collection('rodeos').getFullList({
+            filter:`active = true && cab ='${cab.id}'`,
+            sort: '-nombre',
+        });
+        
+        lotes = await pb.collection('lotes').getFullList({
+            filter:`active = true && cab ='${cab.id}'`,
+            sort: '-nombre',
+        });
+    })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
     <button

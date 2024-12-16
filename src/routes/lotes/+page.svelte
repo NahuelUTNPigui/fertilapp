@@ -26,7 +26,7 @@
         lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
     }
     async function getLotes(){
-        console.log(cab.id)
+        
         const records = await pb.collection('lotes').getFullList({
             filter:`active=True && cab='${cab.id}'`,
             sort: 'nombre',

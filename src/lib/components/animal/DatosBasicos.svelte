@@ -7,7 +7,7 @@
     import { goto } from "$app/navigation";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
-    let {caravana,tropa,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
+    let {caravana,tropa,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -15,12 +15,14 @@
     let cab = caber.cab
     let id = $state("")
     let nombretropa = $state("")
+    let nombrelote = $state("")
     let modoedicion = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
     let caravanavieja = $state("")
     let tropavieja = $state("")
+    let loteviejo = $state("")
     //Datos nacimiento
     let idnacimiento = $state("")
     let padre = $state("")
@@ -33,6 +35,7 @@
     
     let observacion = $state("") 
     let tropas = $state([])
+    let lotes = $state([])
 
     //Tropas
     async function getTropas(){
@@ -46,6 +49,20 @@
         }
         else{
             nombretropa = ""
+        }
+    }
+    //Lotes
+    async function getLotes(){
+        const records = await pb.collection('lotes').getFullList({
+            filter:`active = true && cab ='${cab.id}'`,
+            sort: '-nombre',
+        });
+        lotes = records
+        if(lote != ""){
+            nombrelote = lotes.filter(l=>l.id==lote)[0].nombre
+        }
+        else{
+            nombrelote = ""
         }
     }
     //Animales
@@ -78,6 +95,7 @@
         modoedicion = true
         pesoviejo = peso
         sexoviejo = sexo
+        loteviejo = lote
         tropavieja = tropa
         caravanavieja = caravana
     }
@@ -87,11 +105,18 @@
         sexo = sexoviejo
         caravana = caravanavieja
         tropa = tropavieja
+        lote = loteviejo
         if(tropa != ""){
             nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
         }
         else{
             nombretropa = ""
+        }
+        if(lote != ""){
+            nombrelote = lotes.filter(l=>l.id==lote)[0].nombre
+        }
+        else{
+            nombrelote = ""
         }
     }
     function openNewModal(){
@@ -138,25 +163,33 @@
             peso,
             sexo,
             caravana,
-            tropa
+            rodeo:tropa,
+            lote
         }
         try{
             const record = await pb.collection('animales').update(id, data);
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana
-            tropa = data.tropa
+            tropa = data.rodeo
+            lote = data.lote
             if(tropa != ""){
                 nombretropa = tropas.filter(t=>t.id==tropa)[0].nombre
             }
             else{
                 nombretropa = ""
             }
+            if(lote != ""){
+                nombrelote = lotes.filter(l=>l.id==lote)[0].nombre
+            }
+            else{
+                nombrelote = ""
+            }
             Swal.fire("Éxito editar","Se pudo editar el animal","success")
             modoedicion = false
 
         }catch(err){
-            console.log(err)
+            console.error(err)
             Swal.fire("Error editar","No se pudo editar el animal","error")
         }
     }
@@ -175,6 +208,7 @@
         
         await getAnimales()
         await getTropas()
+        await getLotes()
     })
     //cancelar class="btn btn-error text-white font-medium text-lg "
     //Editar animal class="btn text-lg px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -261,6 +295,36 @@
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
             >
                 {nombretropa}
+            </label>
+        {/if}
+    </div>
+    <div class="mb-1 lg:mb-0">
+        {#if modoedicion}
+        <label for = "lote" class="label">
+            <span class="label-text text-base">Lote</span>
+        </label>
+        <label class="input-group ">
+            <select 
+                class={`
+                    select select-bordered w-full
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 
+                    focus:ring-green-500 focus:border-green-500
+                    ${estilos.bgdark2}
+                `} bind:value={lote}>
+                {#each lotes as l}
+                    <option value={l.id}>{l.nombre}</option>    
+                {/each}
+            </select>
+        </label>
+        {:else}
+            <label for = "tropa" class="label">
+                <span class="label-text text-base">Lote</span>
+            </label>
+            <label for="tropa" 
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+            >
+                {nombrelote}
             </label>
         {/if}
     </div>

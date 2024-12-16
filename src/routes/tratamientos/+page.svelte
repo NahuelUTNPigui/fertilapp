@@ -554,7 +554,7 @@
             </div>  
             
             <div class="modal-action justify-start ">
-                <button class="btn btn-error text-white">Cerrar</button>
+                <button class="btn btn-error text-white" onclick={()=>tiposmodal.close()}>Cerrar</button>
             </div>
         </div>
 
