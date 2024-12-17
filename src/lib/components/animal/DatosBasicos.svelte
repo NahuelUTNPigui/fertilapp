@@ -79,8 +79,8 @@
             filter:`active=true && cab='${cab.id}'`,
             expand:"nacimiento"
         })
-        madres = recordsa.filter(a=>a.sexo == "H")
-        padres = recordsa.filter(a=>a.sexo == "M")
+        madres = recordsa.filter(a=>a.sexo == "H" && a.delete==false)
+        padres = recordsa.filter(a=>a.sexo == "M" && a.delete==false)
     }
     function getSexo(sex){
         let obj = sexos.filter(s => s.id == sex)[0]

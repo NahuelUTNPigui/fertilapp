@@ -34,6 +34,7 @@
     let lote = ""
     let peso = 0
     let pariciones = []
+    let fechafall = ""
     let nacimientoobj = {}
     let tactos = []
     async function  getPariciones(id){
@@ -64,7 +65,8 @@
         }
         catch(err){
             Swal.fire("Error dar de baja","No se pudo dar de baja al animal","error")
-            console.error(err)
+            
+
         }
         
         
@@ -81,7 +83,7 @@
         }
         catch(err){
             Swal.fire("Error eliminar","No se eliminar al animal","error")
-            console.error(err)
+            
         }
     }
     async function transferir(newcab){
@@ -98,7 +100,7 @@
             goto("/animales")
             Swal.fire("Éxito transferencia","Se pudo transferir al animal","success")
         }catch(err){
-            console.error(err)
+            
             Swal.fire("Error transferencia","No se pudo transferir al animal","error")
         }
         
@@ -124,12 +126,18 @@
                 sexo = recorda.sexo
                 rodeo = recorda.rodeo
                 lote = recorda.lote
+                if(recorda.fechafallecimiento != ""){
+                    fechafall = recorda.fechafallecimiento.split(" ")[0]
+                    
+                }
+                
                 //await getPariciones(slug)
                 //await getTactos(slug)
                 
             }
             catch(err){
-                console.log(err)
+                
+
                 Swal.fire('Error historial', 'No existe el animal', 'error');
             }
 
@@ -160,68 +168,10 @@
     <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
         <Acciones 
             caravana = {caravana}
+            fechafallecimiento  = {fechafall}
             bajar={async (fechafallecimiento)=>await darBaja(fechafallecimiento)}
             eliminar={eliminar}
             transferir={(newcab)=>transferir(newcab)}
         />
     </CardAnimal>
-    <!--
-    
-    
-    <CardAnimal cardsize="max-w-7xl" titulo="Detalles animal">
-        <div role="tablist" class="tabs tabs-bordered">
-            <input 
-                type="radio" 
-                name="my_tabs_1" 
-                role="tab" 
-                class="tab" 
-                aria-label="Datos"
-                checked="true"
-            />
-            <div role="tabpanel" class="tab-content p-0">
-                <DatosBasicos peso={peso} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
-            </div>
-          
-            <input
-                type="radio"
-                name="my_tabs_1"
-                role="tab"
-                class="tab text-md"
-                aria-label="Pariciones"
-            />
-            <div role="tabpanel" class="tab-content p-0">
-                
-                <Pariciones cabid={cab.id}/>
-            </div>
-          
-            <input 
-                type="radio"
-                name="my_tabs_1" 
-                role="tab" 
-                class="tab" 
-                aria-label="Tactos" 
-            />
-            <div role="tabpanel" class="tab-content p-0">
-                <Tactos />
-            </div>
-            <input 
-                type="radio"
-                name="my_tabs_1" 
-                role="tab" 
-                class="tab" 
-                aria-label="Acciones" 
-            />
-            <div role="tabpanel" class="tab-content p-0">
-                <Acciones 
-                    caravana = {caravana}
-                    bajar={async (fechafallecimiento)=>await darBaja(fechafallecimiento)}
-                    eliminar={eliminar}
-                    transferir={(newcab)=>transferir(newcab)}
-                />
-            </div>
-        </div>
-        
-    </CardAnimal>
-    -->
-
 </Navbarr>

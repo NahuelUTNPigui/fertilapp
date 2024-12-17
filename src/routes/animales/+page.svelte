@@ -25,11 +25,13 @@
     let animales = []   
     let animalesrows = $state([])
     let rodeos = $state([])
+    let fallecidos = [{id:"vivos",nombre:"Solo vivos"},{id:"todos",nombre:"Todos"}]
     let madres = $state([])
     let padres = $state([])
     let buscar = $state("")
     let rodeobuscar = $state("")
     let sexobuscar = $state("")
+    let fallecidobuscar = $state("vivos")
     
 
     //Datos animal
@@ -61,7 +63,7 @@
     }
     async function getRodeos(){
         const records = await pb.collection('rodeos').getFullList({
-            filter:`active = true && cab = ${cab.id}`,
+            filter:`active = true && cab = '${cab.id}'`,
             sort: 'nombre',
         });
         rodeos = records
@@ -71,7 +73,7 @@
         //Estaria joya que el animal venga con todos los chiches
         
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && delete=false && cab='${cab.id}'`,
+            filter:`delete=false && cab='${cab.id}'`,
             expand:"nacimiento"
         })
         
@@ -181,6 +183,9 @@
         if(rodeobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.rodeo == rodeobuscar)
         }
+        if(fallecidobuscar == "vivos"){
+            animalesrows = animalesrows.filter(a=>a.active == true)
+        }
     }
 
 
@@ -220,6 +225,7 @@
         usuarioid = pb_json.model.id
         await getAnimales()
         await getRodeos()
+        filterUpdate()
     })
     function cerrarModal(){
         idanimal=""
@@ -314,6 +320,29 @@
                   </select>
             </label>
         </div>
+        <div>
+            <label for = "rodeos" class="label">
+                <span class="label-text text-base">Fallecidos</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        rounded-md
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={fallecidobuscar}
+                    onchange={filterUpdate}
+                >
+                    {#each fallecidos as r}
+                        <option value={r.id}>{r.nombre}</option>    
+                    {/each}
+                  </select>
+            </label>
+        </div>
     </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12 lg:w-1/2">
@@ -334,7 +363,19 @@
                 {#each animalesrows as a}
                 <tr>
                     <td class="text-base">
-                        {`${a.caravana} (${a.sexo})`}
+                        <div class="flex gap-1">
+                            {`${a.caravana} (${a.sexo})`}
+                            {#if !a.active}
+                                <div class={`
+                                    bg-transparent rounded-lg
+                                    p-0 m-0  ${estilos.danger}
+                                `}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                                    </svg>
+                                </div>
+                            {/if}
+                        </div>
                     </td>
                     <td class="flex gap-2">
                         

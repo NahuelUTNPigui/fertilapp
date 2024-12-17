@@ -34,6 +34,10 @@
         lotes = records
         ordenar(lotes)
         lotesrows = lotes
+        for(let i = 0;i<lotes.length;i++){
+            let total = await getAnimalesTotal(lotes[i].id)
+            lotes[i].total = total
+        }
     }
     function openNewModal(){
         idlote = ""
@@ -47,7 +51,8 @@
                 active:true,
                 cab:cab.id
             }
-            const record = await pb.collection('lotes').create(data);
+            let record = await pb.collection('lotes').create(data);
+            record.total = 0
             lotes.push(record)
             ordenar(lotes)
             filterUpdate()
@@ -72,7 +77,9 @@
             }
             const record = await pb.collection('lotes').update(idlote, data);
             let idx = lotes.findIndex(r=>r.id==idlote)
+            let total = lotes[idx].total
             lotes[idx]=record
+            lotes[idx].total = total
             ordenar(lotes)
             filterUpdate()
             Swal.fire("Éxito editar","Se pudo editar el lote","success")
@@ -128,6 +135,12 @@
         nombre = ""
         nuevoModal.close()
     }
+    async function getAnimalesTotal(id){
+        const results = await pb.collection('animales').getList(1, 10, {
+            filter: `active = true && delete = false && lote='${id}'`,
+        });
+        return results.totalItems
+    }
     onMount(async ()=>{
         await getLotes()
     })
@@ -153,6 +166,7 @@
             <thead>
                 <tr>
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Nombre</th>
+                    <th class="text-base mx-1 px-1">Total</th>
                     <th class="text-base mx-1 px-1">Acciones</th>
                 </tr>
             </thead>
@@ -160,6 +174,7 @@
                 {#each lotesrows as r}
                     <tr>
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{r.nombre}</td>
+                        <td class="text-base mx-1 px-1">{r.total}</td>
                         <td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(r.id)}>

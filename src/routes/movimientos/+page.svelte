@@ -150,7 +150,10 @@
     }
     async function mover(){
         if(ninguno){
-            console.log("No hay ningun animal seleccionado")
+            Swal.fire("Error movimiento","No hay animales seleccionados","error")
+            nuevorodeo = ""
+            nuevolote = ""
+            nuevacategoria = ""
             return
         }
         let lista = []
@@ -158,22 +161,31 @@
             lista.push(key)
         }
         if(lista.length==0){
-            console.log("No hay ningun animal seleccionado")
+            Swal.fire("Error movimiento","No hay animales seleccionados","error")
+            nuevorodeo = ""
+            nuevolote = ""
+            nuevacategoria = ""
             return
         }
         try{
             let data = {}
+            let nombrelote = ""
+            let nombrerodeo = ""
             if(selectcategoria){
                 data.categoria = nuevacategoria
+                
             }
             if(selectlote){
                 data.lote = nuevolote
+                nombrelote = lotes.filter(l =>l.id==nuevolote)[0]
             }
             if(selectrodeo){
                 data.rodeo = nuevorodeo
+                nombrerodeo = rodeos.filter(r =>r.id==nuevorodeo)[0]
             }
             for(let i = 0;i<lista.length;i++){
                 await pb.collection('animales').update(lista[i], data);
+                
             }
             for(let i = 0;i<lista.length;i++){
                 selecthashmap[lista[i]] = null
@@ -181,10 +193,17 @@
             algunos = false
             todos = false
             ninguno = true
+            Swal.fire("Éxito movimiento","Movimiento exitoso","success")
+            await getAnimales()
+            filterUpdate()
         }
         catch(err){
             console.error(err)
+            Swal.fire("Error movimiento","Movimiento sin éxito","error")
         }
+        nuevorodeo = ""
+        nuevolote = ""
+        nuevacategoria = ""
 
     }
     onMount(async ()=>{
@@ -347,6 +366,7 @@
                     <th class="text-base mx-1 px-1">Categoria</th>
                     <th class="text-base mx-1 px-1">Rodeo</th>
                     <th class="text-base mx-1 px-1">Lote</th>
+                    <th class="text-base mx-1 px-1">Sexo</th>
                 </tr>
 
             </thead>
@@ -378,6 +398,7 @@
                         <td class="text-base mx-1 px-0">{a.categoria}</td>
                         <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
                         <td class="text-base mx-1 px-0">{a.expand?.lote?.nombre||''}</td>
+                        <td class="text-base mx-1 px-0">{a.sexo}</td>
                     </tr>
                 {/each}
             </tbody>

@@ -8,16 +8,17 @@
     import { onMount } from "svelte";
     
 
-    let {caravana,bajar,eliminar,transferir} = $props()
+    let {caravana,bajar,eliminar,transferir,fechafallecimiento} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let nombredel = $state("")
     let nombretrans = $state("")
-    let fechafallecimiento = $state("")
+    //let fechafallecimiento = $state("")
     let buscar = $state("")
     let cabanas = $state([])
     let cabanasrow = $state([])
     let id = $state("")
+    console.log(fechafallecimiento)
     function darBaja(){
         if(fechafallecimiento!=""){
             Swal.fire({

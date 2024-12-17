@@ -37,7 +37,7 @@
     
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cabid}'`,
+            filter:`delete=false && cab='${cabid}'`,
             expand:"nacimiento"
         })
         madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
@@ -99,6 +99,7 @@
         await getAnimales()
         if(sexoanimal == "F" || sexoanimal == "H"){
             let m = madres.filter(item=>item.id == id)[0]
+            
             nombremadre = m.caravana
             madre = id
         }

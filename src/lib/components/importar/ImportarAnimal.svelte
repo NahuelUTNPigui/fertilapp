@@ -146,6 +146,7 @@
                 const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,
                 {});
                 console.log("mod")
+
                 await pb.collection('animales').update(record.id, datamod);
 
                 
@@ -156,7 +157,9 @@
 
             }
         }
-        
+        filename = ""
+        wkbk = null
+        Swal.fire("Éxito importar","Se lograron importar los datos","success")
         
     }
     onMount(async ()=>{

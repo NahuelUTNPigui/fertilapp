@@ -102,6 +102,9 @@
 
             }
         }
+        filename = ""
+        wkbk = null
+        Swal.fire("Éxito importar","Se lograron importar los datos","success")
     }
     onMount(async ()=>{
         lotes = await pb.collection('lotes').getFullList({
