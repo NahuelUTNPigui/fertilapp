@@ -31,6 +31,9 @@ const config = {
 				"/observaciones",
 				"/tareas",
 				"/tratamientos",
+				"/importar",
+				"/lotes",
+				"/movimientos",
 				"/user/new"]
 		}
 	}
