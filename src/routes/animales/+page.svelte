@@ -25,6 +25,7 @@
     let animales = []   
     let animalesrows = $state([])
     let rodeos = $state([])
+    let lotes = $state([])
     let fallecidos = [{id:"vivos",nombre:"Solo vivos"},{id:"todos",nombre:"Todos"}]
     let madres = $state([])
     let padres = $state([])
@@ -44,6 +45,7 @@
     let conparicion = $state(false)
     let peso = $state("")
     let rodeo = $state("")
+    let lote = $state("")
     //Datos paricion
     let madre = $state("")
     let padre = $state("")
@@ -68,6 +70,14 @@
         });
         rodeos = records
         ordenarNombre(rodeos)
+    }
+    async function getLotes(){
+        const records = await pb.collection('lotes').getFullList({
+            filter:`active = true && cab = '${cab.id}'`,
+            sort: 'nombre',
+        });
+        lotes = records
+        ordenarNombre(lotes)
     }
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
@@ -115,6 +125,8 @@
         peso = animal.peso
         botonhabilitado = true
         nacimiento = animal.nacimiento
+        lote = animal.lote
+        rodeo = animal.rodeo
         nuevoModal.showModal()
     }
     //Se puede guardar un animal con su nacimiento
@@ -129,6 +141,7 @@
                     nombremadre,
                     nombrepadre,
                     observacion,
+                    
                     cab:cab.id
                 }
                 recordparicion = await pb.collection('nacimientos').create(dataparicion);
@@ -142,6 +155,8 @@
                 fechanacimiento:fechanacimiento +" 03:00:00",
                 sexo,
                 peso,
+                lote,
+                rodeo,
                 cab:cab.id
             }
             if(conparicion){
@@ -225,6 +240,7 @@
         usuarioid = pb_json.model.id
         await getAnimales()
         await getRodeos()
+        await getLotes()
         filterUpdate()
     })
     function cerrarModal(){
@@ -240,7 +256,10 @@
         padre = ""
         madre = ""
         animal = null
+
         observacion = ""
+        lote = ""
+        rodeo = ""
         nuevoModal.close()
         
     }
@@ -500,6 +519,23 @@
                         {/each}
                     </select>
                 </label>
+                <label for = "rodeo" class="label">
+                    <span class="label-text text-base">Lote</span>
+                </label>
+                <label class="input-group">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2}
+                        `} bind:value={lote}>
+                        {#each lotes as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
                 <label for = "fechanacimiento" class="label">
                     <span class="label-text text-base">Fecha nacimiento</span>
                 </label>
@@ -523,7 +559,7 @@
                 </div>
                 {#if idanimal=="" && conparicion}
                     <label for = "nombremadre" class="label">
-                        <span class="label-text text-base">Nombre madre</span>
+                        <span class="label-text text-base">Caravana madre</span>
                     </label>
                     <label class="input-group">
                         <input 
@@ -563,7 +599,7 @@
                           </select>
                     </label>
                     <label for = "nombrepadre" class="label">
-                        <span class="label-text text-base">Nombre padre</span>
+                        <span class="label-text text-base">Caravana padre</span>
                     </label>
                     <label class="input-group">
                         <input 
@@ -619,16 +655,7 @@
                             `}
                             bind:value={observacion}
                         />
-                        <!--
-                        <textarea style="line-height: 1.3;" 
-                            class={`
-                                textarea textarea-bordered h-24
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                            `} 
-                            bind:value={n.observacion} placeholder=""
-                        ></textarea>
-                        -->
+                        
                     </label>
                     
 

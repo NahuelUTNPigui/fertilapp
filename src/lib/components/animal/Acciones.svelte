@@ -18,7 +18,7 @@
     let cabanas = $state([])
     let cabanasrow = $state([])
     let id = $state("")
-    console.log(fechafallecimiento)
+    
     function darBaja(){
         if(fechafallecimiento!=""){
             Swal.fire({

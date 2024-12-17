@@ -449,7 +449,7 @@
                     />
                 </label>
                 <label for = "nombremadre" class="label">
-                    <span class="label-text text-base">Nombre madre</span>
+                    <span class="label-text text-base">Caravana madre</span>
                 </label>
                 <label class="input-group">
                     <input 
@@ -489,7 +489,7 @@
                       </select>
                 </label>
                 <label for = "nombrepadre" class="label">
-                    <span class="label-text text-base">Nombre padre</span>
+                    <span class="label-text text-base">Caravana padre</span>
                 </label>
                 <label class="input-group">
                     <input 
