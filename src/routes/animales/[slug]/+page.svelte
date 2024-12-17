@@ -30,7 +30,7 @@
     let fechanacimiento = ""
     let sexo = ""
     let nacimiento = ""
-    let tropa = ""
+    let rodeo = ""
     let lote = ""
     let peso = 0
     let pariciones = []
@@ -122,7 +122,7 @@
                 }
                 peso = recorda.peso
                 sexo = recorda.sexo
-                tropa = recorda.rodeo
+                rodeo = recorda.rodeo
                 lote = recorda.lote
                 //await getPariciones(slug)
                 //await getTactos(slug)
@@ -138,7 +138,7 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} {lote} {tropa} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+        <DatosBasicos peso={peso} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
         <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
