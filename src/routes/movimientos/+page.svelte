@@ -1,0 +1,504 @@
+<script>
+    import Navbarr from "$lib/components/Navbarr.svelte";
+    import PocketBase from 'pocketbase'
+    import Swal from 'sweetalert2';
+    import { onMount } from 'svelte';
+    import estilos from '$lib/stores/estilos';
+    import { createCaber } from '$lib/stores/cab.svelte';
+    import categorias from "$lib/stores/categorias";
+    import sexos from "$lib/stores/sexos";
+    let ruta = import.meta.env.VITE_RUTA
+    const pb = new PocketBase(ruta);
+    const HOY = new Date().toISOString().split("T")[0]
+    let caber = createCaber()
+    let cab = caber.cab
+
+    //Datos animales
+    let animales = $state([])
+    let animalesrows = $state([])
+    //Filtros
+    let buscar = $state("")
+    let lote = $state("")
+    let rodeo = $state("")
+    let categoria = $state("")
+    let sexo = $state("")
+
+    let lotes = $state([])
+    let rodeos = $state([])
+    
+    //Seleccionados
+    let selectanimales = $state([])
+    let selecthashmap = $state({})
+    let todos = $state(false)
+    let algunos = $state(false)
+    let ninguno = $state(true)
+    //movimiento
+    let nuevacategoria = $state(false)
+    let nuevolote = $state(false)
+    let nuevorodeo = $state(false)
+    let selectcategoria = $state(false)
+    let selectlote = $state(false)
+    let selectrodeo = $state(false)
+
+
+    function filterUpdate(){
+        let lista = []
+        for (const [key, value ] of Object.entries(selecthashmap)) {
+            lista.push(key)
+        }
+        for(let i = 0;i<lista.length;i++){
+            selecthashmap[lista[i]] = null
+        }
+        algunos = false
+        todos = false
+        ninguno = true
+        animalesrows = animales
+        if(buscar != ""){
+            animalesrows = animalesrows.filter(a=>a.caravana.startsWith(buscar))
+        }
+        if(sexo != ""){
+            animalesrows = animalesrows.filter(a=>a.sexo == sexo)
+        }
+        if(rodeo != ""){
+            animalesrows = animalesrows.filter(a=>a.rodeo == rodeo)
+        }
+        if(lote != ""){
+            animalesrows = animalesrows.filter(a=>a.lote == lote)
+        }
+        if(categoria != ""){
+            animalesrows = animalesrows.filter(a=>a.categoria == categoria)
+        }
+
+    }
+    
+    function ordenarNombre(lista){
+        lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
+    }
+    function clickAnimal(id){
+        if(selecthashmap[id]){
+            if(todos){
+                todos = false
+                algunos = true
+            }
+            selecthashmap[id] = null
+        }
+        else{
+            if(ninguno){
+                algunos = true
+                ninguno =  false
+            }
+            selecthashmap[id] = id
+        }
+    }
+    function clickTodos(){
+        if(todos){
+            todos = false
+            ninguno = true
+            for(let i = 0;i<animalesrows.length;i++){
+                selecthashmap[animalesrows[i].id] = null
+            }
+        }
+        if(ninguno){
+            ninguno = false
+            todos = true
+            for(let i = 0;i<animalesrows.length;i++){
+                selecthashmap[animalesrows[i].id] = animalesrows[i].id
+            }
+        }
+        if (algunos){
+            let lista = []
+            for (const [key, value ] of Object.entries(selecthashmap)) {
+                lista.push(key)
+            }
+            for(let i = 0;i<lista.length;i++){
+                selecthashmap[lista[i]] = null
+            }
+            algunos = false
+            todos = false
+            ninguno = true
+        }
+        
+    }
+    async function getLotes(){
+        const records = await pb.collection('lotes').getFullList({
+            filter:`active = true && cab ~ '${cab.id}'`,
+            sort: 'nombre',
+        });
+        lotes = records
+        ordenarNombre(lotes)
+    }
+    async function getRodeos(){
+        const records = await pb.collection('rodeos').getFullList({
+            filter:`active = true && cab ~ '${cab.id}'`,
+            sort: 'nombre',
+        });
+        rodeos = records
+        //ordenarNombre(rodeos)
+    }
+    async function getAnimales(){
+        const recordsa = await pb.collection("animales").getFullList({
+            filter:`active=true && delete=false && cab='${cab.id}'`,
+            expand:"rodeo,lote"
+        })
+        
+        animales = recordsa
+        animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+        animalesrows = animales
+    }
+    function openNewModal(){
+        nuevoModal.showModal()   
+    }
+    async function mover(){
+        if(ninguno){
+            console.log("No hay ningun animal seleccionado")
+            return
+        }
+        let lista = []
+        for (const [key, value ] of Object.entries(selecthashmap)) {
+            lista.push(key)
+        }
+        if(lista.length==0){
+            console.log("No hay ningun animal seleccionado")
+            return
+        }
+        try{
+            let data = {}
+            if(selectcategoria){
+                data.categoria = nuevacategoria
+            }
+            if(selectlote){
+                data.lote = nuevolote
+            }
+            if(selectrodeo){
+                data.rodeo = nuevorodeo
+            }
+            for(let i = 0;i<lista.length;i++){
+                await pb.collection('animales').update(lista[i], data);
+            }
+            for(let i = 0;i<lista.length;i++){
+                selecthashmap[lista[i]] = null
+            }
+            algunos = false
+            todos = false
+            ninguno = true
+        }
+        catch(err){
+            console.error(err)
+        }
+
+    }
+    onMount(async ()=>{
+        await getAnimales()
+        await getRodeos()
+        await getLotes()
+    })
+
+</script>
+<Navbarr>
+    <div class="w-full grid justify-items-start mx-1 lg:mx-10 mt-1">
+        <h1 class="text-2xl">Movimientos</h1>  
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div class="w-11/12">
+            <label class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}>
+                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
+            </label>
+        </div>
+        
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
+        <div>
+            <label for = "sexo" class="label">
+                <span class="label-text text-base">Sexo</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={sexo}
+                    onchange={filterUpdate}
+                >
+                        <option value="">Todos</option>
+                        {#each sexos as s}
+                            <option value={s.id}>{s.nombre}</option>
+                        {/each}
+                  </select>
+            </label>
+        </div>
+        <div>
+            <label for = "rodeos" class="label">
+                <span class="label-text text-base">Rodeos</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        rounded-md
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={rodeo}
+                    onchange={filterUpdate}
+                >
+                        <option value="">Todos</option>
+                        {#each rodeos as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                  </select>
+            </label>
+        </div>
+        <div>
+            <label for = "rodeos" class="label">
+                <span class="label-text text-base">Lotes</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        rounded-md
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={lote}
+                    onchange={filterUpdate}
+                >
+                        <option value="">Todos</option>
+                        {#each lotes as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                  </select>
+            </label>
+        </div>
+        <div>
+            <label for = "rodeos" class="label">
+                <span class="label-text text-base">Categorias</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        rounded-md
+                        focus:outline-none 
+                        focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={categoria}
+                    onchange={filterUpdate}
+                >
+                        <option value="">Todos</option>
+                        {#each categorias as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                  </select>
+            </label>
+        </div>
+        
+    
+    </div>
+    <div  class="w-full grid grid-cols-1 lg:grid-cols-4 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10">
+        <button class={`w-11/12 btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+            <span  class="text-xl">Nuevo movimiento</span>
+        </button>
+    </div>
+    <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-5/6 overflow-x-auto" >
+        <table class="table table-lg w-full " >
+            <thead>
+                <tr>
+                    <th class="px-1 p-0 m-0">
+                        <button    
+                            aria-label="Todos"
+                            onclick={clickTodos}
+                            class={`
+                                text-base bg-transparent rounded-lg
+                                px-3 py-3 text-base
+                                ${estilos.secundario}
+                            `}
+                        >
+                            {#if todos}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            {/if}
+                            {#if ninguno}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            {/if}
+                            {#if algunos}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>      
+                            {/if}                        
+                          
+                        </button>
+                    </th>
+                    <th class="text-base mx-1 px-1 ">Caravana</th>
+                    <th class="text-base mx-1 px-1">Categoria</th>
+                    <th class="text-base mx-1 px-1">Rodeo</th>
+                    <th class="text-base mx-1 px-1">Lote</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                {#each animalesrows as a}
+                    <tr>
+                        <td class="px-1 p-0 m-0">
+                            <button
+                                aria-label="fila"
+                                onclick={()=>clickAnimal(a.id)}
+                                class={`
+                                    font-medium bg-transparent rounded-lg
+                                    px-3 py-3 text-base
+                                    ${selecthashmap[a.id]?estilos.danger:estilos.primario}
+                                `}
+                            >
+                                {#if selecthashmap[a.id]}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>                                  
+                                {:else}             
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                {/if}
+                            </button>
+                        </td>
+                        <td class="text-base mx-1 px-0">{a.caravana}</td>
+                        <td class="text-base mx-1 px-0">{a.categoria}</td>
+                        <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
+                        <td class="text-base mx-1 px-0">{a.expand?.lote?.nombre||''}</td>
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
+    <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+        <div 
+            class="
+                modal-box w-11/12 max-w-xl
+                bg-gradient-to-br from-white to-gray-100 
+                dark:from-gray-900 dark:to-gray-800
+                "
+        >
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            </form>
+            <h3 class="text-lg font-bold">Movimiento</h3>
+            <div class="form-control gap-1">
+                <div class="collapse">
+                    
+                    <input type="radio" name="my-accordion-1" checked="checked" />
+                    <div class="collapse-title text-xl font-medium">Cambiar categoria</div>
+                    <div class="collapse-content">
+                        <label for = "rodeos" class="label">
+                            <span class="label-text text-base">Seleccione nueva categoria</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 
+                                    focus:ring-green-500 focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `} 
+                                bind:value={nuevacategoria}
+                                onchange={()=>{
+                                    selectcategoria= true
+                                    selectlote= false
+                                    selectrodeo= false
+                                }}
+                            >    
+                                {#each categorias as r}
+                                    <option value={r.id}>{r.nombre}</option>    
+                                {/each}
+                              </select>
+                        </label>
+                    </div>
+                  </div>
+                  <div class="collapse">
+                    <input type="radio" name="my-accordion-1" />
+                    <div class="collapse-title text-xl font-medium">Cambiar lote</div>
+                    <div class="collapse-content">
+                        <label for = "rodeos" class="label">
+                            <span class="label-text text-base">Seleccione nuevo lote</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 
+                                    focus:ring-green-500 focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `} 
+                                bind:value={nuevolote}
+                                onchange={()=>{
+                                    selectcategoria= false
+                                    selectlote= true
+                                    selectrodeo= false
+                                }}
+                            >
+                                {#each lotes as r}
+                                    <option value={r.id}>{r.nombre}</option>    
+                                {/each}
+                            </select>
+                        </label>
+                    </div>
+                  </div>
+                  <div class="collapse">
+                    <input type="radio" name="my-accordion-1" />
+                    <div class="collapse-title text-xl font-medium">Cambiar rodeo</div>
+                    <div class="collapse-content">
+                        <label for = "rodeos" class="label">
+                            <span class="label-text text-base">Rodeos</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 
+                                    focus:ring-green-500 focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `} 
+                                bind:value={nuevorodeo}
+                                onchange={()=>{
+                                    selectcategoria= false
+                                    selectlote = false
+                                    selectrodeo = true
+                                }}
+                            >
+                                    
+                                    {#each rodeos as r}
+                                        <option value={r.id}>{r.nombre}</option>    
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                  </div>
+            </div>
+            <div class="modal-action justify-start ">
+                <form method="dialog" >
+                    <button class="btn btn-success text-white" onclick={mover} >Mover</button>
+                    <button class="btn btn-error text-white" >Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+    </dialog>
+</Navbarr>

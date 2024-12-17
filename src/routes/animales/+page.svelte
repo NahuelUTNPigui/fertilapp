@@ -61,6 +61,7 @@
     }
     async function getRodeos(){
         const records = await pb.collection('rodeos').getFullList({
+            filter:`active = true && cab = ${cab.id}`,
             sort: 'nombre',
         });
         rodeos = records

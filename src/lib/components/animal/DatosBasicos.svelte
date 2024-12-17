@@ -17,7 +17,6 @@
     let nombretropa = $state("")
     let nombrelote = $state("")
     let modoedicion = $state(false)
-    let modoedicionnacimiento = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
@@ -30,6 +29,7 @@
     let nombrepadreviejo = $state("")
     let padreviejo = $state("")
     let madreviejo = $state("")
+    let observacionviejo = $state("")
     
     //Datos nacimiento
     let idnacimiento = $state("")
@@ -132,7 +132,13 @@
         nuevoModal.showModal()
     }
     function openEditModal(){
-
+        fechaviejo =  fecha
+        nombremadreviejo = nombremadre
+        nombrepadreviejo = nombrepadre
+        madreviejo = madre
+        padreviejo = padre
+        observacionviejo = observacion
+        nuevoModal.showModal()
     }
     async function guardarNaciminento(){
         try{
@@ -149,7 +155,6 @@
             let datanimal = {
                 nacimiento:recordparicion.id,
                 fechanacimiento:fecha + " 03:00:00",
-
             }
             const record = await pb.collection('animales').update(id, datanimal);
             Swal.fire("Éxito guardar","Se pudo guardar el nacimiento","success")
@@ -159,6 +164,23 @@
         catch(err){
             console.error(err)
             Swal.fire("Error guardar","No se pudo guardar el nacimiento","error")
+        }
+    }
+    async function editarNacimiento(){
+        let data = {
+            madre,
+            padre,
+            fecha:fecha + " 03:00:00",
+            nombremadre,
+            nombrepadre,
+            observacion,
+        }
+        try{
+            const recordparicion = await pb.collection('nacimientos').update(idnacimiento,data);
+            
+        }
+        catch(err){
+            console.error(err)
         }
     }
     function getNombreMadre(){
@@ -211,7 +233,15 @@
         madre = ""
         padre = ""
         observacion = ""
-        
+        if (connacimiento){
+            fecha =  fechaviejo
+            nombremadre = nombremadreviejo
+            nombrepadre = nombrepadreviejo
+            madre = madreviejo
+            padre = padreviejo
+            observacion = observacionviejo
+            
+        }
         nuevoModal.close()
     }
     onMount(async ()=>{
@@ -221,16 +251,40 @@
         await getTropas()
         await getLotes()
         if(connacimiento){
-            console.log(nacimiento)
+            idnacimiento = nacimiento.id
+            fecha = nacimiento.fecha.split(" ")[0]
+            nombremadre = nacimiento.nombremadre
+            nombrepadre = nacimiento.nombrepadre
+            padre = nacimiento.padre
+            madre = nacimiento.madre
+            observacion = nacimiento.observacion
         }
     })
     //cancelar class="btn btn-error text-white font-medium text-lg "
     //Editar animal class="btn text-lg px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
 </script>
+<div class="grid grid-cols-2 lg:grid-cols-3">
+    <h2 class="text-2xl mx-1 font-bold mb-2 text-left mt-2">
+        Caravana: {caravana}
+    </h2>
+    <div class="flex w-11/12">
+        <button
+            onclick={openEditar}
+            class={`
+                ${estilos.basico} ${estilos.chico}
+                ${estilos.btnsecondary}
+                ${modoedicion?"hidden":""}
+                `}
+                aria-label="Editar"
+        >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+          </svg>
+          
+        </button>    
+    </div>
+</div>
 
-<h2 class="text-2xl mx-1 font-bold mb-2 text-left mt-2">
-    Caravana: {caravana}
-</h2>
 <div class="grid grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
     <div class="mb-1 lg:mb-0">
         <label for = "peso" class="label">
@@ -357,23 +411,7 @@
     {/if}
 </div>
 <div class="mt-3 flex justify-start gap-2 ">
-    {#if  !modoedicion}
-        <div class="flex w-11/12">
-            <button
-                onclick={openEditar}
-                class={`
-                    ${estilos.basico} ${estilos.chico}
-                    ${estilos.btnsecondary}
-                    `}
-                    aria-label="Editar"
-            >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-              
-            </button>    
-        </div>
-    {:else}
+    {#if modoedicion}
         <div class="grid grid-cols-2 gap-3">
             <div>
                 <button
@@ -409,9 +447,28 @@
     {/if}
 </div>
 {#if connacimiento}
-    <h3 class="text-xl font-bold mt-1 mb-1 text-left">
-        Nacimiento
-    </h3>
+    <div class="grid grid-cols-2 lg:grid-cols-3">
+        <h3 class="text-2xl font-bold mt-2 mb-1 text-left">
+            Nacimiento
+        </h3>
+        <div class="flex w-11/12">
+            <button
+                onclick={openEditModal}
+                class={`
+                    ${estilos.basico} ${estilos.chico}
+                    ${estilos.btnsecondary}
+                    
+                    `}
+                    aria-label="Editar"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                </svg>
+              
+            </button>    
+        </div>
+    </div>
+    
     <div class="grid grid-cols-1 lg:grid-cols-1 gap-1 lg:gap-6 mb-2">
         <div>
             <label for = "fechanacimiento" class="label">
@@ -420,7 +477,7 @@
             <label for="fechanacimiento" 
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
             >
-                {getFechaNacimiento(nacimiento)}
+                {new Date(fecha+" 03:00:00").toLocaleDateString()}
             </label>
         </div>
     </div>
@@ -432,7 +489,7 @@
             <label for="nombremadre" 
                 class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
             >
-                {nacimiento.nombremadre}
+                {nombremadre}
             </label>
         </div>
         <div>
@@ -442,22 +499,26 @@
             <label for="nombrepadre" 
                 class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
             >
-                {nacimiento.nombrepadre}
+                {nombrepadre}
             </label>
         </div>
     </div>
-    {:else}
-        <div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-10 m-1  mb-2 lg:mt-2 lg:mx-10" >
-                <h3 class="text-xl mx-1 font-bold mb-1 text-left">
-                    No tiene un nacimiento registrado
-                </h3>
-                <button class={`w-11/12 ${estilos.basico} ${estilos.medio} ${estilos.primario}`} onclick={()=>openNewModal()}>
-                    <span class="text-lg">Crear nacimiento</span>
-                </button>
-            </div>
+    
+    
+{:else}
+    <div>
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-2 lg:gap-10 m-1  mb-2 lg:mt-2" >
+            <h3 class="text-xl mx-1 font-bold mb-1 text-left">
+                No tiene un nacimiento registrado
+            </h3>
+            <button class={`w-11/12  ${estilos.basico} ${estilos.medio} ${estilos.primario}`} onclick={()=>openNewModal()}>
+                <span class="text-lg">Crear nacimiento</span>
+            </button>
+            
             
         </div>
+        
+    </div>
 {/if}
 <div class="flex justify-start p-0 m-0">
     <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>
@@ -478,7 +539,11 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
-        <h3 class="text-lg font-bold">Nuevo nacimiento</h3>  
+        {#if connacimiento}
+            <h3 class="text-lg font-bold">Editar nacimiento</h3>
+        {:else}
+            <h3 class="text-lg font-bold">Nuevo nacimiento</h3>
+        {/if}
         <div class="form-control">    
             <label for = "fechanacimiento" class="label">
                 <span class="label-text text-base">Fecha nacimiento</span>
@@ -607,8 +672,13 @@
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
-              <!-- if there is a button, it will close the modal -->
-              <button class="btn btn-success text-white" onclick={guardarNaciminento} >Guardar</button>
+                <!-- if there is a button, it will close the modal -->
+                {#if connacimiento}
+                    <button class="btn btn-success text-white" onclick={editarNacimiento} >Editar</button>
+                {:else}
+                    <button class="btn btn-success text-white" onclick={guardarNaciminento} >Guardar</button>
+                {/if}
+              
               <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
             </form>
         </div>
