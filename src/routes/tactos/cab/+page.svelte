@@ -36,7 +36,6 @@
     //Tipo animal
     let categoria = $state("vaca")
     let prenada = $state(false)
-    let pppc = $state("PP")
     //tipo tacto
     let tipo = $state("tacto")
     let nombreveterinario = $state("")
@@ -59,7 +58,7 @@
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}' && sexo='H' || sexo ='F'`,
+            filter:`active=true && cab='${cab.id}' && sexo='H'`,
             expand:"nacimiento"
         })
         animales = recordsa
@@ -73,7 +72,6 @@
         animal = ""
         categoria = "vaca"
         prenada = false
-        pppc = "PP"
         tipo = "tacto"
         nombreveterinario = ""
         nuevoModal.showModal()
@@ -86,7 +84,6 @@
         animal = tacto.animal
         categoria = tacto.categoria
         prenada = tacto.prenada
-        pppc = tacto.pp
         tipo = tacto.tipo
         nombreveterinario = tacto.nombreveterinario
         nuevoModal.showModal()
@@ -127,7 +124,6 @@
         animal = ""
         categoria = "vaca"
         prenada = false
-        pppc = "PP"
         tipo = "tacto"
         nombreveterinario = ""
         nuevoModal.close()
@@ -161,7 +157,6 @@
                animal,
                categoria,
                prenada,
-               pp:pppc,
                tipo,
                nombreveterinario,
                cab:cab.id,
@@ -185,7 +180,6 @@
                animal,
                categoria,
                prenada,
-               pp:pppc,
                tipo,
                nombreveterinario
             }
@@ -385,26 +379,6 @@
                     >
                         {#each tipostacto as t}
                             <option value={t.id}>{t.nombre}</option>    
-                        {/each}
-                      </select>
-                </label>
-                <label for = "tipo" class="label">
-                    <span class="label-text text-base">PP/PC</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={pppc}
-                    >
-                        {#each pp as p}
-                            <option value={p.id}>{p.nombre}</option>    
                         {/each}
                       </select>
                 </label>

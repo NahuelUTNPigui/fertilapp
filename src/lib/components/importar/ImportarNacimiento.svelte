@@ -231,7 +231,7 @@
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
         });
-        animales = await pb.collections('animales').getFullList({
+        animales = await pb.collection('animales').getFullList({
             filter:`delete = false && cab ='${cab.id}'`,
         })
     })

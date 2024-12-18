@@ -6,6 +6,7 @@
     import ImportarLotes from '$lib/components/importar/ImportarLotes.svelte';
     import ImportarNacimiento from '$lib/components/importar/ImportarNacimiento.svelte';
     import ImportarRodeos from '$lib/components/importar/ImportarRodeos.svelte';
+    import ImportarTactos from '$lib/components/importar/ImportarTactos.svelte';
     
 </script>
 <Navbarr>
@@ -20,5 +21,8 @@
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar lotes">
         <ImportarLotes/>
+    </CardImportar>
+    <CardImportar cardsize="max-w-2xl" titulo="Importar tactos">
+        <ImportarTactos/>
     </CardImportar>
 </Navbarr>
