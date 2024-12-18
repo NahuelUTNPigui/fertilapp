@@ -55,7 +55,7 @@
     }       
     async function getTiposTratamientos(){
         const records = await pb.collection('tipotratamientos').getFullList({
-            filter : `cab='${cab.id}' && active = true`,
+            filter : `(cab='${cab.id}' || generico = true) && active = true`,
             sort: '-created',
         });
         tipotratamientos = records
