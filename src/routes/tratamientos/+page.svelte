@@ -52,7 +52,7 @@
         });
         tratamientos = records
         tratamientosrow = records
-    }
+    }       
     async function getTiposTratamientos(){
         const records = await pb.collection('tipotratamientos').getFullList({
             filter : `cab='${cab.id}' && active = true`,

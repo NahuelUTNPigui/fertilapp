@@ -300,7 +300,7 @@
         </label>
         {#if modoedicion}
             <label class="input-group">
-                <input id ="peso" type="text"  
+                <input id ="peso" type="number"  
                     class={`input input-bordered w-full ${estilos.bgdark2}`}
                     bind:value={peso}
                 />

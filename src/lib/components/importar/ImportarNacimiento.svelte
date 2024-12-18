@@ -15,6 +15,8 @@
     let wkbk = $state(null)
     let lotes = $state([])
     let rodeos = $state([])
+    let animales = $state([])
+
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -22,18 +24,20 @@
             sexo:"H/M",
             rodeo:"",
             lote:"",
-            fecha_nac:"",
-            caravanaMadre:"",
-            caravanaPadre:"",
+            fechanacimiento:"AAAA-MM-DD",
+            nombremadre:"",
+            nombrepadre:"",
+            observaciones:""
         }].map(item=>({
             CARAVANA: item.caravana,
             PESO: item.peso,
             SEXO: item.sexo,
             RODEO: item.rodeo,
             LOTE: item.lote,
-            FECHA_NACIMIENTO: item.fecha_nac,
-            CARAVANA_MADRE: item.caravanaMadre,
-            CARAVANA_PADRE: item.caravanaPadre,
+            fechanacimientoIMIENTO: item.fechanacimiento,
+            CARAVANA_MADRE: item.nombremadre,
+            CARAVANA_PADRE: item.nombrepadre,
+            OBSERVACIONES:item.observaciones
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -89,18 +93,21 @@
                     animaleshashmap[tail].lote = value.v
                 }
                 if(firstLetter=="F"){
-                    animaleshashmap[tail].fecha_nac = value.v
+                    animaleshashmap[tail].fechanacimiento = new Date(value.w).toISOString().split("T")[0]
                 }
                 if(firstLetter=="G"){
-                    animaleshashmap[tail].caravanaMadre = value.v
+                    animaleshashmap[tail].nombremadre = value.v
                 }
                 if(firstLetter=="H"){
-                    animaleshashmap[tail].caravanaPadre = value.v
+                    animaleshashmap[tail].nombrepadre = value.v
+                }
+                if(firstLetter=="I"){
+                    animaleshashmap[tail].observaciones = value.v
                 }
             }
             else{
                 animaleshashmap[tail]={
-                    caravana:'',peso:'',sexo:'',rodeo:'',lote:"",fecha_nac:"",caravanaMadre:"",caravanaPadre:""
+                    caravana:'',peso:'',sexo:'',rodeo:'',lote:"",fechanacimiento:"",nombremadre:"",nombrepadre:"",observaciones:""
                 }
                 if(firstLetter=="A"){
                     animaleshashmap[tail].caravana = value.v
@@ -118,14 +125,17 @@
                     animaleshashmap[tail].lote = value.v
                 }
                 if(firstLetter=="F"){
-                    animaleshashmap[tail].fecha_nac = value.v
+                    animaleshashmap[tail].fechanacimiento = new Date(value.w).toISOString().split("T")[0]
                 }
                 if(firstLetter=="G"){
-                    animaleshashmap[tail].caravanaMadre = value.v
+                    animaleshashmap[tail].nombremadre = value.v
                 }
                 if(firstLetter=="H"){
-                    animaleshashmap[tail].caravanaPadre = value.v
-                }            
+                    animaleshashmap[tail].nombrepadre = value.v
+                }
+                if(firstLetter=="I"){
+                    animaleshashmap[tail].observaciones = value.v
+                }          
             }
         }
         for (const [key, value ] of Object.entries(animaleshashmap)) {
@@ -137,43 +147,73 @@
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
             
-
+            // Agregar animal si no existe y nacimientoi
             let dataadd = {
                 caravana:an.caravana,
                 active:true,
                 delete:false,
                 sexo:an.sexo,
                 peso:an.peso,
-                fecha_nac:an.fecha_nac,
-                caravanaMadre: an.caravanaMadre,
-                caravanaPadre: an.caravanaPadre,
+                fechanacimiento: an.fechanacimiento+ " 03:00:00",
+                nombremadre: an.nombremadre,
+                nombrepadre: an.nombrepadre,
                 cab:cab.id
             }
-
-            let datamod = {
-                caravana:an.caravana,
-                sexo:an.sexo,
-                peso:an.peso,
-                    
+            //Modificar nacimiento cuando existe
+            let datanacimiento = {
+                fecha:an.fechanacimiento + " 03:00:00",
+                nombremadre: an.nombremadre,
+                nombrepadre: an.nombrepadre,
+                observacion:an.observaciones,
+                cab:cab.id
             }
+            
             if(lote){
                 dataadd.lote = lote.id
-                datamod.lote = lote.id
             }
             if(rodeo){
                 dataadd.rodeo = rodeo.id
-                datamod.rodeo = rodeo.id
             }
+            let padre = animales.filter(a=>a.caravana == an.nombrepadre)[0]
+            let madre = animales.filter(a=>a.caravana == an.nombremadre)[0]
+            if(padre){
+                datanacimiento.padre=padre.id
+            }
+            if(madre){
+                datanacimiento.madre = madre.id
+            }
+            
             try{
-                const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,
-                {});
-                console.log("mod")
-                await pb.collection('animales').update(record.id, datamod);
+                
+                const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,{});
+                if(record.nacimiento != ""){
+                    try{
+                        await pb.collection('nacimientos').update(record.nacimiento,datanacimiento)
+                    }
+                    catch(err){
+                        console.error(err)
+                    }
+                    
+                }
+                else{
+                    try{
+                        
+                        const recordnacimiento = await pb.collection('nacimientos').create(datanacimiento)
+                        await pb.collection('animales').update(record.id,{
+                            fechanacimiento: an.fechanacimiento+ " 03:00:00",
+                            nacimiento : recordnacimiento.id
+                        })
+                    }
+                    catch(err){
+                        console.error(err)
+                    }
+                    
+                }
             }
             catch(err){
-                console.log("Add")
+                const recordnacimiento = await pb.collection('nacimientos').create( datanacimiento);
+                dataadd.nacimiento = recordnacimiento.id
                 await pb.collection('animales').create(dataadd);
-
             }
         }
         filename = ""
@@ -191,6 +231,9 @@
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
         });
+        animales = await pb.collections('animales').getFullList({
+            filter:`delete = false && cab ='${cab.id}'`,
+        })
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
