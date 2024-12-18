@@ -33,6 +33,7 @@
     let rodeo = ""
     let lote = ""
     let peso = 0
+    let categoria = ""
     let pariciones = []
     let fechafall = ""
     let nacimientoobj = {}
@@ -126,6 +127,7 @@
                 sexo = recorda.sexo
                 rodeo = recorda.rodeo
                 lote = recorda.lote
+                categoria = recorda.categoria
                 if(recorda.fechafallecimiento != ""){
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
                     
@@ -146,7 +148,7 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+        <DatosBasicos peso={peso} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
         <Pariciones cabid={cab.id} sexoanimal = {sexo}/>

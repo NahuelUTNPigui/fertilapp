@@ -7,7 +7,8 @@
     import { goto } from "$app/navigation";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
-    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento} = $props()
+    import categorias from "$lib/stores/categorias";
+    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -23,6 +24,7 @@
     let caravanavieja = $state("")
     let rodeovieja = $state("")
     let loteviejo = $state("")
+    let categoriavieja = $state("")
     //Nacimiento
     let fechaviejo = $state("")
     let nombremadreviejo = $state("")
@@ -106,6 +108,7 @@
         loteviejo = lote
         rodeovieja = rodeo
         caravanavieja = caravana
+        categoriavieja = categoria
     }
     function cancelarEditar(){
         modoedicion = false
@@ -114,6 +117,7 @@
         caravana = caravanavieja
         rodeo = rodeovieja
         lote = loteviejo
+        categoria = categoriavieja
         if(rodeo != ""){
             nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
         }
@@ -138,6 +142,7 @@
         madreviejo = madre
         padreviejo = padre
         observacionviejo = observacion
+        
         nuevoModal.showModal()
     }
     async function guardarNaciminento(){
@@ -197,7 +202,8 @@
             sexo,
             caravana,
             rodeo:rodeo,
-            lote
+            lote,
+            categoria
         }
         try{
             const record = await pb.collection('animales').update(id, data);
@@ -206,6 +212,7 @@
             caravana = data.caravana
             rodeo = data.rodeo
             lote = data.lote
+            categoria = data.categoria
             if(rodeo != ""){
                 nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
             }
@@ -233,6 +240,7 @@
         madre = ""
         padre = ""
         observacion = ""
+        categoria = ""
         if (connacimiento){
             fecha =  fechaviejo
             nombremadre = nombremadreviejo
@@ -308,23 +316,23 @@
     <div class="mb-1 lg:mb-0">
         
         {#if modoedicion}
-        <label for = "sexo" class="label">
-            <span class="label-text text-base">Sexo</span>
-        </label>
-        <label class="input-group ">
-            <select 
-                class={`
-                    select select-bordered w-full
-                    border border-gray-300 rounded-md
-                    focus:outline-none focus:ring-2 
-                    focus:ring-green-500 focus:border-green-500
-                    ${estilos.bgdark2}
-                `} bind:value={sexo}>
-                {#each sexos as s}
-                    <option value={s.id}>{s.nombre}</option>    
-                {/each}
-            </select>
-        </label>
+            <label for = "sexo" class="label">
+                <span class="label-text text-base">Sexo</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} bind:value={sexo}>
+                    {#each sexos as s}
+                        <option value={s.id}>{s.nombre}</option>    
+                    {/each}
+                </select>
+            </label>
         {:else}
             <label for = "sexo" class="label">
                 <span class="label-text text-base">Sexo</span>
@@ -338,23 +346,23 @@
     </div>
     <div class="mb-1 lg:mb-0">
         {#if modoedicion}
-        <label for = "rodeo" class="label">
-            <span class="label-text text-base">Rodeo</span>
-        </label>
-        <label class="input-group ">
-            <select 
-                class={`
-                    select select-bordered w-full
-                    border border-gray-300 rounded-md
-                    focus:outline-none focus:ring-2 
-                    focus:ring-green-500 focus:border-green-500
-                    ${estilos.bgdark2}
-                `} bind:value={rodeo}>
-                {#each rodeos as t}
-                    <option value={t.id}>{t.nombre}</option>    
-                {/each}
-            </select>
-        </label>
+            <label for = "rodeo" class="label">
+                <span class="label-text text-base">Rodeo</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} bind:value={rodeo}>
+                    {#each rodeos as t}
+                        <option value={t.id}>{t.nombre}</option>    
+                    {/each}
+                </select>
+            </label>
         {:else}
             <label for = "rodeo" class="label">
                 <span class="label-text text-base">Rodeo</span>
@@ -368,23 +376,23 @@
     </div>
     <div class="mb-1 lg:mb-0">
         {#if modoedicion}
-        <label for = "lote" class="label">
-            <span class="label-text text-base">Lote</span>
-        </label>
-        <label class="input-group ">
-            <select 
-                class={`
-                    select select-bordered w-full
-                    border border-gray-300 rounded-md
-                    focus:outline-none focus:ring-2 
-                    focus:ring-green-500 focus:border-green-500
-                    ${estilos.bgdark2}
-                `} bind:value={lote}>
-                {#each lotes as l}
-                    <option value={l.id}>{l.nombre}</option>    
-                {/each}
-            </select>
-        </label>
+            <label for = "lote" class="label">
+                <span class="label-text text-base">Lote</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} bind:value={lote}>
+                    {#each lotes as l}
+                        <option value={l.id}>{l.nombre}</option>    
+                    {/each}
+                </select>
+            </label>
         {:else}
             <label for = "lote" class="label">
                 <span class="label-text text-base">Lote</span>
@@ -393,6 +401,36 @@
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
             >
                 {nombrelote}
+            </label>
+        {/if}
+    </div>
+    <div class="mb-1 lg:mb-0">
+        {#if modoedicion}
+            <label for = "categoria" class="label">
+                <span class="label-text text-base">Categoria</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} bind:value={categoria}>
+                    {#each categorias as l}
+                        <option value={l.id}>{l.nombre}</option>    
+                    {/each}
+                </select>
+            </label>
+        {:else}
+            <label for = "categoria" class="label">
+                <span class="label-text text-base">Categoria</span>
+            </label>
+            <label for="lote" 
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+            >
+                {categoria}
             </label>
         {/if}
     </div>
