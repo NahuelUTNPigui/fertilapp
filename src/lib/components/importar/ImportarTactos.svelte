@@ -2,7 +2,7 @@
     import estilos from "$lib/stores/estilos";
     import * as XLSX from 'xlsx';
     import { createCaber } from '$lib/stores/cab.svelte';
-    import PocketBase from 'pocketbase'
+    import PocketBase from 'pocketbase';
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
     let ruta = import.meta.env.VITE_RUTA
@@ -56,7 +56,6 @@
         }
 
         let sheettactos = wkbk.Sheets.Tactos
-        console.log(wkbk.Sheets.Tactos)
         if(!sheettactos){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
@@ -124,24 +123,30 @@
         }
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
-
+            console.log(ta)
             //Agregar Tacto si no existe
             let dataadd = {
                 fecha: ta.fecha + " 03:00:00",
                 active: true,
+                animal: ta.caravana.id,
                 observacion: ta.observacion,
-                animal: ta.animal,
                 categoria: ta.categoria,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
                 nombreveterinario: ta.nombreveterinario,
                 cab: cab.id
             }
+            console.log(await pb.collection("animales").getFirstListItem(`caravana=${ta.caravana}`,{
+                expand: "tacto"
+            }))
+            console.log(dataadd.animal)
+            console.log(ta.caravana)
+            console.log(ta.caravana.id)
 
             let datamod = {
                 fecha: ta.fecha + " 03:00:00",
                 observacion: ta.observacion,
-                animal: ta.animal,
+                animal: ta.caravana.id,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
                 nombreveterinario: ta.nombreveterinario,
@@ -164,9 +169,8 @@
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
     }
     onMount(async ()=>{
-        tactos = await pb.collection('tactos').getFullList({
-            filter:`active = true && cab ='${cab.id}'`,
-            sort: '-nombre',
+        const tactos = await pb.collection('tactos').getFullList({
+            filter:`active = true && cab ='${cab.id}'`
         })
     })
 </script>

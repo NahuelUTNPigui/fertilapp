@@ -6,7 +6,6 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
     import tiposanimal from '$lib/stores/tiposanimal';
-    import pp from '$lib/stores/pp';
     import estilos from '$lib/stores/estilos';
     let ruta = import.meta.env.VITE_RUTA
 
@@ -39,7 +38,6 @@
     let idanimal = $state("")
     //Datos de la inseminacion
     let categoria = $state("")
-    let pcpp = $state("")
     let fechadesdeins = $state("")
     let fechahastains = $state("")
     function isEmpty(str){
@@ -55,7 +53,6 @@
         idins = ""
         idanimal = ""
         categoria = ""
-        pcpp = ""
         fechadesdeins = ""
         fechahastains = ""
         pajuela = ""
@@ -67,7 +64,6 @@
         idins = ""
         idanimal = ""
         categoria = ""
-        pcpp = ""
         fechadesdeins = ""
         fechahastains = ""
         pajuela = ""
@@ -81,7 +77,6 @@
         padre = inseminacion.padre
         pajuela = inseminacion.pajuela
         categoria = inseminacion.categoria
-        pcpp = inseminacion.pcpp
         fechadesdeins = inseminacion.fechadesde.split(" ")[0]
         fechahastains = inseminacion.fechahasta.split(" ")[0]
         idanimal = inseminacion.animal
@@ -117,7 +112,6 @@
                 active:true,
                 padre,
                 pajuela,
-                pcpp,
                 categoria
             }
             const record = await pb.collection('inseminacion').create(data);
@@ -142,7 +136,6 @@
                 
                 padre,
                 pajuela,
-                pcpp,
                 categoria
             }
             const record = await pb.collection('inseminacion').update(idanimal, data);
@@ -344,26 +337,6 @@
                     >
                         {#each tiposanimal as t}
                             <option value={t.id}>{t.nombre}</option>    
-                        {/each}
-                      </select>
-                </label>
-                <label for = "tipo" class="label">
-                    <span class="label-text text-base">PP/PC</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={pcpp}
-                    >
-                        {#each pp as p}
-                            <option value={p.id}>{p.nombre}</option>    
                         {/each}
                       </select>
                 </label>

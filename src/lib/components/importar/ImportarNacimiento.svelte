@@ -174,8 +174,10 @@
             if(rodeo){
                 dataadd.rodeo = rodeo.id
             }
+            
             let padre = animales.filter(a=>a.caravana == an.nombrepadre)[0]
             let madre = animales.filter(a=>a.caravana == an.nombremadre)[0]
+
             if(padre){
                 datanacimiento.padre=padre.id
             }

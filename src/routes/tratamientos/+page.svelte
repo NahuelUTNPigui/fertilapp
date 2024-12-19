@@ -306,7 +306,6 @@
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha</th>
                     <th class="text-base mx-1 px-1">Animal</th>
                     <th class="text-base mx-1 px-1">Tipo</th>
-                    
                     <th class="text-base mx-1 px-1">Acciones</th>
                 </tr>
             </thead>

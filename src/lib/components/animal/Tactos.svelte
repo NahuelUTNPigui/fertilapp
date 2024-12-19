@@ -5,7 +5,6 @@
     import PocketBase from 'pocketbase'
     import tipostacto from '$lib/stores/tipostacto';
     import tiposanimal from '$lib/stores/tiposanimal';
-    import pp from '$lib/stores/pp';
     import categorias from "$lib/stores/categorias";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -28,7 +27,6 @@
     //Tipo animal
     let categoria = $state("vaca")
     let prenada = $state(false)
-    let pppc = $state("PP")
     //tipo tacto
     let tipo = $state("tacto")
     let nombreveterinario = $state("")
@@ -38,11 +36,9 @@
         animal = ""
         categoria = "vaca"
         prenada = false
-        pppc = "PP"
         tipo = "tacto"
         nombreveterinario = ""
         nuevoTactoAnimal.showModal()
-
     }
     async function guardarTacto(){
         try{
@@ -52,7 +48,6 @@
                animal:id,
                categoria,
                prenada,
-               pp:pppc,
                tipo,
                nombreveterinario,
                cab:cabid,
@@ -125,7 +120,6 @@
                 <th class="text-base mx-1 px-1"  >Observacion</th>
                 <th class="text-base mx-1 px-1"  >Categoria</th>
                 <th class="text-base mx-1 px-1"  >Preñada</th>
-                <th class="text-base mx-1 px-1"  >PP/PC</th>
                 <th class="text-base mx-1 px-1"  >Tipo</th>
             </tr>
         </thead>
@@ -143,9 +137,6 @@
                     </td>
                     <td class="text-base mx-1 px-1">
                         {`${t.prenada?"Si":"No"}`}
-                    </td>
-                    <td class="text-base mx-1 px-1">
-                        {`${t.pp.toUpperCase()}`}
                     </td>
                     <td class="text-base mx-1 px-1">
                         {`${getTipoNombre(t.tipo)}`}
@@ -177,7 +168,6 @@
                         <th class="text-base mx-1 px-1"  >Observacion</th>
                         <th class="text-base mx-1 px-1"  >Categoria</th>
                         <th class="text-base mx-1 px-1"  >Preñada</th>
-                        <th class="text-base mx-1 px-1"  >PP/PC</th>
                         <th class="text-base mx-1 px-1"  >Tipo</th>
                     </tr>
                 </thead>
@@ -286,26 +276,6 @@
                 >
                     {#each tipostacto as t}
                         <option value={t.id}>{t.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
-            <label for = "tipo" class="label">
-                <span class="label-text text-base">PP/PC</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={pppc}
-                >
-                    {#each pp as p}
-                        <option value={p.id}>{p.nombre}</option>    
                     {/each}
                   </select>
             </label>

@@ -4,7 +4,6 @@
     import estilos from "$lib/stores/estilos";
     import PocketBase from 'pocketbase'
     import tiposanimal from '$lib/stores/tiposanimal';
-    import pp from '$lib/stores/pp';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let{cabid} = $props()
@@ -18,14 +17,12 @@
     let padres = $state([])
     //Datos de la inseminacion
     let categoria = $state("")
-    let pcpp = $state("")
     let fechadesdeins = $state("")
     let fechahastains = $state("")
     function openNewModal(){
         fecha = ""
         padre = ""
         categoria = ""
-        pcpp = ""
         fechadesdeins = ""
         fechahastains = ""
         pajuela = ""
@@ -42,7 +39,6 @@
                 active:true,
                 padre,
                 pajuela,
-                pcpp,
                 categoria
             }
             const record = await pb.collection('inseminacion').create(data);
@@ -118,7 +114,6 @@
                 <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha parto</th>
                 <th class="text-base mx-1 px-1">Pajuela</th>
                 <th class="text-base mx-1 px-1">Categoria</th>
-                <th class="text-base mx-1 px-1">PP/PC</th>
                 <th class="text-base mx-1 px-1">Fechas</th>
             </tr>
         </thead>
@@ -131,9 +126,6 @@
                 </td>
                 <td class="text-base mx-1 px-1">
                     {`${i.categoria}`}
-                </td>
-                <td class="text-base mx-1 px-1">
-                    {`${i.pcpp}`}
                 </td>
                 <td class="text-base mx-1 px-1">
                     {`${new Date(i.fechadesde).toLocaleDateString()} - ${new Date(i.fechahasta).toLocaleDateString()}`}
@@ -164,7 +156,6 @@
                         <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha parto</th>
                         <th class="text-base mx-1 px-1">Pajuela</th>
                         <th class="text-base mx-1 px-1">Categoria</th>
-                        <th class="text-base mx-1 px-1">PP/PC</th>
                         <th class="text-base mx-1 px-1">Fechas</th>
                     </tr>
                 </thead>
@@ -177,9 +168,6 @@
                         </td>
                         <td class="text-base mx-1 px-1">
                             {`${getCategoriaNombre(i.categoria)}`}
-                        </td>
-                        <td class="text-base mx-1 px-1">
-                            {`${i.pcpp}`}
                         </td>
                         <td class="text-base mx-1 px-1">
                             {`${new Date(i.fechadesde).toLocaleDateString()} - ${new Date(i.fechahasta).toLocaleDateString()}`}
@@ -224,26 +212,6 @@
                 >
                     {#each tiposanimal as t}
                         <option value={t.id}>{t.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
-            <label for = "tipo" class="label">
-                <span class="label-text text-base">PP/PC</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={pcpp}
-                >
-                    {#each pp as p}
-                        <option value={p.id}>{p.nombre}</option>    
                     {/each}
                   </select>
             </label>
