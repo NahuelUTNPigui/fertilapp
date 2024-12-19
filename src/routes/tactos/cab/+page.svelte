@@ -6,7 +6,6 @@
     import sexos from '$lib/stores/sexos';
     import tipostacto from '$lib/stores/tipostacto';
     import tiposanimal from '$lib/stores/tiposanimal';
-    import pp from '$lib/stores/pp';
     import estilos from '$lib/stores/estilos';
     import { createCaber } from "$lib/stores/cab.svelte";
     let caber = createCaber()

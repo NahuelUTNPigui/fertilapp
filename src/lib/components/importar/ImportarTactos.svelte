@@ -8,6 +8,7 @@
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
+    let animales = $state([])
     
 
     const pb = new PocketBase(ruta);
@@ -136,9 +137,6 @@
                 nombreveterinario: ta.nombreveterinario,
                 cab: cab.id
             }
-            console.log(await pb.collection("animales").getFirstListItem(`caravana=${ta.caravana}`,{
-                expand: "tacto"
-            }))
             console.log(dataadd.animal)
             console.log(ta.caravana)
             console.log(ta.caravana.id)
