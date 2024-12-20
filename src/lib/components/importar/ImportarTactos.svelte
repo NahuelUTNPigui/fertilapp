@@ -124,7 +124,7 @@
         }
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
-            console.log(ta)
+            //let a = animales.filter(an=>an.caravana == ta[i].caravana)[0]
             //Agregar Tacto si no existe
             let dataadd = {
                 fecha: ta.fecha + " 03:00:00",
@@ -153,11 +153,10 @@
 
             try{
                 const record = await pb.collection('tactos').getFirstListItem(`fecha="${ta.fecha + " 03:00:00"}" && animal="${animal.id}"`,{});
-                console.log("mod")
                 await pb.collection('tactos').update(record.id, datamod);               
             }
             catch(err){
-                console.log("Add")
+                
                 await pb.collection('tactos').create(dataadd);
 
             }
@@ -170,6 +169,9 @@
         const tactos = await pb.collection('tactos').getFullList({
             filter:`active = true && cab ='${cab.id}'`
         })
+        animales = await pb.collection('animales').getFullList({
+            filter:`delete = false && cab ='${cab.id}'`,
+        }) 
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">

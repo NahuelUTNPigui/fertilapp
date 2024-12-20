@@ -8,6 +8,7 @@
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
     import categorias from "$lib/stores/categorias";
+    import estados from "$lib/stores/estados";
     let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -47,7 +48,7 @@
     let observacion = $state("") 
     let rodeos = $state([])
     let lotes = $state([])
-    let estados = [{id:2,nombre:"Preñada"},{id:1,nombre:"Dudosa"},{id:0,nombre:"Vacia"}]
+    
 
     //rodeos
     async function getRodeos(){
@@ -463,7 +464,13 @@
             
         {:else}
             <label for = "prenada" class="label">
-                <span class="label-text text-base">{prenada?"Preñada":"Vacia"}</span>
+                <span class="label-text text-base">
+                    {
+                        prenada==2?"Preñada":
+                        prenada==1?"Dudosa":
+                        "Vacia"
+                    }
+                </span>
             </label>
             
         {/if}

@@ -6,6 +6,7 @@
     import tipostacto from '$lib/stores/tipostacto';
     import tiposanimal from '$lib/stores/tiposanimal';
     import categorias from "$lib/stores/categorias";
+    import estados from "$lib/stores/estados";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -26,7 +27,7 @@
     let animal = $state("")
     //Tipo animal
     let categoria = $state("vaca")
-    let prenada = $state(false)
+    let prenada = $state(0)
     //tipo tacto
     let tipo = $state("tacto")
     let nombreveterinario = $state("")
@@ -35,7 +36,7 @@
         observacion =  ""
         animal = ""
         categoria = "vaca"
-        prenada = false
+        prenada = 0
         tipo = "tacto"
         nombreveterinario = ""
         nuevoTactoAnimal.showModal()
@@ -54,6 +55,9 @@
                active:true
             }
             const record = await pb.collection('tactos').create(data);
+            await pb.collection('animales').update(id,{
+                prenada
+            })
             tactos.push(record)
         }
         catch(err){
@@ -136,7 +140,11 @@
                         {`${getCategoriaNombre(t.categoria)}`}
                     </td>
                     <td class="text-base mx-1 px-1">
-                        {`${t.prenada?"Si":"No"}`}
+                        {   
+                            t.prenada==0?"Vacia":
+                            t.prenada==1?"Dudosa":
+                            "Preñada"
+                        }
                     </td>
                     <td class="text-base mx-1 px-1">
                         {`${getTipoNombre(t.tipo)}`}
@@ -186,9 +194,7 @@
                             <td class="text-base mx-1 px-1">
                                 {`${t.prenada?"Si":"No"}`}
                             </td>
-                            <td class="text-base mx-1 px-1">
-                                {`${t.pp.toUpperCase()}`}
-                            </td>
+                            
                             <td class="text-base mx-1 px-1">
                                 {`${getTipoNombre(t.tipo)}`}
                             </td>
@@ -237,10 +243,23 @@
                   </select>
             </label>
             <div class="form-group">
-                <br>
-                <span class="label-text">Preñada</span>  
-                <br>
-                <input type="checkbox" class="toggle" bind:checked={prenada} />
+                <label for = "prenada" class="label">
+                    <span class="label-text text-base">Preñada</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2}
+                        `} bind:value={prenada}>
+                        {#each estados as e}
+                            <option value={e.id}>{e.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
             </div>
             <label for = "fecha" class="label">
                 <span class="label-text text-base">Fecha </span>
@@ -279,6 +298,7 @@
                     {/each}
                   </select>
             </label>
+            <div class="hidden">
             <label for = "vete" class="label">
                 <span class="label-text text-base">Veterinario</span>
             </label>
@@ -296,6 +316,7 @@
                     bind:value={nombreveterinario}
                 />
             </label>
+            </div>
             <label for="obs" class="label">
                 <span class="label-text">Observacion</span>                    
             </label>

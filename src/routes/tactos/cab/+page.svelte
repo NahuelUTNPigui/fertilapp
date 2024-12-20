@@ -51,6 +51,7 @@
         });
         tactos = recordst
         tactosrow = tactos
+        
     }
     function isEmpty(str){
         return (!str || str.length === 0 );
@@ -166,7 +167,12 @@
                active:true
             }
             const record = await pb.collection('tactos').create(data);
-            await getTactos()
+            await pb.collection('animales').update(animal,{
+                prenada
+            })
+            let a = animales.find(an=>an.id == animal)[0]
+            let item = {...record,expand:{animal:a}}
+            tactos.push(item)
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }
@@ -187,8 +193,14 @@
                nombreveterinario
             }
             const record = await pb.collection('tactos').update(idtacto,data);
+            
+            await pb.collection('animales').update(animal,{
+                prenada
+            })
             let idx = tactos.findIndex(t=>t.id==idtacto)
+            let a = animales.find(an=>an.id == animal)[0]
             tactos[idx] = record
+            tactos[idx].expand = {animal:a}
 
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
@@ -197,6 +209,7 @@
             console.error(err)
             Swal.fire("Error guardar","No se pudo guardar el tacto","error")
         }
+        console.log(tactos)
     }
 </script>
 <Navbarr>
@@ -300,7 +313,11 @@
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
             </form>
-            <h3 class="text-lg font-bold">Nuevo tacto</h3>  
+            {#if idtacto == ""}
+                <h3 class="text-lg font-bold">Nuevo tacto</h3>  
+            {:else}
+                <h3 class="text-lg font-bold">Editar tacto</h3>  
+            {/if}
             <div class="form-control">
                 <label for = "animal" class="label">
                     <span class="label-text text-base">Animal</span>
@@ -420,6 +437,7 @@
                         {/each}
                       </select>
                 </label>
+                <div class="hidden">
                 <label for = "vete" class="label">
                     <span class="label-text text-base">Veterinario</span>
                 </label>
@@ -437,6 +455,7 @@
                         bind:value={nombreveterinario}
                     />
                 </label>
+                </div>
                 <label class="form-control">
                     <div class="label">
                         <span class="label-text">Observacion</span>                    
