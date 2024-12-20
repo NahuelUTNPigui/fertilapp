@@ -10,6 +10,7 @@ export default{
     medio:"px-6 py-3 text-base",
     chico:"px-4 py-2 text-sm",
     basico:"font-medium bg-transparent border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200",
+    basicofill:"font-medium border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200",
     deshabilitado:"opacity-50 cursor-not-allowed",
     sinbordes:"font-medium bg-transparent border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200",
     sinbordesprimario:"text-green-700 bg-green-100 hover:bg-green-200 focus:ring-green-500 dark:text-green-100 dark:bg-green-900 dark:bg-opacity-40 dark:hover:bg-opacity-60"

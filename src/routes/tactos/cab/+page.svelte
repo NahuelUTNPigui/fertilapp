@@ -7,6 +7,7 @@
     import tipostacto from '$lib/stores/tipostacto';
     import tiposanimal from '$lib/stores/tiposanimal';
     import estilos from '$lib/stores/estilos';
+    import estados from "$lib/stores/estados";
     import { createCaber } from "$lib/stores/cab.svelte";
     let caber = createCaber()
     let cab = caber.cab
@@ -34,7 +35,7 @@
     let animal = $state("")
     //Tipo animal
     let categoria = $state("vaca")
-    let prenada = $state(false)
+    let prenada = $state(0)
     //tipo tacto
     let tipo = $state("tacto")
     let nombreveterinario = $state("")
@@ -70,7 +71,7 @@
         observacion =  ""
         animal = ""
         categoria = "vaca"
-        prenada = false
+        prenada = 0
         tipo = "tacto"
         nombreveterinario = ""
         nuevoModal.showModal()
@@ -148,6 +149,9 @@
         filterUpdate()
         await getAnimales()
     })
+    function selectOption(opcion){
+        prenada = opcion
+    }
     async function guardar(){
         try{
             let data = {
@@ -339,10 +343,45 @@
                       </select>
                 </label>
                 <div class="form-group">
-                    <br>
-                    <span class="label-text">Preñada</span>  
-                    <br>
-                    <input type="checkbox" class="toggle" bind:checked={prenada} />
+                    <label for = "prenada" class="label">
+                        <span class="label-text text-base">Preñada</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} bind:value={prenada}>
+                            {#each estados as e}
+                                <option value={e.id}>{e.nombre}</option>    
+                            {/each}
+                        </select>
+                    </label>
+                    <!--<div class="grid grid-cols-3">
+                        {#each  estados as e}
+                            <div>
+                                <button
+                                    aria-label={`estado ${e.nombre}` }
+                                    onclick={()=>selectOption(e.id)}
+                                    class={`
+                                        ${
+                                            e.id==prenada?
+                                            estilos.basicofill:
+                                            estilos.basico} 
+
+                                            ${estilos.medio} ${estilos.primario}
+                                    `}
+                                >
+                                        {e.nombre}
+                                </button>
+                                
+                            </div>
+                        {/each} 
+                    </div>
+                    -->
                 </div>
                 <label for = "fecha" class="label">
                     <span class="label-text text-base">Fecha </span>

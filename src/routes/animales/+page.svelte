@@ -84,7 +84,7 @@
         
         const recordsa = await pb.collection("animales").getFullList({
             filter:`delete=false && cab='${cab.id}'`,
-            expand:"nacimiento"
+            expand:"nacimiento,lote,rodeo"
         })
         
         animales = recordsa
@@ -152,6 +152,7 @@
                 caravana,
                 active:true,
                 delete:false,
+                prenada:0,
                 fechanacimiento:fechanacimiento +" 03:00:00",
                 sexo,
                 peso,
@@ -374,8 +375,10 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base w-3/12"  >Animal</th>
-                    <th class="text-base w-3/12"  >Acciones</th>
+                    <th class="text-base"  >Animal</th>
+                    <th class="text-base"  >Lote</th>
+                    <th class="text-base"  >Rodeo</th>
+                    <th class="text-base"  >Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -395,6 +398,25 @@
                                 </div>
                             {/if}
                         </div>
+                    </td>
+                    <td class="text-base">
+                        {
+                            a.expand?
+                            a.expand.lote?
+                            a.expand.lote.nombre
+                            :""
+                            :""
+
+                        }
+                    </td>
+                    <td class="text-base">
+                        {
+                            a.expand?
+                            a.expand.rodeo?
+                            a.expand.rodeo.nombre
+                            :""
+                            :""
+                        }
                     </td>
                     <td class="flex gap-2">
                         

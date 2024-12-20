@@ -38,6 +38,7 @@
     let fechafall = ""
     let nacimientoobj = {}
     let tactos = []
+    let prenada = 0
     async function  getPariciones(id){
         const recordpariciones =  await pb.collection('nacimientos').getFullList({
             filter:`madre='${id}' || padre='${id}'`,
@@ -128,6 +129,7 @@
                 rodeo = recorda.rodeo
                 lote = recorda.lote
                 categoria = recorda.categoria
+                prenada = recorda.prenada
                 if(recorda.fechafallecimiento != ""){
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
                     
@@ -148,7 +150,7 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+        <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
         <Pariciones cabid={cab.id} sexoanimal = {sexo}/>

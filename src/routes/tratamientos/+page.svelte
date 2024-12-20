@@ -537,7 +537,7 @@
     </dialog>
     <dialog id="tiposmodal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="
-                modal-box w-11/12 max-w-xl
+                modal-box max-w-xl w-11/12
                 bg-gradient-to-br from-white to-gray-100 
                 dark:from-gray-900 dark:to-gray-800
             "
@@ -546,14 +546,14 @@
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
             </form>
             <h3 class="text-xl font-bold">Tipo tratamientos</h3>  
-            <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-                <div class="w-11/12 lg:w-1/2">
+            <div class="grid grid-cols-1 m-0 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+                <div class="w-11/12">
                     <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>nuevoTipo()}>
                         <span  class="text-xl">Nuevo tipo</span>
                     </button>
                     {#if addtipo}
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
+                    <div class="grid grid-cols-3 gap-1">
+                        <div class="col-span-2">
                             <label for = "nombre" class="label">
                                 <span class="label-text text-base">Nombre</span>
                             </label>
@@ -579,7 +579,7 @@
                             <button
                                 aria-label="guardar"
                                 class={`
-                                    btn flex btn-primary ${estilos.btntext}
+                                    ${estilos.basico} ${estilos.chico} ${estilos.primario}
                                 `}
                                 onclick={guardarTipo}
                             >
@@ -590,9 +590,9 @@
                             </button>
                             <button 
                                 aria-label="cerrar"
-                                class="
-                                    btn btn-error text-white
-                                "
+                                class={`
+                                    ${estilos.basico} ${estilos.chico} ${estilos.danger}
+                                `}
                                 onclick={cerrarTipoModal}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
@@ -607,8 +607,8 @@
                         <table class="table table-lg w-full" >
                             <thead>
                                 <tr>
-                                    <th class="text-base w-3/12"  >Nombre</th>
-                                    <th class="text-base w-3/12"  >Acciones</th>
+                                    <th class="text-base"  >Nombre</th>
+                                    <th class="text-base"  >Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -617,7 +617,7 @@
                                         <td class="text-base">
                                             {tp.nombre}
                                         </td>
-                                        <td class="flex gap-2">
+                                        <td class={`flex gap-2 ${tp.generico?"hidden":""}`}>
                                             <div class="tooltip" data-tip="Editar">
                                                 <button aria-label="Editar" onclick={()=>openEditTipoModal(tp.id)}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

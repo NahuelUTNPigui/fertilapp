@@ -83,7 +83,7 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v
+                    tactoshashmap[tail].prenada = value.v?2:0
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v
@@ -109,7 +109,7 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v
+                    tactoshashmap[tail].prenada = value.v?2:0
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v

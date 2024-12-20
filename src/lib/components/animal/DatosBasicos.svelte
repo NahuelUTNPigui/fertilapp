@@ -8,7 +8,7 @@
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
     import categorias from "$lib/stores/categorias";
-    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria} = $props()
+    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -25,6 +25,7 @@
     let rodeovieja = $state("")
     let loteviejo = $state("")
     let categoriavieja = $state("")
+    let prenadaviejo = $state(false)
     //Nacimiento
     let fechaviejo = $state("")
     let nombremadreviejo = $state("")
@@ -46,6 +47,7 @@
     let observacion = $state("") 
     let rodeos = $state([])
     let lotes = $state([])
+    let estados = [{id:2,nombre:"Preñada"},{id:1,nombre:"Dudosa"},{id:0,nombre:"Vacia"}]
 
     //rodeos
     async function getRodeos(){
@@ -109,6 +111,7 @@
         rodeovieja = rodeo
         caravanavieja = caravana
         categoriavieja = categoria
+        prenadaviejo  = prenada
     }
     function cancelarEditar(){
         modoedicion = false
@@ -118,6 +121,7 @@
         rodeo = rodeovieja
         lote = loteviejo
         categoria = categoriavieja
+        prenada = prenadaviejo
         if(rodeo != ""){
             nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
         }
@@ -203,6 +207,7 @@
             caravana,
             rodeo:rodeo,
             lote,
+            prenada,
             categoria
         }
         try{
@@ -213,6 +218,7 @@
             rodeo = data.rodeo
             lote = data.lote
             categoria = data.categoria
+            prenada = data.prenada
             if(rodeo != ""){
                 nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
             }
@@ -241,6 +247,7 @@
         padre = ""
         observacion = ""
         categoria = ""
+        
         if (connacimiento){
             fecha =  fechaviejo
             nombremadre = nombremadreviejo
@@ -432,6 +439,33 @@
             >
                 {categoria}
             </label>
+        {/if}
+    </div>
+    <div class="mb-1 lg:mb-0">
+        {#if modoedicion}
+            <label for = "prenada" class="label">
+                <span class="label-text text-base">Preñada</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} bind:value={prenada}>
+                    {#each estados as e}
+                        <option value={e.id}>{e.nombre}</option>    
+                    {/each}
+                </select>
+            </label>
+            
+        {:else}
+            <label for = "prenada" class="label">
+                <span class="label-text text-base">{prenada?"Preñada":"Vacia"}</span>
+            </label>
+            
         {/if}
     </div>
     {#if modoedicion}
