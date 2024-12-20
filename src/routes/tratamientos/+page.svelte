@@ -34,9 +34,77 @@
     let categoria = $state("")
     let fecha = $state("")
     let tipo = $state("")
+    //Validaciones
+    let malanimal = $state(false)
+    let malcategoria = $state(false)
+    let malfecha = $state(false)
+    let maltipo = $state(false)
+    let botonhabilitado=$state(false)
+
 
     function isEmpty(str){
         return (!str || str.length === 0 );
+    }
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(animal)){
+            botonhabilitado = false
+        }
+        if(isEmpty(categoria)){
+            botonhabilitado = false
+        }
+        if(isEmpty(tipo)){
+            botonhabilitado = false
+        }
+        if(isEmpty(fecha)){
+            botonhabilitado = false
+        }
+    }
+    function cambioAnimal(){
+        if(!isEmpty(animal)){
+            let a = animales.filter(an=>an.id==animal)[0]
+            categoria = a.categoria
+        }
+        else{
+            categoria = ""
+        }
+    }
+    function oninput(campo){
+        validarBoton()
+        if(campo=="ANIMAL"){
+            
+            if(isEmpty(animal)){
+                malanimal = true
+            }
+            else{
+                malanimal = false
+                cambioAnimal()
+            }
+        }
+        else if(campo == "FECHA"){
+            if(isEmpty(fecha)){
+                malfecha = true
+            }
+            else{
+                malfecha = false
+            }
+        }
+        else if(campo == "CATEGORIA"){
+            if(isEmpty(categoria)){
+                malcategoria = true
+            }
+            else{
+                malcategoria = false
+            }
+        }
+        else if(campo == "TIPO"){
+            if(isEmpty(tipo)){
+                maltipo = true
+            }
+            else{
+                maltipo = false
+            }
+        }
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
@@ -70,7 +138,6 @@
                 fecha:fecha +" 03:00:00",
                 active : true,
                 cab:cab.id
-
             }
             
             const  record = await pb.collection("tratamientos").create(data)
@@ -212,7 +279,9 @@
         animal = ""
         tipo = ""
         categoria = ""
+        
     }
+    
     function openNewModal(){
         idtratamiento = ""
         fecha = ""
@@ -227,7 +296,7 @@
         fecha = tratamiento.fecha.split(" ")[0]
         animal = tratamiento.animal
         tipo = tratamiento.tipo
-        categoria = tratamiento.categoria
+        
         nuevoModal.showModal()
 
     }
@@ -366,14 +435,21 @@
                             border border-gray-300 rounded-md
                             focus:outline-none focus:ring-2 
                             focus:ring-green-500 focus:border-green-500
+
                             ${estilos.bgdark2} 
+                            ${malanimal?"input-error":""}
                         `}
+                        onchange={()=>oninput("ANIMAL")}
                         bind:value={animal}
+                        
                     >
                         {#each animales as a}
                             <option value={a.id}>{a.caravana}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    <div class={`label ${malanimal?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
+                    </div>
                 </label>
                 <label for = "fecha" class="label">
                     <span class="label-text text-base">Fecha</span>
@@ -389,7 +465,11 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={fecha}
+                        onchange={()=>oninput("FECHA")}
                     />
+                    <div class={`label ${malfecha?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar la fecha</span>
+                    </div>
                 </label>
                 <label for = "categoria" class="label">
                     <span class="label-text text-base">Categoria</span>
@@ -404,13 +484,18 @@
                             focus:border-green-500
                             ${estilos.bgdark2} 
                         `}
-                        bind:value={categoria}
+                        bind:value={categoria} read
+                        onchange={()=>oninput("CATEGORIA")}
                     >
                         {#each categorias as c}
                             <option value={c.id}>{c.nombre}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    <div class={`label ${malcategoria?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar la categoria</span>
+                    </div>
                 </label>
+                
                 <label for = "tipo" class="label">
                     <span class="label-text text-base">Tipo tratamiento</span>
                 </label>
@@ -425,18 +510,22 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={tipo}
+                        onchange={()=>oninput("TIPO")}
                     >
                         {#each tipotratamientos as t}
                             <option value={t.id}>{t.nombre}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    <div class={`label ${maltipo?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar un tipo</span>
+                    </div>
                 </label>
             </div>
             <div class="modal-action justify-start ">
                 <form method="dialog" >
                   <!-- if there is a button, it will close the modal -->
                   {#if idtratamiento == ""}
-                    <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
                     <button class="btn btn-success text-white" onclick={editar} >Editar</button>
                   {/if}

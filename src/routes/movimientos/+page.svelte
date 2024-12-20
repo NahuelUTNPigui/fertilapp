@@ -13,6 +13,8 @@
     let caber = createCaber()
     let cab = caber.cab
 
+    //boton
+    let textoboton = $state("Mover")
     //Datos animales
     let animales = $state([])
     let animalesrows = $state([])
@@ -25,6 +27,7 @@
 
     let lotes = $state([])
     let rodeos = $state([])
+    let tipos = $state([])
     
     //Seleccionados
     let selectanimales = $state([])
@@ -33,12 +36,24 @@
     let algunos = $state(false)
     let ninguno = $state(true)
     //movimiento
-    let nuevacategoria = $state(false)
-    let nuevolote = $state(false)
-    let nuevorodeo = $state(false)
-    let selectcategoria = $state(false)
+    let nuevacategoria = $state("")
+    let nuevolote = $state("")
+    let nuevorodeo = $state("")
+    let tipotratamiento = $state("")
+    let fecha = $state("")
+    //validar
+    let malcategoria = $state("")
+    let mallote = $state("")
+    let malrodeo = $state("")
+    let maltipo = $state("")
+    let malfecha = $state("")
+    let habilitarboton = $state(false)
+
+    //Seleecionar
+    let selectcategoria = $state(true)
     let selectlote = $state(false)
     let selectrodeo = $state(false)
+    let selecttratamiento = $state(false)
 
 
     function filterUpdate(){
@@ -87,7 +102,10 @@
                 algunos = true
                 ninguno =  false
             }
-            selecthashmap[id] = id
+            let a = animalesrows.filter(an=>an.id==id)[0]
+            selecthashmap[id] = {
+                ...a
+            }
         }
     }
     function clickTodos(){
@@ -102,7 +120,10 @@
             ninguno = false
             todos = true
             for(let i = 0;i<animalesrows.length;i++){
-                selecthashmap[animalesrows[i].id] = animalesrows[i].id
+                let a = animalesrows.filter(an=>an.id==id)[0]
+                selecthashmap[animalesrows[i].id] = {
+                    ...a
+                }
             }
         }
         if (algunos){
@@ -135,6 +156,14 @@
         rodeos = records
         //ordenarNombre(rodeos)
     }
+    async function getTipos(){
+        const records = await pb.collection('tipotratamientos').getFullList({
+            filter : `(cab='${cab.id}' || generico = true) && active = true`,
+            sort: '-created',
+        });
+        tipos = records
+        tipos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
+    }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
             filter:`active=true && delete=false && cab='${cab.id}'`,
@@ -158,7 +187,7 @@
         }
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            lista.push(key)
+            lista.push(value)
         }
         if(lista.length==0){
             Swal.fire("Error movimiento","No hay animales seleccionados","error")
@@ -183,16 +212,45 @@
                 data.rodeo = nuevorodeo
                 nombrerodeo = rodeos.filter(r =>r.id==nuevorodeo)[0]
             }
+            if(selecttratamiento){
+                data.fecha = fecha + " 03:00:00"
+                data.tipo = tipotratamiento
+                data.active = true
+                data.cab = cab.id
+            }
             for(let i = 0;i<lista.length;i++){
-                await pb.collection('animales').update(lista[i], data);
+                
+                if(!selecttratamiento){
+                    await pb.collection('animales').update(lista[i].id, data);
+                }
+                else{
+                    let a = lista[i]
+                    await pb.collection("tratamientos").create({
+                        ...data,
+                        animal:a.id,
+                        categoria:a.categoria
+
+                    })
+                }
+                
                 
             }
             for(let i = 0;i<lista.length;i++){
-                selecthashmap[lista[i]] = null
+                selecthashmap[lista[i].id] = null
             }
             algunos = false
             todos = false
             ninguno = true
+            selectcategoria = true
+            selectlote = false
+            selectrodeo = false
+            selecttratamiento = false
+            nuevacategoria = ""
+            nuevolote = ""
+            nuevorodeo = ""
+            fecha = ""
+            tipotratamiento = ""
+            habilitarboton = false
             Swal.fire("Éxito movimiento","Movimiento exitoso","success")
             await getAnimales()
             filterUpdate()
@@ -206,10 +264,125 @@
         nuevacategoria = ""
 
     }
+    function onChangeCollapse(seccion){
+        nuevacategoria = ""
+        nuevolote = ""
+        nuevorodeo = ""
+        fecha = ""
+        tipotratamiento = ""
+        habilitarboton = false
+        if(seccion == "CATEGORIA"){
+            selectcategoria= true
+            selectlote= false
+            selectrodeo= false
+            selecttratamiento = false
+            textoboton = "Mover"
+            
+        }
+        if(seccion == "RODEO"){
+            selectcategoria= false
+            selectlote= false
+            selectrodeo= true
+            selecttratamiento = false
+            textoboton = "Mover"
+            
+        }
+        if(seccion == "LOTE"){
+            selectcategoria= false
+            selectlote= true
+            selectrodeo= false
+            selecttratamiento = false
+            textoboton = "Mover"
+            
+        }
+        if(seccion == "TRATAMIENTO"){
+            selectcategoria= false
+            selectlote= false
+            selectrodeo= false
+            selecttratamiento = true
+            textoboton = "Crear tratamientos"
+            
+        }
+
+    }
+    function validarBoton(){
+        habilitarboton = true
+        if(selectcategoria){
+            if(nuevacategoria == ""){
+                habilitarboton = false
+                
+            }
+        }
+        if(selectlote){
+            if(nuevolote == ""){
+                habilitarboton = false
+                
+            }
+        }
+        if(selectrodeo){
+            if(nuevorodeo == ""){
+                habilitarboton = false
+                
+            }
+        }
+        if(selecttratamiento){
+            if(fecha == "" || tipotratamiento == ""){
+                habilitarboton = false
+                
+            }
+        }
+    }
+    function oninput(campo){
+        validarBoton()
+        if(selectcategoria && campo == "CATEGORIA"){
+            if(nuevacategoria == ""){
+                malcategoria = true
+            }
+            else{
+                malcategoria = false
+            }
+        }
+        if(selectlote && campo == "LOTE"){
+            if(nuevolote == ""){
+                mallote = true
+            }
+            else{
+                mallote = false
+            }
+        }
+        if(selectrodeo && campo == "RODEO"){
+            if(nuevorodeo == ""){
+                malrodeo = true
+            }
+            else{
+                malrodeo = false
+            }
+        }
+        if(selecttratamiento){
+            if(campo == "FECHA"){
+                if(fecha == "" ){
+                    malfecha = true
+                }
+                else{
+                    malfecha = false
+                }
+            }
+
+            if(campo == "TIPO"){
+                if( tipotratamiento == ""){
+                    maltipo = true
+                }
+                else{
+                    maltipo = false
+                }
+            }
+        }
+    }
     onMount(async ()=>{
         await getAnimales()
         await getRodeos()
         await getLotes()
+        await getTipos()
     })
 
 </script>
@@ -419,7 +592,7 @@
             <div class="form-control gap-1">
                 <div class="collapse">
                     
-                    <input type="radio" name="my-accordion-1" checked="checked" />
+                    <input type="radio" name="my-accordion-1" checked="checked" onchange={()=>onChangeCollapse("CATEGORIA")}/>
                     <div class="collapse-title text-xl font-medium">Cambiar categoria</div>
                     <div class="collapse-content">
                         <label for = "rodeos" class="label">
@@ -436,11 +609,8 @@
                                     ${estilos.bgdark2}
                                 `} 
                                 bind:value={nuevacategoria}
-                                onchange={()=>{
-                                    selectcategoria= true
-                                    selectlote= false
-                                    selectrodeo= false
-                                }}
+                                onchange={()=>{oninput("CATEGORIA")}}
+
                             >    
                                 {#each categorias as r}
                                     <option value={r.id}>{r.nombre}</option>    
@@ -448,9 +618,9 @@
                               </select>
                         </label>
                     </div>
-                  </div>
-                  <div class="collapse">
-                    <input type="radio" name="my-accordion-1" />
+                </div>
+                <div class="collapse">
+                    <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("LOTE")} />
                     <div class="collapse-title text-xl font-medium">Cambiar lote</div>
                     <div class="collapse-content">
                         <label for = "rodeos" class="label">
@@ -467,11 +637,7 @@
                                     ${estilos.bgdark2}
                                 `} 
                                 bind:value={nuevolote}
-                                onchange={()=>{
-                                    selectcategoria= false
-                                    selectlote= true
-                                    selectrodeo= false
-                                }}
+                                onchange={()=>oninput("LOTE")}
                             >
                                 {#each lotes as r}
                                     <option value={r.id}>{r.nombre}</option>    
@@ -479,9 +645,9 @@
                             </select>
                         </label>
                     </div>
-                  </div>
-                  <div class="collapse">
-                    <input type="radio" name="my-accordion-1" />
+                </div>
+                <div class="collapse">
+                    <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("RODEO")}/>
                     <div class="collapse-title text-xl font-medium">Cambiar rodeo</div>
                     <div class="collapse-content">
                         <label for = "rodeos" class="label">
@@ -498,11 +664,7 @@
                                     ${estilos.bgdark2}
                                 `} 
                                 bind:value={nuevorodeo}
-                                onchange={()=>{
-                                    selectcategoria= false
-                                    selectlote = false
-                                    selectrodeo = true
-                                }}
+                                onchange={()=>oninput("RODEO")}
                             >
                                     
                                     {#each rodeos as r}
@@ -511,11 +673,62 @@
                               </select>
                         </label>
                     </div>
-                  </div>
+                </div>
+                <div class="collapse">
+                    <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("TRATAMIENTO")}/>
+                    <div class="collapse-title text-xl font-medium">Agregar tratamientos</div>
+                    <div class="collapse-content">
+                        <div class="grid grid-cols-2 gap-1">
+                            <div>
+                                <label for = "tipo" class="label">
+                                    <span class="label-text text-base">Tipo tratamiento</span>
+                                </label>
+                                <label class="input-group ">
+                                    <select 
+                                        class={`
+                                            select select-bordered w-full
+                                            border border-gray-300 rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2} 
+                                        `}
+                                        bind:value={tipotratamiento}
+                                        onchange={()=>oninput("TIPO")}
+                                    >
+                                        {#each tipos as t}
+                                            <option value={t.id}>{t.nombre}</option>    
+                                        {/each}
+                                    </select>
+                                    
+                                </label>
+                            </div>
+                            <div>
+                                <label for = "fecha" class="label">
+                                    <span class="label-text text-base">Fecha</span>
+                                </label>
+                                <label class="input-group ">
+                                    <input id ="fecha" type="date" max={HOY}  
+                                        class={`
+                                            input input-bordered w-full
+                                            border border-gray-300 rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2} 
+                                        `}
+                                        bind:value={fecha}
+                                        onchange={()=>oninput("FECHA")}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-action justify-start ">
                 <form method="dialog" >
-                    <button class="btn btn-success text-white" onclick={mover} >Mover</button>
+                    <button class="btn btn-success text-white" disabled='{!habilitarboton}' onclick={mover} >{textoboton}</button>
                     <button class="btn btn-error text-white" >Cancelar</button>
                 </form>
             </div>
