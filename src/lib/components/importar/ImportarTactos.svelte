@@ -20,7 +20,7 @@
             observacion:"",
             caravana:"AAA",
             categoria:"Vaca/Vaquillona",
-            prenada:"true/false",
+            prenada:"preñada/dudosa/vacia",
             tipo:"eco/tacto",
             nombreveterinario:""
         }].map(item=>({
