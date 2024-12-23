@@ -7,6 +7,7 @@
     import { onMount } from 'svelte';
     import sexos from '$lib/stores/sexos';
     import estilos from '$lib/stores/estilos';
+    import estados from '$lib/stores/estados';
     import { goto }  from '$app/navigation';
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
@@ -39,6 +40,7 @@
     let animal = $state(null)
     let idanimal = $state("")
     let caravana = $state("")
+    let prenada = $state(0)
     let fechanacimiento = $state("")
     let nacimiento = $state("")
     let sexo = $state("H")
@@ -90,7 +92,7 @@
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
         animalesrows = animales
-        madres = animales.filter(a=>a.sexo=="F")
+        madres = animales.filter(a=>a.sexo=="H")
         padres = animales.filter(a=>a.sexo=="M")
         
         
@@ -121,6 +123,9 @@
         caravana = animal.caravana
         fechanacimiento = animal.fechanacimiento.split(" ")[0]
         sexo = animal.sexo
+        if (sexo == "H"){
+            prenada = animal.prenada
+        }
         conparicion = animal.nacimiento != ""
         peso = animal.peso
         botonhabilitado = true
@@ -206,7 +211,7 @@
 
 
     function onSelectPadre(sex){
-        if(sex=="F"){
+        if(sex=="H"){
             let m = madres.filter(a=>a.id == madre)[0]
             nombremadre = m.caravana
         }
@@ -491,7 +496,6 @@
                         <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
                     </div>
                 </label>
-                
                 <label for = "sexo" class="label">
                     <span class="label-text text-base">Sexo</span>
                 </label>
@@ -524,6 +528,25 @@
                         bind:value={peso}
                     />
                 </label>
+                {#if sexo == "H"}
+                    <label for = "estado" class="label">
+                        <span class="label-text text-base">Estado</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} bind:value={prenada}>
+                            {#each estados as e}
+                                <option value={e.id}>{e.nombre}</option>    
+                            {/each}
+                        </select>
+                    </label>
+                {/if}
                 <label for = "rodeo" class="label">
                     <span class="label-text text-base">Rodeo</span>
                 </label>
