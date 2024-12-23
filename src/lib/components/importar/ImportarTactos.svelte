@@ -83,7 +83,15 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v?2:0
+                    if (value.v == "preñada"){
+                        tactoshashmap[tail].prenada = 2
+                    }
+                    else if(value.v == "dudosa"){
+                        tactoshashmap[tail].prenada = 1
+                    }
+                    else{
+                        tactoshashmap[tail].prenada = 0
+                    }
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v
@@ -109,7 +117,15 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v?2:0
+                    if (value.v == "preñada"){
+                        tactoshashmap[tail].prenada = 2
+                    }
+                    else if(value.v == "dudosa"){
+                        tactoshashmap[tail].prenada = 1
+                    }
+                    else{
+                        tactoshashmap[tail].prenada = 0
+                    }
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v
