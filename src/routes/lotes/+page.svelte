@@ -16,6 +16,7 @@
     let lotes = $state([])
     let lotesrows = $state([])
     let buscar = $state("")
+    let mostrarVacios =$state(true)
 
 
     //Guardar
@@ -160,6 +161,11 @@
                 <span  class="text-xl">Nuevo Lote</span>
             </button>
         </div>
+        <div>
+            <span class="text-base">Mostrar lotes vacios</span>
+            <br>
+            <input type="checkbox" class="toggle"bind:checked={mostrarVacios}/>
+        </div>
     </div>
     <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-3/4">
         <table class="table table-lg w-full " >
@@ -172,6 +178,7 @@
             </thead>
             <tbody>
                 {#each lotesrows as r}
+                    {#if r.total != 0 || mostrarVacios}                    
                     <tr>
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{r.nombre}</td>
                         <td class="text-base mx-1 px-1">{r.total}</td>
@@ -192,6 +199,7 @@
                             </div>
                         </td>
                     </tr>
+                    {/if}
                 {/each}
             </tbody>
         </table>
