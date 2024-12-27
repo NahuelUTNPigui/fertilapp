@@ -20,7 +20,7 @@
             observacion:"",
             caravana:"AAA",
             categoria:"Vaca/Vaquillona",
-            prenada:"true/false",
+            prenada:"preñada/dudosa/vacia",
             tipo:"eco/tacto",
             nombreveterinario:""
         }].map(item=>({
@@ -83,7 +83,15 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v?2:0
+                    if (value.v == "preñada"){
+                        tactoshashmap[tail].prenada = 2
+                    }
+                    else if(value.v == "dudosa"){
+                        tactoshashmap[tail].prenada = 1
+                    }
+                    else{
+                        tactoshashmap[tail].prenada = 0
+                    }
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v
@@ -109,7 +117,15 @@
                     tactoshashmap[tail].categoria = value.v
                 }
                 if(firstLetter=="E"){
-                    tactoshashmap[tail].prenada = value.v?2:0
+                    if (value.v == "preñada"){
+                        tactoshashmap[tail].prenada = 2
+                    }
+                    else if(value.v == "dudosa"){
+                        tactoshashmap[tail].prenada = 1
+                    }
+                    else{
+                        tactoshashmap[tail].prenada = 0
+                    }
                 }
                 if(firstLetter=="F"){
                     tactoshashmap[tail].tipo = value.v
@@ -124,35 +140,29 @@
         }
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
-            //let a = animales.filter(an=>an.caravana == ta[i].caravana)[0]
+            let an = animales.filter(a=>a.caravana==ta.caravana)[0]
             //Agregar Tacto si no existe
             let dataadd = {
                 fecha: ta.fecha + " 03:00:00",
                 active: true,
-                animal: ta.caravana.id,
                 observacion: ta.observacion,
+                animal: an.id,
                 categoria: ta.categoria,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
                 nombreveterinario: ta.nombreveterinario,
                 cab: cab.id
             }
-            console.log(dataadd.animal)
-            console.log(ta.caravana)
-            console.log(ta.caravana.id)
 
             let datamod = {
-                fecha: ta.fecha + " 03:00:00",
                 observacion: ta.observacion,
-                animal: ta.caravana.id,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
-                nombreveterinario: ta.nombreveterinario,
-                cab: cab.id
+                nombreveterinario: ta.nombreveterinario
             }
 
             try{
-                const record = await pb.collection('tactos').getFirstListItem(`fecha="${ta.fecha + " 03:00:00"}" && animal="${animal.id}"`,{});
+                const record = await pb.collection('tactos').getFirstListItem(`fecha="${ta.fecha + " 03:00:00"}" && animal="${an.id}"`,{});
                 await pb.collection('tactos').update(record.id, datamod);               
             }
             catch(err){

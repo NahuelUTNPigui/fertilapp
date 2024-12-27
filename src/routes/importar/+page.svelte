@@ -5,6 +5,7 @@
     import ImportarAnimal from '$lib/components/importar/ImportarAnimal.svelte';
     import ImportarLotes from '$lib/components/importar/ImportarLotes.svelte';
     import ImportarNacimiento from '$lib/components/importar/ImportarNacimiento.svelte';
+    import ImportarObservaciones from '$lib/components/importar/ImportarObservaciones.svelte';
     import ImportarRodeos from '$lib/components/importar/ImportarRodeos.svelte';
     import ImportarTactos from '$lib/components/importar/ImportarTactos.svelte';
     
@@ -12,6 +13,9 @@
 <Navbarr>
     <CardImportar cardsize="max-w-2xl" titulo="Importar animales">
         <ImportarAnimal/>
+    </CardImportar>
+    <CardImportar cardsize="max-w-2xl" titulo="Importar tactos">
+        <ImportarTactos/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar nacimientos">
         <ImportarNacimiento/>
@@ -22,7 +26,7 @@
     <CardImportar cardsize="max-w-2xl" titulo="Importar lotes">
         <ImportarLotes/>
     </CardImportar>
-    <CardImportar cardsize="max-w-2xl" titulo="Importar tactos">
-        <ImportarTactos/>
+    <CardImportar cardsize="max-w-2xl" titulo="Importar observaciones">
+        <ImportarObservaciones/>
     </CardImportar>
 </Navbarr>

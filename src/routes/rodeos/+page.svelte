@@ -16,6 +16,7 @@
     let rodeos = $state([])
     let rodeosrows = $state([])
     let buscar = $state("")
+    let mostrarVacios =$state(true)
 
 
     //Guardar
@@ -159,6 +160,11 @@
                 <span  class="text-xl">Nuevo rodeo</span>
             </button>
         </div>
+        <div>
+            <span class="text-base">Mostrar rodeos vacios</span>
+            <br>
+            <input type="checkbox" class="toggle"bind:checked={mostrarVacios}/>
+        </div>
     </div>
     <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-3/4">
         <table class="table table-lg w-full " >
@@ -171,15 +177,16 @@
             </thead>
             <tbody>
                 {#each rodeosrows as r}
+                    {#if r.total != 0 || mostrarVacios}
                     <tr>
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{r.nombre}</td>
                         <td class="text-base mx-1 px-1">{r.total}</td>
                         <td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(r.id)}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
                                     <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-                                  </svg>
+                                </svg>
                                 </button>
                             </div>
                             <div class="tooltip" data-tip="Eliminar">
@@ -191,6 +198,7 @@
                             </div>
                         </td>
                     </tr>
+                    {/if}
                 {/each}
             </tbody>
         </table>
