@@ -43,10 +43,11 @@
     let malfecha = $state("")
     let malanimal = $state("")
     let malvet = $state("")
+    let botonhabilitado=$state(false)
     async function getTactos(){
         const recordst = await pb.collection('tactos').getFullList({
             filter:`cab='${cab.id}' && active=true`,
-            sort: '-created',
+            sort: '-fecha',
             expand:"animal"
         });
         tactos = recordst
@@ -75,9 +76,15 @@
         prenada = 0
         tipo = "tacto"
         nombreveterinario = ""
+        botonhabilitado = false
+        malfecha = false
+        malanimal = false
         nuevoModal.showModal()
     }
     function openModalEdit(id){
+        botonhabilitado = true
+        malanimal = false
+        malfecha = false
         idtacto = id
         tacto = tactos.filter(t=>t.id==idtacto)[0]
         fecha = tacto.fecha.split(" ")[0]
@@ -130,6 +137,7 @@
         nuevoModal.close()
     }
     function filterUpdate(){
+        
         tactosrow = tactos
         if(buscar!=""){
             tactosrow = tactosrow.filter(t=>t.expand.animal.caravana.startsWith(buscar))
@@ -150,6 +158,10 @@
         filterUpdate()
         await getAnimales()
     })
+    function onSelectAnimal(){
+        let a = animales.filter(an=>an.id==animal)[0]
+        categoria = a.categoria
+    }
     function selectOption(opcion){
         prenada = opcion
     }
@@ -170,9 +182,18 @@
             await pb.collection('animales').update(animal,{
                 prenada
             })
-            let a = animales.find(an=>an.id == animal)[0]
-            let item = {...record,expand:{animal:a}}
+            let a = animales.filter(an=>an.id == animal)[0]
+            let item = {
+                ...record,
+                expand:{
+                    animal:{
+                        caravana:a.caravana,id:a.id
+                    }
+                }
+            }
+            
             tactos.push(item)
+            tactos.sort((t1,t2)=>new Date(t1.fecha)>new Date(t2.fecha)?-1:1)
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }
@@ -198,10 +219,10 @@
                 prenada
             })
             let idx = tactos.findIndex(t=>t.id==idtacto)
-            let a = animales.find(an=>an.id == animal)[0]
+            let a = animales.filter(an=>an.id == animal)[0]
             tactos[idx] = record
             tactos[idx].expand = {animal:a}
-
+            tactos.sort((t1,t2)=>new Date(t1.fecha)>new Date(t2.fecha)?-1:1)
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }
@@ -209,7 +230,36 @@
             console.error(err)
             Swal.fire("Error guardar","No se pudo guardar el tacto","error")
         }
-        console.log(tactos)
+        
+    }
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(animal)){
+            botonhabilitado=false
+        }
+        if(isEmpty(fecha)){
+            botonhabilitado=false
+        }
+    }
+    function oninput(inputName){
+        validarBoton()
+        if(inputName == "ANIMAL"){
+            if(isEmpty(animal)){
+                malanimal = true
+            }
+            else{
+                malanimal = false
+                onSelectAnimal()
+            }
+        }   
+        if(inputName == "FECHA"){
+            if(isEmpty(fecha)){
+                malfecha = true
+            }
+            else{
+                malfecha = false
+            }
+        }
     }
 </script>
 <Navbarr>
@@ -333,6 +383,7 @@
                             ${estilos.bgdark2}
                         `}
                         bind:value={animal}
+                        onchange={()=>oninput("ANIMAL")}
                     >
                         {#each animales as a}
                             <option value={a.id}>{a.caravana}</option>    
@@ -415,7 +466,13 @@
                             ${estilos.bgdark2}
                         `} 
                         bind:value={fecha}
+                        onchange={()=>oninput("FECHA")}
                     />
+                    {#if malfecha}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tacto</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "tipo" class="label">
                     <span class="label-text text-base">Tacto/Ecografia</span>
@@ -491,9 +548,9 @@
                 <form method="dialog" >
                   <!-- if there is a button, it will close the modal -->
                   {#if idtacto==""}
-                    <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                   {:else}
-                    <button class="btn btn-success text-white" onclick={editarTacto} >Editar</button>
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editarTacto} >Editar</button>
                   {/if}
                   <button class="btn btn-error text-white" onclick={cerrar}>Cancelar</button>
                 </form>

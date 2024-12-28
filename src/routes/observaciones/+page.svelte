@@ -27,7 +27,10 @@
     let categoria = $state("")
     let fecha = $state("")
     let observacion = $state("")
-
+    //Validacioones
+    let malanimal = $state(false)
+    let malfecha = $state(false)
+    let botonhabilitado = $state(false)
     //Filtros
     let buscar = $state("")
     let fechadesde = $state("")
@@ -141,7 +144,14 @@
                 active:true
             }
             const record = await pb.collection('observaciones').create(data);
-            await getObservaciones()
+            let a = animales.filter(an=>a.id==animal)[0]
+            let item = {
+                ...record,
+                expand:{animal:a}
+            }
+            observaciones.push(item)
+            observaciones.sort((o1,o2)=>new Date(o1.fecha)>new Date(o2.fecha)?-1:1)
+
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
 
@@ -160,7 +170,11 @@
                 observacion
             }
             const record = await pb.collection('observaciones').update(idobservacion, data);
-            await getObservaciones()
+            let a = animales.filter(an=>a.id==animal)[0]
+            let idx = observaciones.findIndex(o=>o.id==idobservacion)
+            observaciones[idx] = record
+            observaciones[idx].expand = {animal:a}
+            observaciones.sort((o1,o2)=>new Date(o1.fecha)>new Date(o2.fecha)?-1:1)
             filterUpdate()
             Swal.fire("Éxito editar","Se pudo editar la observación","success")
 
@@ -168,6 +182,39 @@
         catch(err){
             console.error(err)
             Swal.fire("Error editar","No se pudo editar la observación","error")
+        }
+    }
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(animal)){
+            botonhabilitado=false
+        }
+        if(isEmpty(fecha)){
+            botonhabilitado=false
+        }
+    }
+    function onSelectAnimal(){
+        let a = animales.filter(an=>an.id==animal)[0]
+        categoria = a.categoria
+    }
+    function oninput(inputName){
+        validarBoton()
+        if(inputName == "ANIMAL"){
+            if(isEmpty(animal)){
+                malanimal = true
+            }
+            else{
+                malanimal = false
+                onSelectAnimal()
+            }
+        }   
+        if(inputName == "FECHA"){
+            if(isEmpty(fecha)){
+                malfecha = true
+            }
+            else{
+                malfecha = false
+            }
         }
     }
 
@@ -275,7 +322,11 @@
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
             </form>
-            <h3 class="text-lg font-bold">Nueva observación</h3>  
+            {#if idobservacion==""}
+                <h3 class="text-lg font-bold">Nueva observación</h3>  
+            {:else}
+                <h3 class="text-lg font-bold">Editar observación</h3>  
+            {/if}
             <div class="form-control">
                 <label for = "animal" class="label">
                     <span class="label-text text-base">Animal</span>
@@ -291,11 +342,17 @@
                             ${estilos.bgdark2}
                         `}
                         bind:value={animal}
-                    >
+                        onchange={()=>oninput("ANIMAL")}
+                    >   
                         {#each animales as a}
                             <option value={a.id}>{a.caravana}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    {#if malanimal}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "categoria" class="label">
                     <span class="label-text text-base">Categoria</span>
@@ -332,7 +389,13 @@
                             ${estilos.bgdark2}
                         `} 
                         bind:value={fecha}
+                        onchange={()=>oninput("FECHA")}
                     />
+                    {#if malfecha}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tacto</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <div class="label">
                     <span class="label-text">Observacion</span>                    
@@ -356,9 +419,9 @@
                 <form method="dialog" >
                     <!-- if there is a button, it will close the modal -->
                     {#if idobservacion==""}
-                      <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                      <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
-                      <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                      <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
                     {/if}
                     <button class="btn btn-error text-white" onclick={cerrar}>Cancelar</button>
                   </form>

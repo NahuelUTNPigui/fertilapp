@@ -40,14 +40,28 @@
     let categoria = $state("")
     let fechadesdeins = $state("")
     let fechahastains = $state("")
+    //Validaciones
+    let malanimal = $state(false) 
+    let malpadre = $state(false)
+    let malfechaparto = $state(false)
+    let malfechadesde = $state(false)
+    let malfechahasta = $state(false)
+    let botonhabilitado = $state(false)
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]
         pajuela = p.caravana
+        oninput("PADRE")
     }
     function openNewModal(){
+        botonhabilitado = false
+        malanimal = false
+        malpadre = false
+        malfechaparto = false
+        malfechadesde = false
+        malfechahasta = false
         fecha = ""
         padre = ""
         idins = ""
@@ -71,6 +85,12 @@
         
     }
     function openEditModal(id){
+        botonhabilitado = true
+        malanimal = false
+        malpadre = false
+        malfechaparto = false
+        malfechadesde = false
+        malfechahasta = false
         idins = id
         let inseminacion = inseminaciones.filter(i => i.id == id)[0]
         fecha = inseminacion.fechaparto.split(" ")[0]
@@ -118,7 +138,8 @@
             let item = record
             item.expand ={animal:{caravana}}
             inseminaciones.push(item)
-            inseminacionesrow = inseminaciones
+            inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
+            filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
         }
         catch(err){
@@ -126,19 +147,27 @@
             Swal.fire("Error guardar","Hubo un error para guardar la inseminación","error")
         }
     }
+    function onSelectAnimal(){
+        let a = madres.filter(an=>an.id==idanimal)[0]
+        categoria = a.categoria
+    }
     async function editar(){
         try {
             let data = {
-                
                 fechaparto:fecha +' 03:00:00',
                 fechadesde:fechadesdeins+" 03:00:00",
                 fechahasta:fechahastains+" 03:00:00",
-                
                 padre,
                 pajuela,
                 categoria
             }
-            const record = await pb.collection('inseminacion').update(idanimal, data);
+            const record = await pb.collection('inseminacion').update(idins, data);
+            let idx = inseminaciones.findIndex(i=>i.id==idins)
+            let a = madres.filter(an=>an.id==idanimal)[0]
+            inseminaciones[idx]=record
+            inseminaciones[idx].expand={animal:a}
+            inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
+            filterUpdate()
             Swal.fire("Éxito editar","Se pudo editar la inseminación con exito","success")
         }catch(err){
             console.error(err)
@@ -159,7 +188,6 @@
             if(result.value){
                 try{
                     let data = {active:false}
-                    
                     const record = await pb.collection('inseminacion').update(idins, data);
                     inseminaciones = inseminaciones.filter(i=>i.id!=idins)
                     inseminacionesrow = inseminaciones
@@ -167,7 +195,6 @@
                 }
                 catch(err){
                     console.error(err)
-                    
                     Swal.fire("Éxito editar","Se pudo eliminar la inseminación con exito","success")
                 }
             }
@@ -190,7 +217,68 @@
         await getAnimales()
         await getInseminaciones()
     })
-
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(idanimal)){
+            botonhabilitado = false
+        }
+        if(isEmpty(pajuela)){
+            botonhabilitado = false
+        }
+        if(isEmpty(fecha)){
+            botonhabilitado = false
+        }
+        if(isEmpty(fechadesdeins)){
+            botonhabilitado = false
+        }
+        if(isEmpty(fechahastains)){
+            botonhabilitado = false
+        }
+    }
+    function oninput(campo){
+        validarBoton()
+        if(campo == "ANIMAL"){
+            if(isEmpty(idanimal)){
+                malanimal = true
+            }
+            else{
+                onSelectAnimal()
+                malanimal = false
+            }
+        }
+        if(campo == "PADRE"){
+            if(isEmpty(pajuela)){
+                malpadre = true
+            }
+            else{
+                malpadre = false
+            }
+        }
+        if(campo == "FECHA"){
+            if(isEmpty(fecha)){
+                malfechaparto = true
+            }
+            else{
+                malfechaparto = false
+            }
+        }
+        if(campo == "DESDE"){
+            if(isEmpty(fechadesdeins)){
+                malfechadesde = true
+            }
+            else{
+                malfechadesde = false
+            }
+        }
+        if(campo == "HASTA"){
+            if(isEmpty(fechahastains)){
+                malfechahasta = true
+            }
+            else{
+                malfechahasta = false
+            }
+        }
+    }
 
     
 </script>
@@ -314,11 +402,18 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={idanimal}
+                        onchange={()=>oninput("ANIMAL")}
                     >
                         {#each madres as m}
                             <option value={m.id}>{m.caravana}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    {#if malanimal}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                        </div>
+                    {/if}
+
                 </label>
                 <label for = "tipo" class="label">
                     <span class="label-text text-base">Categoria</span>
@@ -358,7 +453,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={pajuela}
+                        oninput={()=>oninput("PADRE")}
                     />
+                    {#if malpadre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre del padre</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "padre" class="label">
                     <span class="label-text text-base">Padre</span>
@@ -394,7 +495,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={fecha}
+                        onchange={()=>oninput("FECHA")}
                     />
+                    {#if malfechaparto}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha aproximada de parto</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "fechadesde" class="label">
                     <span class="label-text text-base">Fecha desde</span>
@@ -410,7 +517,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={fechadesdeins}
+                        onchange={()=>oninput("DESDE")}
                     />
+                    {#if malfechadesde}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha desde</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "fechahasta" class="label">
                     <span class="label-text text-base">Fecha hasta</span>
@@ -426,7 +539,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={fechahastains}
+                        onchange={()=>oninput("HASTA")}
                     />
+                    {#if malfechahasta}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha hasta</span>                    
+                        </div>
+                    {/if}
                 </label>
 
             </div>
@@ -434,9 +553,9 @@
                 <form method="dialog" >
                     <!-- if there is a button, it will close the modal -->
                     {#if idins == ""}
-                        <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                        <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
-                        <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                        <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
                     {/if}
                     <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
                 </form>

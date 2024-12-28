@@ -40,6 +40,8 @@
     let malfecha = $state(false)
     let maltipo = $state(false)
     let botonhabilitado=$state(false)
+    //Validaciones tipo
+    let botontipo = $state(false)
 
 
     function isEmpty(str){
@@ -58,6 +60,12 @@
         }
         if(isEmpty(fecha)){
             botonhabilitado = false
+        }
+    }
+    function validarBotonTipo(){
+        botontipo = true
+        if(isEmpty(nombretipotratamiento)){
+            botontipo = false
         }
     }
     function cambioAnimal(){
@@ -570,6 +578,7 @@
                                         
                                     `}
                                     bind:value={nombretipotratamiento}
+                                    oninput={validarBotonTipo}
                                 />
                             </label>
                         </div>
@@ -582,6 +591,7 @@
                                     ${estilos.basico} ${estilos.chico} ${estilos.primario}
                                 `}
                                 onclick={guardarTipo}
+                                disabled='{!botontipo}'
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
                                     <path d="M11 2H9v3h2z"/>

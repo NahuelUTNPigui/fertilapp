@@ -22,6 +22,9 @@
     //Guardar
     let idrodeo = $state("")
     let nombre = $state("")
+    //validacciones
+    let malnombre = $state(false)
+    let botonhabilitado = $state(false)
 
     function ordenar(lista){
         lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
@@ -144,6 +147,26 @@
     onMount(async ()=>{
         await getRodeos()
     })
+    function isEmpty(str){
+        return (!str || str.length === 0 );
+    }
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(nombre)){
+            botonhabilitado = false
+        }
+
+    }
+    function oninput(){
+        validarBoton()
+
+        if(isEmpty(nombre)){
+            malnombre = true
+        }
+        else{
+            malnombre = false
+        }
+    }
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-start mx-1 lg:mx-10 mt-1">
@@ -234,16 +257,22 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={nombre}
+                        oninput={oninput}
                     />
+                    {#if malnombre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre del rodeo</span>                    
+                        </div>
+                    {/if}
                 </label>
             </div>
             <div class="modal-action justify-start ">
                 <form method="dialog" >
                     <!-- if there is a button, it will close the modal -->
                     {#if idrodeo==""}
-                        <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>  
+                        <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>  
                     {:else}
-                        <button class="btn btn-success text-white" onclick={editar} >Editar</button>  
+                        <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>  
                     {/if}
                   
                   <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>

@@ -40,6 +40,9 @@
     let malmadre = $state(false)
     let malpadre = $state(false)
     let malfecha = $state(false)
+    let malcaravana = $state(false)
+    let malsexo = $state(false)
+    let botonhabilitado=$state(false)
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -98,7 +101,7 @@
             }
             nacimientos.push(item)
             
-            nacimientos.sort((n1,n2)=>n1.fecha<n2.fecha?-1:1)
+            nacimientos.sort((n1,n2)=>new Date(n1.fecha)>new Date(n2.fecha)?-1:1)
             filterUpdate()
 
             
@@ -138,7 +141,7 @@
             }
             nacimientos = nacimientos.filter(n=>n.id!=idnacimiento)
             nacimientos.push(item)
-            nacimientos.sort((n1,n2)=>n1.fecha<n2.fecha?-1:1)
+            nacimientos.sort((n1,n2)=>new Date(n1.fecha)>new Date(n2.fecha)?-1:1)
             filterUpdate()
             idnacimiento = ""
             caravana = ""
@@ -182,10 +185,22 @@
         observacion = ""
         peso=""
         idanimal = ""
+        botonhabilitado = false
+        malcaravana = false
+        malfecha  = false
+        malmadre = false
+        malpadre = false
+
         nuevoModal.showModal()
     }
     function openEditModal(id){
+        botonhabilitado = true
+        malcaravana = false
+        malfecha = false
+        malmadre = false
+        malpadre = false
         idnacimiento = id
+        
         nacimiento = nacimientos.filter(n=>n.id == id)[0]
         if(nacimiento.padre){
             padre = nacimiento.padre
@@ -263,10 +278,79 @@
     function getNombreMadre(){
         let m = madres.filter(item=>item.id == madre)[0]
         nombremadre = m.caravana
+        onchange("MADRE")
     }
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]
         nombrepadre = p.caravana
+        onchange("PADRE")
+    }
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(fecha)){
+            botonhabilitado = false
+            
+        }
+        if(isEmpty(nombremadre)){
+            botonhabilitado = false
+            
+        }
+        if(isEmpty(nombrepadre)){
+            botonhabilitado = false
+            
+        }
+        if(idnacimiento == "" && isEmpty(sexo)){
+            botonhabilitado = false
+            
+        }
+        if(isEmpty(caravana)){
+            botonhabilitado = false
+            
+        }
+    }
+    function onchange(nombreCampo){
+        validarBoton()
+        if(nombreCampo=="FECHA"){
+            if(isEmpty(fecha)){
+                malfecha = true
+            }
+            else{
+                malfecha = false
+            }
+        }
+        if(nombreCampo=="CARAVANA"){
+            if(isEmpty(caravana)){
+                malcaravana = true
+            }
+            else{
+                malcaravana = false
+            }
+        }
+        if(nombreCampo=="MADRE"){
+            if(isEmpty(nombremadre)){
+                malmadre = true
+            }
+            else{
+                malmadre = false
+            }
+        }
+        if(nombreCampo=="PADRE"){
+            if(isEmpty(nombrepadre)){
+                malpadre=true
+            }
+            else{
+                malpadre = true
+            }
+        }
+
+        if(nombreCampo=="SEXO"){
+            if(isEmpty(sexo)){
+                malsexo = true
+            }
+            else{
+                malsexo = false
+            }
+        }
     }
 </script>
 <Navbarr>
@@ -392,9 +476,17 @@
                             
                         `}
                         disabled={idnacimiento!=""}
+                      
                         bind:value={caravana}
+                        oninput={()=>onchange("CARAVANA")}
                     />
+                    {#if malcaravana}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir la caravana del animal por nacer</span>                    
+                        </div>
+                    {/if}
                 </label>
+                
                 {#if idnacimiento == ""}
                 <label for = "sexo" class="label">
                     <span class="label-text text-base">Sexo</span>
@@ -410,12 +502,19 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={sexo}
+                        onchange={()=>onchange("SEXO")}
                     >
                         {#each sexos as s}
                             <option value={s.id}>{s.nombre}</option>    
                         {/each}
-                      </select>
+                    </select>
+                    {#if malsexo}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el sexo del animal</span>                    
+                        </div>
+                    {/if}
                 </label>
+
                 <label for = "peso" class="label">
                     <span class="label-text text-base">Peso (KG)</span>
                 </label>
@@ -446,7 +545,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={fecha}
+                        onchange={()=>onchange("FECHA")}
                     />
+                    {#if malfecha}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del nacimiento</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "nombremadre" class="label">
                     <span class="label-text text-base">Caravana madre</span>
@@ -466,7 +571,14 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={nombremadre}
+                        oninput={()=>onchange("MADRE")}
+                        
                     />
+                    {#if malmadre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre de la madre</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "madre" class="label">
                     <span class="label-text text-base">Madre</span>
@@ -506,7 +618,13 @@
                             ${estilos.bgdark2} 
                         `}
                         bind:value={nombrepadre}
+                        oninput={()=>onchange("PADRE")}
                     />
+                    {#if malmadre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre del padre</span>                    
+                        </div>
+                    {/if}
                 </label>
                 <label for = "padre" class="label">
                     <span class="label-text text-base">Padre</span>
@@ -562,9 +680,9 @@
                 <form method="dialog" >
                   <!-- if there is a button, it will close the modal -->
                   {#if idnacimiento == ""}
-                    <button class="btn btn-success text-white" onclick={guardar} >Guardar</button>
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
-                    <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
                   {/if}
                   <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
                 </form>
