@@ -1,5 +1,6 @@
 <script>
     import Navbarr from '$lib/components/Navbarr.svelte';
+    import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
@@ -19,7 +20,7 @@
     let cab = caber.cab
     let usuarioid = userer.userid
     // Datos para mostrar
-    let inseminaciones = []
+    let inseminaciones = $state([])
     let inseminacionesrow = $state([])
     let buscar = $state("")
     let fechadesde = $state("")
@@ -113,12 +114,12 @@
     async function getInseminaciones(){
         // you can also fetch all records at once via getFullList
         const records = await pb.collection('inseminacion').getFullList({
-            sort: '-created ',
+            sort: '-fechaparto ',
             filter :`cab = '${cab.id}' && active = true`,
             expand:"animal"
         });
         inseminaciones = records
-        inseminacionesrow = records
+        inseminacionesrow = inseminaciones
     }
     async function guardar(){
         try{
@@ -137,10 +138,12 @@
             const record = await pb.collection('inseminacion').create(data);
             let item = record
             item.expand ={animal:{caravana}}
+            
             inseminaciones.push(item)
             inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
+            
             filterUpdate()
-            Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
+            Swal.fire("Éxito guardar","Se pudo gu   ardar la inseminación con exito","success")
         }
         catch(err){
             console.error(err)
@@ -164,9 +167,11 @@
             const record = await pb.collection('inseminacion').update(idins, data);
             let idx = inseminaciones.findIndex(i=>i.id==idins)
             let a = madres.filter(an=>an.id==idanimal)[0]
+            
             inseminaciones[idx]=record
             inseminaciones[idx].expand={animal:a}
             inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
+            
             filterUpdate()
             Swal.fire("Éxito editar","Se pudo editar la inseminación con exito","success")
         }catch(err){
@@ -202,7 +207,9 @@
         
     }
     function filterUpdate(){
-        let inseminacionesrow = inseminaciones
+        
+        inseminacionesrow = inseminaciones
+        
         if(buscar !=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.startsWith(buscar))
         }
@@ -279,6 +286,15 @@
             }
         }
     }
+    function prepararData(item){
+        return {
+            ANIMAL:item.expand.animal.caravana,
+            PAJUELA:item.pajuela,
+            FECHAPARTO:new Date(item.fechaparto).toLocaleDateString(),
+            FECHADESDE:new Date(item.fechadesde).toLocaleDateString(),
+            FECHAHASTA:new Date(item.fechahasta).toLocaleDateString()
+        }
+    }
 
     
 </script>
@@ -328,11 +344,20 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div class="w-11/12 lg:w-1/2">
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div >
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nueva inseminación</span>
             </button>
+        </div>
+        <div>
+            <Exportar
+                titulo={"Inseminaciones"}
+                filtros={[]}
+                confiltros={false}
+                data = {inseminacionesrow}
+                {prepararData}
+            />
         </div>
     </div>
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">

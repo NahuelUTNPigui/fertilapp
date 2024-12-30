@@ -7,6 +7,7 @@ export default{
     secundario:"text-gray-600 border-gray-400 hover:bg-gray-200 hover:bg-opacity-50 focus:ring-gray-500  dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-700 dark:hover:bg-opacity-50 dark:focus:ring-offset-gray-900",
     danger: "text-red-500 border-red-500 hover:bg-red-500 hover:bg-opacity-10 focus:ring-red-500  dark:text-red-400 dark:border-red-400 dark:hover:bg-red-400 dark:hover:bg-opacity-10 dark:focus:ring-offset-gray-800",
     grande:"px-8 py-4 text-lg",
+    
     medio:"px-6 py-3 text-base",
     chico:"px-4 py-2 text-sm",
     basico:"font-medium bg-transparent border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200",

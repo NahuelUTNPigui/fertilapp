@@ -1,5 +1,6 @@
 <script>
     import Navbarr from '$lib/components/Navbarr.svelte';
+    import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
@@ -352,6 +353,15 @@
             }
         }
     }
+    function prepararData(item){
+        return {
+            CARAVANA:item.caravana,
+            FECHA:new Date(item.fecha).toLocaleDateString(),
+            MADRE:item.nombremadre,
+            PADRE:item.nombrepadre,
+            OBSERVACION:item.observacion
+        }
+    }
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
@@ -398,11 +408,20 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div class="w-11/12 lg:w-1/2">
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div >
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo nacimiento</span>
             </button>
+        </div>
+        <div>
+            <Exportar
+            titulo ={"Nacimientos"}
+            filtros = {[]}
+            confiltros = {false}
+            data = {nacimientosrow}
+            {prepararData}
+            />
         </div>
     </div>  
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">

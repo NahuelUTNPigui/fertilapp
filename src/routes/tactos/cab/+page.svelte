@@ -1,5 +1,6 @@
 <script>
     import Navbarr from "$lib/components/Navbarr.svelte";
+    import Exportar from "$lib/components/Exportar.svelte";
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
@@ -9,6 +10,7 @@
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
     import { createCaber } from "$lib/stores/cab.svelte";
+    import Tactos from "$lib/components/animal/Tactos.svelte";
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -261,6 +263,12 @@
             }
         }
     }
+    
+    function prepararData(item){
+        return {
+
+        }
+    }
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
@@ -306,11 +314,20 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div class="w-11/12 lg:w-1/2">
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div>
             <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo tacto</span>
             </button>
+        </div>
+        <div class="hidden">
+            <Exportar
+                titulo ={"Tactos"}
+                filtros = {[]}
+                confiltros = {false}
+                data = {tactosrow}
+                {prepararData}
+            />
         </div>
     </div>
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">

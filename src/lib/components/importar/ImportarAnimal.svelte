@@ -141,18 +141,15 @@
                 datamod.rodeo = rodeo.id
             }
             try{
-                
-                
-                const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,
+                const record = await pb.collection('animales').getFirstListItem(`
+                    caravana="${an.caravana}" && cab='${cab.id}' && active = True`,
                 {});
-                console.log("mod")
-
                 await pb.collection('animales').update(record.id, datamod);
 
                 
             }
             catch(err){
-                console.log("Add")
+                
                 await pb.collection('animales').create(dataadd);
 
             }

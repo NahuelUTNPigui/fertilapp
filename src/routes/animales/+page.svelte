@@ -2,6 +2,7 @@
     //En esta pagina solo se van a crear y ver animales
     //Se pueden crear nuevos animales con un nacimientos
     import Navbarr from '$lib/components/Navbarr.svelte';
+    import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
@@ -23,7 +24,7 @@
     
 
     //Datos para mostrar
-    let animales = []   
+    let animales = $state([])
     let animalesrows = $state([])
     let rodeos = $state([])
     let lotes = $state([])
@@ -196,7 +197,7 @@
     function filterUpdate(){
         animalesrows = animales
         if(buscar != ""){
-            animalesrows = animalesrows.filter(a=>a.caravana.startsWith(buscar))
+            animalesrows = animalesrows.filter(a=>a.caravana.includes(buscar))
         }
         if(sexobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexobuscar)
@@ -268,6 +269,39 @@
         rodeo = ""
         nuevoModal.close()
         
+    }
+    function prepararData(item){
+        return {
+            CARAVANA:item.caravana,
+            NACIMIENTO:item.fechanacimiento?new Date(item.fechanacimiento).toLocaleDateString():"",
+            PADRE:item.expand?
+                item.expand.nacimiento?
+                    item.expand.nacimiento.nombrepadre:
+                "":
+                "",
+            MADRE:item.expand?
+                item.expand.nacimiento?
+                item.expand.nacimiento.nombremadre:
+                "":
+                "",
+            SEXO:item.sexo=="M"?"Macho":"Hembra",
+            PESO:item.peso,
+            RODEO:
+                item.expand?
+                item.expand.rodeo?
+                item.expand.rodeo.nombre:
+                "":
+                "",
+            LOTE:item.expand?
+                item.expand.rodeo?
+                item.expand.rodeo.nombre:
+                "":
+                "",
+            CATEGORIA:item.categoria,
+            ESTADO:item.prenada == 2?"Preñada":item.prenada==1?"Dudosa":"Vacía",
+            FALLECIMIENTO:item.fechafallecimiento?new Date(item.fechafallecimiento).toLocaleDateString():""
+
+        }
     }
 </script>
 <Navbarr>
@@ -369,11 +403,21 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div class="w-11/12 lg:w-1/2">
-            <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div >
+            <button class={`w-full btn btn-primary rounded-full flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo animal</span>
             </button>
+        </div>
+        <div>
+            
+            <Exportar
+                titulo ={"Animales"}
+                filtros = {[]}
+                confiltros = {false}
+                data = {animalesrows}
+                {prepararData}
+            />
         </div>
     </div>
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">

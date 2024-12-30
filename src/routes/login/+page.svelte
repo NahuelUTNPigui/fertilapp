@@ -40,8 +40,7 @@
 
             if(pb.authStore.isValid){
                 if(pb.authStore.model.active){
-                    // after the above you can also access the auth data from the authStore
-                    //Hace falta?
+                    
                     usuario.set(pb.authStore.token)
                     enabled.set("si")
                     // Cuando te logeas, deberia revisar si tenes una cabaña

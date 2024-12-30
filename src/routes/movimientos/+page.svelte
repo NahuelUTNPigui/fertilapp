@@ -112,28 +112,21 @@
         if(todos){
             todos = false
             ninguno = true
-            for(let i = 0;i<animalesrows.length;i++){
-                selecthashmap[animalesrows[i].id] = null
-            }
+            algunos = false
+            selecthashmap = {}
         }
-        if(ninguno){
+        else if(ninguno){
             ninguno = false
             todos = true
             for(let i = 0;i<animalesrows.length;i++){
-                let a = animalesrows.filter(an=>an.id==id)[0]
+                let a = animalesrows[i]
                 selecthashmap[animalesrows[i].id] = {
                     ...a
                 }
             }
         }
-        if (algunos){
-            let lista = []
-            for (const [key, value ] of Object.entries(selecthashmap)) {
-                lista.push(key)
-            }
-            for(let i = 0;i<lista.length;i++){
-                selecthashmap[lista[i]] = null
-            }
+        else if (algunos){
+            selecthashmap = {}
             algunos = false
             todos = false
             ninguno = true

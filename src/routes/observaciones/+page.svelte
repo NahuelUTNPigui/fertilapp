@@ -1,5 +1,6 @@
 <script>
     import Navbarr from '$lib/components/Navbarr.svelte';
+    import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
@@ -63,9 +64,15 @@
         observacion = ""
         categoria = ""
         fecha = ""
+        botonhabilitado = false
+        malanimal = false
+        malfecha = false
         nuevoModal.showModal()
     }
     function openModalEditar(id){
+        botonhabilitado = true
+        malanimal = false
+        malfecha = false
         idobservacion = id
         let obs = observaciones.filter(o=>o.id==idobservacion)[0]
         observacion = obs.observacion
@@ -144,7 +151,7 @@
                 active:true
             }
             const record = await pb.collection('observaciones').create(data);
-            let a = animales.filter(an=>a.id==animal)[0]
+            let a = animales.filter(an=>an.id==animal)[0]
             let item = {
                 ...record,
                 expand:{animal:a}
@@ -170,7 +177,7 @@
                 observacion
             }
             const record = await pb.collection('observaciones').update(idobservacion, data);
-            let a = animales.filter(an=>a.id==animal)[0]
+            let a = animales.filter(an=>an.id==animal)[0]
             let idx = observaciones.findIndex(o=>o.id==idobservacion)
             observaciones[idx] = record
             observaciones[idx].expand = {animal:a}
@@ -215,6 +222,13 @@
             else{
                 malfecha = false
             }
+        }
+    }
+    function prepararData(item){
+        return {
+            CARAVANA:item.expand.animal.caravana,
+            FECHA:new Date(item.fecha).toLocaleDateString(),
+            OBSERVACION:item.observacion
         }
     }
 
@@ -264,11 +278,21 @@
                 </label>
             </div>
     </div>
-    <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-            <div class="w-11/12 lg:w-1/2">
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+            <div>
                 <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                     <span  class="text-xl">Nueva observación</span>
                 </button>
+            </div>
+            <div>
+            
+                <Exportar
+                    titulo ={"Observaciones"}
+                    filtros = {[]}
+                    confiltros = {false}
+                    data = {observacionesrow}
+                    {prepararData}
+                />
             </div>
     </div>
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
