@@ -44,7 +44,7 @@
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}' && sexo='H' || sexo ='M'`,
+            filter:`active=true && cab='${cab.id}' && (sexo='H' || sexo ='M')`,
             expand:"nacimiento"
         })
         animales = recordsa

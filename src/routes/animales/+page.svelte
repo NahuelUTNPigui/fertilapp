@@ -412,7 +412,7 @@
         <div>
             
             <Exportar
-                titulo ={"Animales"}
+                titulo = {"Animales"}
                 filtros = {[]}
                 confiltros = {false}
                 data = {animalesrows}
