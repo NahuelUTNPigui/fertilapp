@@ -95,7 +95,8 @@
                     animaleshashmap[tail].peso = value.v
                 }
                 if(firstLetter=="C"){
-                    animaleshashmap[tail].sexo = value.v
+                    
+                    animaleshashmap[tail].sexo = value.v 
                 }
                 if(firstLetter=="D"){
                     animaleshashmap[tail].rodeo = value.v

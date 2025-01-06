@@ -393,6 +393,15 @@
             />
         </div>
     </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
+        <div>
+            Madre
+        </div>
+        <div>
+            Padre
+        </div>
+        
+    </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
         <div class="w-full lg:w-1/2">
             <label 

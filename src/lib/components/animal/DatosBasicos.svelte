@@ -213,6 +213,7 @@
         }
         try{
             const record = await pb.collection('animales').update(id, data);
+            const recordhistorial = await pb.collection('historialanimales').create(data)
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana
