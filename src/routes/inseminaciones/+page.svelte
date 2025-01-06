@@ -23,30 +23,29 @@
     let inseminaciones = $state([])
     let inseminacionesrow = $state([])
     let buscar = $state("")
-    let fechadesde = $state("")
-    let fechahasta = $state("")
     
     //Datos inseminaciones
     let idins = $state("")
-    // La inseminacion es a un animal mujer que luego sera un nacimiento
+    // La inseminacion es a un animal hembra que luego sera un nacimiento
     let padre = $state("")
     let pajuela = $state("")
 
     //Seria la fecha del parto
-    let fecha = $state("")
+    let fechaparto = $state("")
     let madres = $state([])
     let padres = $state([])
     let idanimal = $state("")
     //Datos de la inseminacion
     let categoria = $state("")
-    let fechadesdeins = $state("")
-    let fechahastains = $state("")
+    let fechainseminacion = $state("")
+    //Filtro de inseminaciones
+    let fechainseminacionhasta = $state("")
+    let fechainseminaciondesde = $state("")
     //Validaciones
     let malanimal = $state(false) 
     let malpadre = $state(false)
+    let malfechainseminacion = $state(false)
     let malfechaparto = $state(false)
-    let malfechadesde = $state(false)
-    let malfechahasta = $state(false)
     let botonhabilitado = $state(false)
     function isEmpty(str){
         return (!str || str.length === 0 );
@@ -60,27 +59,22 @@
         botonhabilitado = false
         malanimal = false
         malpadre = false
+        malfechainseminacion = false
         malfechaparto = false
-        malfechadesde = false
-        malfechahasta = false
-        fecha = ""
+        fechaparto = ""
         padre = ""
         idins = ""
         idanimal = ""
         categoria = ""
-        fechadesdeins = ""
-        fechahastains = ""
         pajuela = ""
         nuevoModal.showModal()
     }
     function cerrarModal(){
-        fecha = ""
+        fechaparto = ""
         padre = ""
         idins = ""
         idanimal = ""
         categoria = ""
-        fechadesdeins = ""
-        fechahastains = ""
         pajuela = ""
         nuevoModal.close()
         
@@ -89,17 +83,15 @@
         botonhabilitado = true
         malanimal = false
         malpadre = false
+        malfechainseminacion = false
         malfechaparto = false
-        malfechadesde = false
-        malfechahasta = false
         idins = id
         let inseminacion = inseminaciones.filter(i => i.id == id)[0]
-        fecha = inseminacion.fechaparto.split(" ")[0]
+        fechaparto = inseminacion.fechaparto.split(" ")[0]
         padre = inseminacion.padre
         pajuela = inseminacion.pajuela
         categoria = inseminacion.categoria
-        fechadesdeins = inseminacion.fechadesde.split(" ")[0]
-        fechahastains = inseminacion.fechahasta.split(" ")[0]
+        fechainseminacion = inseminacion.fechainseminacion.split(" ")[0]
         idanimal = inseminacion.animal
         nuevoModal.showModal()
     }
@@ -114,7 +106,7 @@
     async function getInseminaciones(){
         // you can also fetch all records at once via getFullList
         const records = await pb.collection('inseminacion').getFullList({
-            sort: '-fechaparto ',
+            sort: '-fechainseminacion ',
             filter :`cab = '${cab.id}' && active = true`,
             expand:"animal"
         });
@@ -126,10 +118,9 @@
             let caravana = madres.filter(a=>a.id==idanimal)[0].caravana
             let data = {
                 cab:cab.id,
-                animal : idanimal,
-                fechaparto:fecha +' 03:00:00',
-                fechadesde:fechadesdeins+" 03:00:00",
-                fechahasta:fechahastains+" 03:00:00",
+                animal: idanimal,
+                fechaparto:fechaparto +' 03:00:00',
+                fechainseminacion: fechainseminacion + ' 03:00:00',
                 active:true,
                 padre,
                 pajuela,
@@ -143,7 +134,7 @@
             inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
             
             filterUpdate()
-            Swal.fire("Éxito guardar","Se pudo gu   ardar la inseminación con exito","success")
+            Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
         }
         catch(err){
             console.error(err)
@@ -157,9 +148,8 @@
     async function editar(){
         try {
             let data = {
-                fechaparto:fecha +' 03:00:00',
-                fechadesde:fechadesdeins+" 03:00:00",
-                fechahasta:fechahastains+" 03:00:00",
+                fechaparto: fechaparto +' 03:00:00',
+                fechainseminacion: fechainseminacion + ' 03:00:00',
                 padre,
                 pajuela,
                 categoria
@@ -213,11 +203,11 @@
         if(buscar !=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.startsWith(buscar))
         }
-        if(fechadesde !=""){
-            inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto >= fechadesde)
+        if(fechainseminacionhasta!=""){
+            inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion <= fechainseminacionhasta)
         }
-        if(fechahasta!=""){
-            inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto <= fechahasta)
+        if(fechainseminaciondesde!=""){
+            inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion >= fechainseminaciondesde)
         }
     }
     onMount(async ()=>{
@@ -232,13 +222,7 @@
         if(isEmpty(pajuela)){
             botonhabilitado = false
         }
-        if(isEmpty(fecha)){
-            botonhabilitado = false
-        }
-        if(isEmpty(fechadesdeins)){
-            botonhabilitado = false
-        }
-        if(isEmpty(fechahastains)){
+        if(isEmpty(fechaparto)){
             botonhabilitado = false
         }
     }
@@ -261,28 +245,20 @@
                 malpadre = false
             }
         }
-        if(campo == "FECHA"){
-            if(isEmpty(fecha)){
+        if(campo == "FECHAPARTO"){
+            if(isEmpty(fechaparto)){
                 malfechaparto = true
             }
             else{
                 malfechaparto = false
             }
         }
-        if(campo == "DESDE"){
-            if(isEmpty(fechadesdeins)){
-                malfechadesde = true
+        if(campo == "FECHAINSEMINACION"){
+            if(isEmpty(fechainseminacion)){
+                malfechainseminacion = true
             }
             else{
-                malfechadesde = false
-            }
-        }
-        if(campo == "HASTA"){
-            if(isEmpty(fechahastains)){
-                malfechahasta = true
-            }
-            else{
-                malfechahasta = false
+                malfechainseminacion = false
             }
         }
     }
@@ -291,8 +267,7 @@
             ANIMAL:item.expand.animal.caravana,
             PAJUELA:item.pajuela,
             FECHAPARTO:new Date(item.fechaparto).toLocaleDateString(),
-            FECHADESDE:new Date(item.fechadesde).toLocaleDateString(),
-            FECHAHASTA:new Date(item.fechahasta).toLocaleDateString()
+            FECHAINSEMINACION: new Date(item.fechainseminacion).toLocaleDateString()
         }
     }
 
@@ -305,30 +280,29 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
         <div class="">
             <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha desde
+              Fecha de Inseminacion desde:
             </label>
-            <input id ="fechadesde" type="date"  
+            <input id ="fechainseminaciondesde" type="date"  
                 class={`
                     input input-bordered
                     ${estilos.bgdark2}
                 `} 
-                bind:value={fechadesde} onchange={filterUpdate}
+                bind:value={fechainseminaciondesde} onchange={filterUpdate}
             />
         </div>
         <div class="">
             <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha Hasta
+                Fecha de Inseminacion hasta:
             </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechahasta} onchange={filterUpdate}
+            <input id ="fechainseminacionhasta" type="date"  
+                  class={`
+                      input input-bordered
+                      ${estilos.bgdark2}
+                  `} 
+                  bind:value={fechainseminacionhasta} onchange={filterUpdate}
             />
-        </div>
-    </div>
-    
+        </div>  
+    </div>  
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
         <div class="w-full lg:w-1/2">
             <label 
@@ -364,7 +338,7 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha parto</th>
+                    <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha inseminacion</th>
                     <th class="text-base mx-1 px-1">Caravana</th>
                     <th class="text-base mx-1 px-1">Acciones</th>
                 </tr>
@@ -372,7 +346,7 @@
             <tbody>
                 {#each inseminacionesrow as i}
                 <tr>
-                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechaparto).toLocaleDateString()}</td>
+                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechainseminacion).toLocaleDateString()}</td>
                     <td class="text-base mx-1 px-1">
                         {`${i.expand.animal.caravana}`}
                     </td>
@@ -506,8 +480,30 @@
                         {/each}
                       </select>
                 </label>
+                <label for = "fechainseminacion" class="label">
+                    <span class="label-text text-base">Fecha de inseminacion</span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechainseminacion" type="date" 
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fechainseminacion}
+                        onchange={()=>oninput("FECHAINSEMINACION")}
+                    />
+                    {#if malfechainseminacion}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha de inseminacion</span>                    
+                        </div>
+                    {/if}
+                </label>
                 <label for = "fechaparto" class="label">
-                    <span class="label-text text-base">Fecha parto</span>
+                    <span class="label-text text-base">Fecha estimada de parto</span>
                 </label>
                 <label class="input-group ">
                     <input id ="fechaparto" type="date" 
@@ -519,8 +515,8 @@
                             focus:border-green-500
                             ${estilos.bgdark2} 
                         `}
-                        bind:value={fecha}
-                        onchange={()=>oninput("FECHA")}
+                        bind:value={fechaparto}
+                        onchange={()=>oninput("FECHAPARTO")}
                     />
                     {#if malfechaparto}
                         <div class="label">
@@ -528,51 +524,6 @@
                         </div>
                     {/if}
                 </label>
-                <label for = "fechadesde" class="label">
-                    <span class="label-text text-base">Fecha desde</span>
-                </label>
-                <label class="input-group ">
-                    <input id ="fechadesde" type="date" 
-                        class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={fechadesdeins}
-                        onchange={()=>oninput("DESDE")}
-                    />
-                    {#if malfechadesde}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha desde</span>                    
-                        </div>
-                    {/if}
-                </label>
-                <label for = "fechahasta" class="label">
-                    <span class="label-text text-base">Fecha hasta</span>
-                </label>
-                <label class="input-group ">
-                    <input id ="fechaparto" type="date" 
-                        class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={fechahastains}
-                        onchange={()=>oninput("HASTA")}
-                    />
-                    {#if malfechahasta}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha hasta</span>                    
-                        </div>
-                    {/if}
-                </label>
-
             </div>
             <div class="modal-action justify-start ">
                 <form method="dialog" >
