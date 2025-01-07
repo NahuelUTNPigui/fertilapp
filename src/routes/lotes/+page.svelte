@@ -287,7 +287,7 @@
                     {/if}
                 </label>
             </div>
-            <div class="modal-action justify-start ">
+            <div class="modal-action justify-start">
                 <form method="dialog" >
                     <!-- if there is a button, it will close the modal -->
                     {#if idlote==""}
@@ -296,8 +296,6 @@
                         <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>  
                         <button class="btn btn-error text-white" onclick={()=>eliminar(idlote)}>Cancelar</button>
                     {/if}
-                  
-                  
                 </form>
             </div>
         </div>
