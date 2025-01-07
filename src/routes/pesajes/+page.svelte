@@ -173,9 +173,6 @@
         nuevoModal.showModal()   
         if(ninguno){
             Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            nuevorodeo = ""
-            nuevolote = ""
-            nuevacategoria = ""
             return
         }
         selectanimales = []
@@ -185,9 +182,6 @@
         }
         if(selectanimales.length==0){
             Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            nuevorodeo = ""
-            nuevolote = ""
-            nuevacategoria = ""
             return
         }
         
@@ -467,7 +461,7 @@
                             <tr>
                                 <td class="text-base p-0">{a.caravana}</td>
                                 <td class="text-base p-0">{a.peso}</td>
-                                <td class="border-b">
+                                <td class="">
                                     <input
                                       
                                       bind:value={selectanimales[i].pesonuevo}

@@ -69,6 +69,7 @@
         malfechainseminacion = false
         malfechaparto = false
         fechaparto = ""
+        fechainseminacion = ""
         padre = ""
         idins = ""
         idanimal = ""
@@ -133,6 +134,7 @@
                 pajuela,
                 categoria
             }
+            
             const record = await pb.collection('inseminacion').create(data);
             let item = record
             item.expand ={animal:{caravana}}
@@ -141,6 +143,7 @@
             inseminaciones.sort((i1,i2)=>new Date(i1.fechaparto)>new Date(i2.fechaparto)?-1:1)
             
             filterUpdate()
+
             Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
         }
         catch(err){
@@ -496,7 +499,7 @@
                         {`${i.expand.animal.caravana}`}
                     </td>
                     <td class="text-base mx-1 px-1 border-b">
-                        {`${i.expand.animal.categoria}`}
+                        {`${i.categoria}`}
                     </td>
                     <td class="text-base mx-1 px-1 border-b">
                         {`${i.pajuela}`}

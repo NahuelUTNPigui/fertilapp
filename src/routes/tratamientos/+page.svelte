@@ -412,7 +412,7 @@
         </button>
         {#if isOpenFilter}
             <div transition:slide>
-                <div class="grid grid-cols-2 lg:grid-cols-4" >
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-1" >
                     <div class="">
                         <label class="block tracking-wide  mb-2" for="grid-first-name">
                           Fecha desde

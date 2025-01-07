@@ -202,7 +202,9 @@
             await pb.collection('animales').update(animal,{
                 prenada
             })
+            /*
             let a = animales.filter(an=>an.id == animal)[0]
+            console.log(a)
             let item = {
                 ...record,
                 expand:{
@@ -211,6 +213,9 @@
                     }
                 }
             }
+            */
+            await getTactos()
+            filterUpdate()
             
             tactos.push(item)
             tactos.sort((t1,t2)=>new Date(t1.fecha)>new Date(t2.fecha)?-1:1)
@@ -477,26 +482,26 @@
             <tbody>
                 {#each tactosrow as t}
                     <tr onclick={()=>openModalEdit(t.id) } class=" hover:bg-gray-200 dark:hover:bg-gray-900">
-                        <td class="text-base">
+                        <td class="text-base border-b">
                             {`${new Date(t.fecha).toLocaleDateString()}`}
                         </td>
-                        <td class="text-base">
+                        <td class="text-base border-b">
                             {`${t.expand.animal.caravana}`}
                         </td>
-                        <td class="text-base">
+                        <td class="text-base border-b">
                             {`${capitalizeFirstLetter(t.expand.animal.categoria)}`}
                         </td>
-                        <td class="text-base p-3"> {
+                        <td class="text-base p-3 border-b"> {
                             t.prenada==2?
                             "Preñada":
                             t.prenada==1?
                             "Dudosa":
                             "Vacia"
                         }</td>
-                        <td class="text-base">
+                        <td class="text-base border-b">
                             {`${t.tipo=="eco"?"Ecografía":"Tacto"}`}
                         </td>
-                        <td class="text-base">
+                        <td class="text-base border-b">
                             {`${t.observacion}`}
                         </td>
                         <!--<td class="flex gap-2">
