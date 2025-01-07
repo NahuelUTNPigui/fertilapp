@@ -32,11 +32,11 @@
             <h3 class="text-lg font-bold">Nuevo reporte</h3>
             <div class="form-control">
                 <label for = "rodeo" class="label">
-                    <span class="label-text text-base">Rodeos</span>
+                    <span class="label-text text-base">Mostrar rodeos</span>
                 </label>
                 <input type="checkbox" name="rodeo">
                 <label for = "lote" class="label">
-                    <span class="label-text text-base">Lotes</span>
+                    <span class="label-text text-base">Mostrar lotes</span>
                 </label>
                 <input type="checkbox" name="lote">
             </div>
