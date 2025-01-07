@@ -490,15 +490,15 @@
             <tbody>
                 {#each inseminacionesrow as i}
                 <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>openEditModal(i.id)}>
-                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechainseminacion).toLocaleDateString()}</td>
-                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechaparto).toLocaleDateString()}</td>
-                    <td class="text-base mx-1 px-1">
+                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{new Date(i.fechainseminacion).toLocaleDateString()}</td>
+                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{new Date(i.fechaparto).toLocaleDateString()}</td>
+                    <td class="text-base mx-1 px-1 border-b">
                         {`${i.expand.animal.caravana}`}
                     </td>
-                    <td class="text-base mx-1 px-1">
+                    <td class="text-base mx-1 px-1 border-b">
                         {`${i.expand.animal.categoria}`}
                     </td>
-                    <td class="text-base mx-1 px-1">
+                    <td class="text-base mx-1 px-1 border-b">
                         {`${i.pajuela}`}
                     </td>
                     <!--<td class="flex gap-2 text-base mx-1 px-1">

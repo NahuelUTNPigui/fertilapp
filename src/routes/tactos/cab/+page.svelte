@@ -476,7 +476,7 @@
             </thead>
             <tbody>
                 {#each tactosrow as t}
-                    <tr onclick={()=>openModalEdit(t.id) } class="overflow-x-auto">
+                    <tr onclick={()=>openModalEdit(t.id) } class=" hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td class="text-base">
                             {`${new Date(t.fecha).toLocaleDateString()}`}
                         </td>

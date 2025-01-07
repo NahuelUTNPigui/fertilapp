@@ -412,26 +412,26 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base w-3/12"  >Fecha</th>
-                    <th class="text-base w-3/12"  >Animal</th>
-                    <th class="text-base w-3/12"  >Categoria</th>
-                    <th class="text-base w-3/12"  >Observacion</th>
+                    <th class="text-base border-b"  >Fecha</th>
+                    <th class="text-base border-b"  >Animal</th>
+                    <th class="text-base border-b"  >Categoria</th>
+                    <th class="text-base border-b"  >Observacion</th>
                     
                 </tr>
             </thead>
             <tbody>
                 {#each observacionesrow as o}
-                <tr onclick={()=>openModalEditar(o.id)}>
-                    <td class="text-base">
+                <tr onclick={()=>openModalEditar(o.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
+                    <td class="text-base border-b">
                         {`${new Date(o.fecha).toLocaleDateString()}`}
                     </td>
-                    <td class="text-base">
+                    <td class="text-base border-b">
                         {`${o.expand.animal.caravana}`}
                     </td>
-                    <td class="text-base">
+                    <td class="text-base border-b">
                         {`${o.categoria}`}
                     </td>
-                    <td class="text-base">
+                    <td class="text-base border-b">
                         {`${o.observacion}`}
                     </td>
                     <!--<td class="flex gap-2">

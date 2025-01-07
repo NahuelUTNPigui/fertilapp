@@ -222,9 +222,9 @@
             <tbody>
                 {#each lotesrows as r}
                     {#if r.total != 0 || mostrarVacios}                    
-                    <tr onclick={()=>openEditModal(r.id)}>
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{r.nombre}</td>
-                        <td class="text-base mx-1 px-1">{r.total}</td>
+                    <tr onclick={()=>openEditModal(r.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{r.nombre}</td>
+                        <td class="text-base mx-1 px-1 border-b">{r.total}</td>
                         <!--<td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(r.id)}>

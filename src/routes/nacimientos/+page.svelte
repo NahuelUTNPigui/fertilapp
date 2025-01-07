@@ -522,17 +522,17 @@
             <tbody>
                 {#each nacimientosrow as n}
                     <tr onclick={()=>openEditModal(n.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(n.fecha).toLocaleDateString()}</td>
-                        <td class="text-base mx-1 px-1">
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{new Date(n.fecha).toLocaleDateString()}</td>
+                        <td class="text-base mx-1 px-1 border-b">
                             {`${n.caravana}`}
                         </td>
-                        <td class="text-base mx-1 px-1">
+                        <td class="text-base mx-1 px-1 border-b">
                             {`${n.nombremadre}`}
                         </td>
-                        <td class="text-base mx-1 px-1">
+                        <td class="text-base mx-1 px-1 border-b">
                             {`${n.nombrepadre}`}
                         </td>
-                        <td class="text-base mx-1 px-1">
+                        <td class="text-base mx-1 px-1 border-b">
                             {`${n.observacion}`}
                         </td>
                         <!--<td class="flex gap-2 text-base mx-1 px-1">

@@ -316,22 +316,22 @@
             </label>
         {:else}
             <label for="nombre" 
-                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
                 {peso}
             </label>
         {/if}
     </div>
     <div class="mb-1 lg:mb-0">
-        
+        <label for = "sexo" class="label">
+            <span class="label-text text-base">Sexo</span>
+        </label>
         {#if modoedicion}
-            <label for = "sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
-            </label>
+            
             <label class="input-group ">
                 <select 
                     class={`
-                        select select-bordered w-full
+                        select select-bordered
                         border border-gray-300 rounded-md
                         focus:outline-none focus:ring-2 
                         focus:ring-green-500 focus:border-green-500
@@ -343,21 +343,20 @@
                 </select>
             </label>
         {:else}
-            <label for = "sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
-            </label>
+            
             <label for="sexo" 
-                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
                 {getSexo(sexo)}
             </label>
         {/if}
     </div>
     <div class="mb-1 lg:mb-0">
+        <label for = "rodeo" class="label">
+            <span class="label-text text-base">Rodeo</span>
+        </label>
         {#if modoedicion}
-            <label for = "rodeo" class="label">
-                <span class="label-text text-base">Rodeo</span>
-            </label>
+            
             <label class="input-group ">
                 <select 
                     class={`
@@ -373,21 +372,20 @@
                 </select>
             </label>
         {:else}
-            <label for = "rodeo" class="label">
-                <span class="label-text text-base">Rodeo</span>
-            </label>
+            
             <label for="rodeo" 
-                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
                 {nombrerodeo}
             </label>
         {/if}
     </div>
     <div class="mb-1 lg:mb-0">
+        <label for = "lote" class="label">
+            <span class="label-text text-base">Lote</span>
+        </label>
         {#if modoedicion}
-            <label for = "lote" class="label">
-                <span class="label-text text-base">Lote</span>
-            </label>
+            
             <label class="input-group ">
                 <select 
                     class={`
@@ -403,21 +401,20 @@
                 </select>
             </label>
         {:else}
-            <label for = "lote" class="label">
-                <span class="label-text text-base">Lote</span>
-            </label>
+            
             <label for="lote" 
-                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
                 {nombrelote}
             </label>
         {/if}
     </div>
     <div class="mb-1 lg:mb-0">
+        <label for = "categoria" class="label">
+            <span class="label-text text-base">Categoria</span>
+        </label>
         {#if modoedicion}
-            <label for = "categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
+            
             <label class="input-group ">
                 <select 
                     class={`
@@ -433,21 +430,20 @@
                 </select>
             </label>
         {:else}
-            <label for = "categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
+            
             <label for="lote" 
-                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-2`}
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
                 {categoria}
             </label>
         {/if}
     </div>
     <div class="mb-1 lg:mb-0">
+        <label for = "prenada" class="label">
+            <span class="label-text text-base">Estado</span>
+        </label>
         {#if modoedicion}
-            <label for = "prenada" class="label">
-                <span class="label-text text-base">Preñada</span>
-            </label>
+            
             <label class="input-group ">
                 <select 
                     class={`
@@ -461,11 +457,38 @@
                         <option value={e.id}>{e.nombre}</option>    
                     {/each}
                 </select>
+
             </label>
-            
+            <div class=" hidden flex inline">
+                <button
+                    
+                    class={`
+                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
+                    `}
+                    >
+                        Vacia
+                </button>
+                <button
+                    
+                    class={`
+                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
+                    `}
+                    >
+                        Dudosa
+                </button>
+                <button
+                    
+                    class={`
+                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
+                    `}
+                    >
+                        Preñada
+                </button>
+
+            </div>
         {:else}
             <label for = "prenada" class="label">
-                <span class="label-text text-base">
+                <span class="label-text text-base p-1">
                     {
                         prenada==2?"Preñada":
                         prenada==1?"Dudosa":
