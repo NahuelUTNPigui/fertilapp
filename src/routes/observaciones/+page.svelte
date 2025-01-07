@@ -2,6 +2,7 @@
     import Navbarr from '$lib/components/Navbarr.svelte';
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
+    import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import { createCaber } from '$lib/stores/cab.svelte';
@@ -34,10 +35,15 @@
     let botonhabilitado = $state(false)
     //Filtros
     let buscar = $state("")
+    let buscarcategoria = $state("")
     let fechadesde = $state("")
     let fechahasta = $state("")
-
+    let isOpenFilter = $state(false)
     //Funciones
+    //Para el collapse de los filtros
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -107,9 +113,13 @@
                 console.error(err)
             }
             idobservacion = ""
+            observacion = ""
+            categoria = ""
+            fecha = ""
             
           }
         })
+        
     }
     function cerrar(){
         idobservacion = ""
@@ -130,6 +140,9 @@
         }
         if(fechahasta!=""){
             observacionesrow = observacionesrow.filter(o=>o.fecha<=fechahasta)
+        }
+        if(buscarcategoria != ""){
+            observacionesrow = observacionesrow.filter(o=>o.categoria==buscarcategoria)
         }
     }
     onMount(async ()=>{
@@ -167,6 +180,11 @@
             console.error(err)
             Swal.fire("Error guardar","No se pudo guardar la observación","error")
         }
+        idobservacion = ""
+        fecha = ""
+        observacion = ""
+        categoria = ""
+        animal = ""
     }
     async function editar(){
         try{
@@ -235,10 +253,29 @@
 
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Observaciones</h1>  
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+        <div>
+            <h1 class="text-2xl">Observaciones</h1>  
+        </div>
+        <div class="flex col-span-2 gap-1 justify-end">
+            <div>
+                <button class={` btn btn-primary rounded-lg ${estilos.btntext} px-2 mx-1`} data-theme="forest" onclick={()=>openNewModal()}>
+                    <span  class="text-lg m-1">Nuevo</span>
+                </button>
+            </div>
+            <div>
+            
+                <Exportar
+                    titulo ={"Observaciones"}
+                    filtros = {[]}
+                    confiltros = {false}
+                    data = {observacionesrow}
+                    {prepararData}
+                />
+            </div>
+        </div>
     </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
+    <!--<div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
         <div class="">
             <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
                 Fecha desde
@@ -267,6 +304,24 @@
             Categoria
         </div>
     </div>
+    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div>
+            <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <span  class="text-xl">Nueva observación</span>
+            </button>
+        </div>
+        <div>
+        
+            <Exportar
+                titulo ={"Observaciones"}
+                filtros = {[]}
+                confiltros = {false}
+                data = {observacionesrow}
+                {prepararData}
+            />
+        </div>
+    </div>-->
+    
     <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
             <div class="w-full lg:w-1/2">
                 <label 
@@ -281,42 +336,105 @@
                 </label>
             </div>
     </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-            <div>
-                <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                    <span  class="text-xl">Nueva observación</span>
-                </button>
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-2">
+                <h1 class="font-medium py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
             </div>
-            <div>
-            
-                <Exportar
-                    titulo ={"Observaciones"}
-                    filtros = {[]}
-                    confiltros = {false}
-                    data = {observacionesrow}
-                    {prepararData}
-                />
+        </button>
+        {#if isOpenFilter}
+            <div transition:slide>
+                <div class="grid grid-cols-2 lg:grid-cols-4" >
+                    <div class="">
+                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                            Fecha desde
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechadesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                            Fecha Hasta
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `}  
+                            bind:value={fechahasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div>
+                        <label for = "categoria" class="label">
+                            <span class="label-text text-base">Categoria</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscarcategoria}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each categorias as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                </div>  
             </div>
+        {/if}
+
     </div>
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
                     <th class="text-base w-3/12"  >Fecha</th>
                     <th class="text-base w-3/12"  >Animal</th>
-                    <th class="text-base w-3/12"  >Acciones</th>
+                    <th class="text-base w-3/12"  >Categoria</th>
+                    <th class="text-base w-3/12"  >Observacion</th>
+                    
                 </tr>
             </thead>
             <tbody>
                 {#each observacionesrow as o}
-                <tr>
+                <tr onclick={()=>openModalEditar(o.id)}>
                     <td class="text-base">
                         {`${new Date(o.fecha).toLocaleDateString()}`}
                     </td>
-                    <td class="tex-base">
+                    <td class="text-base">
                         {`${o.expand.animal.caravana}`}
                     </td>
-                    <td class="flex gap-2">
+                    <td class="text-base">
+                        {`${o.categoria}`}
+                    </td>
+                    <td class="text-base">
+                        {`${o.observacion}`}
+                    </td>
+                    <!--<td class="flex gap-2">
                         <div class="tooltip" data-tip="Editar">
                             <button aria-label="Editar" onclick={()=>openModalEditar(o.id)}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -332,6 +450,7 @@
                             </button>
                         </div>
                     </td>
+                    -->
                 </tr>
                 {/each}
             </tbody>
@@ -449,8 +568,10 @@
                       <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
                       <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
+                      <button class="btn btn-error text-white" onclick={()=>eliminar(idobservacion)}>Eliminar</button>
                     {/if}
-                    <button class="btn btn-error text-white" onclick={cerrar}>Cancelar</button>
+                    
+                    
                   </form>
             </div>
         </div>

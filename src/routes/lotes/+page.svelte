@@ -169,10 +169,32 @@
     }
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-start mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Lote</h1>  
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+        <div>
+            <h1 class="text-2xl">Lote</h1>
+        </div>
+        <div>
+            <button class={`btn btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <span  class="text-xl">Nuevo</span>
+            </button>
+        </div>
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-1  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div class="grid grid-cols-3 lg:grid-cols-4 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+        <div class="col-span-2">
+            <label class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}>
+                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
+            </label>
+        </div>
+        <div>
+            <div class="form-control ">
+                <label class="label cursor-pointer flex justify-start gap-2">
+                  <span class="label-text text-lg">Vacios</span>
+                  <input type="checkbox" class="checkbox" bind:checked={mostrarVacios}/>
+                </label>
+            </div>
+        </div>
+    </div>
+    <!--<div class="grid grid-cols-1 lg:grid-cols-1  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12 lg:w-1/2">
             <label class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}>
                 <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
@@ -188,23 +210,23 @@
             <br>
             <input type="checkbox" class="toggle"bind:checked={mostrarVacios}/>
         </div>
-    </div>
+    </div>-->
     <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-3/4">
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Nombre</th>
                     <th class="text-base mx-1 px-1">Total</th>
-                    <th class="text-base mx-1 px-1">Acciones</th>
+                    <!--<th class="text-base mx-1 px-1">Acciones</th>-->
                 </tr>
             </thead>
             <tbody>
                 {#each lotesrows as r}
                     {#if r.total != 0 || mostrarVacios}                    
-                    <tr>
+                    <tr onclick={()=>openEditModal(r.id)}>
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{r.nombre}</td>
                         <td class="text-base mx-1 px-1">{r.total}</td>
-                        <td class="flex gap-2 text-base mx-1 px-1">
+                        <!--<td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(r.id)}>
                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
@@ -219,7 +241,7 @@
                                     </svg>                              
                                 </button>
                             </div>
-                        </td>
+                        </td>-->
                     </tr>
                     {/if}
                 {/each}
@@ -273,9 +295,10 @@
                         <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>  
                     {:else}
                         <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>  
+                        <button class="btn btn-error text-white" onclick={()=>eliminar(idlote)}>Cancelar</button>
                     {/if}
                   
-                  <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
+                  
                 </form>
             </div>
         </div>

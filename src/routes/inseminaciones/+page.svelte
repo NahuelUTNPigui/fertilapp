@@ -2,6 +2,7 @@
     import Navbarr from '$lib/components/Navbarr.svelte';
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
+    import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import { createCaber } from '$lib/stores/cab.svelte';
@@ -23,7 +24,7 @@
     let inseminaciones = $state([])
     let inseminacionesrow = $state([])
     let buscar = $state("")
-    
+    let isOpenFilter = $state(false)
     //Datos inseminaciones
     let idins = $state("")
     // La inseminacion es a un animal hembra que luego sera un nacimiento
@@ -41,12 +42,18 @@
     //Filtro de inseminaciones
     let fechainseminacionhasta = $state("")
     let fechainseminaciondesde = $state("")
+    let fechapartodesde = $state("")
+    let fechapartohasta = $state("")
+    let buscarpadre = $state("")
     //Validaciones
     let malanimal = $state(false) 
     let malpadre = $state(false)
     let malfechainseminacion = $state(false)
     let malfechaparto = $state(false)
     let botonhabilitado = $state(false)
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -274,35 +281,28 @@
     
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Inseminaciones</h1>  
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha de Inseminacion desde:
-            </label>
-            <input id ="fechainseminaciondesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechainseminaciondesde} onchange={filterUpdate}
-            />
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+        <div>
+            <h1 class="text-2xl">Inseminaciones</h1>
         </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-                Fecha de Inseminacion hasta:
-            </label>
-            <input id ="fechainseminacionhasta" type="date"  
-                  class={`
-                      input input-bordered
-                      ${estilos.bgdark2}
-                  `} 
-                  bind:value={fechainseminacionhasta} onchange={filterUpdate}
-            />
-        </div>  
-    </div>  
+        <div class="flex col-span-2 gap-1 justify-end">
+            <div>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                    <span  class="text-lg">Nueva</span>
+                </button>
+            </div>
+            <div>
+                <Exportar
+                    titulo={"Inseminaciones"}
+                    filtros={[]}
+                    confiltros={false}
+                    data = {inseminacionesrow}
+                    {prepararData}
+                />
+            </div>
+            
+        </div>
+    </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
         <div class="w-full lg:w-1/2">
             <label 
@@ -317,6 +317,130 @@
                 <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
             </label>
         </div>
+    </div>
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </button>
+        {#if isOpenFilter}
+            <div transition:slide>
+                <div class="grid grid-cols-2 lg:grid-cols-4" >
+                    <div class="">
+                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
+                          Inseminacion desde
+                        </label>
+                        <input id ="fechainseminaciondesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechainseminaciondesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
+                            Inseminacion hasta
+                        </label>
+                        <input id ="fechainseminacionhasta" type="date"  
+                              class={`
+                                  input input-bordered
+                                  ${estilos.bgdark2}
+                              `} 
+                              bind:value={fechainseminacionhasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
+                          Parto desde
+                        </label>
+                        <input id ="fechainseminaciondesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechapartodesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
+                            Parto hasta
+                        </label>
+                        <input id ="fechainseminacionhasta" type="date"  
+                              class={`
+                                  input input-bordered
+                                  ${estilos.bgdark2}
+                              `} 
+                              bind:value={fechapartohasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div>
+                        <label for = "nombrepadre" class="label">
+                            <span class="label-text text-base">Pajuela</span>
+                        </label>
+                        <label class="input-group">
+                            <input 
+                                id ="nombrepadre" 
+                                type="text"  
+                                class={`
+                                    input 
+                                    input-bordered 
+                                    border border-gray-300 rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 focus:ring-green-500 
+                                    focus:border-green-500
+                                    w-full 
+                                    ${estilos.bgdark2} 
+                                `}
+                                bind:value={buscarpadre}
+                                oninput={filterUpdate}
+                            />
+                        </label>
+                    </div>
+                    
+                </div>
+            </div>
+        {/if}
+    </div>
+    <!--<div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
+        <h1 class="text-2xl">Inseminaciones</h1>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
+        <div class="">
+            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+              Inseminacion desde
+            </label>
+            <input id ="fechainseminaciondesde" type="date"  
+                class={`
+                    input input-bordered
+                    ${estilos.bgdark2}
+                `} 
+                bind:value={fechainseminaciondesde} onchange={filterUpdate}
+            />
+        </div>
+        <div class="">
+            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                Inseminacion hasta
+            </label>
+            <input id ="fechainseminacionhasta" type="date"  
+                  class={`
+                      input input-bordered
+                      ${estilos.bgdark2}
+                  `} 
+                  bind:value={fechainseminacionhasta} onchange={filterUpdate}
+            />
+        </div>  
     </div>
     <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
         <div >
@@ -333,7 +457,7 @@
                 {prepararData}
             />
         </div>
-    </div>
+    </div>-->
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
         <table class="table table-lg w-full" >
             <thead>

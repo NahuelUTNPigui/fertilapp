@@ -382,11 +382,11 @@
             class="w-full"
             onclick={clickFilter}
         >
-            <div class="flex justify-between items-center px-2">
-                <h1 class="font-medium py-2">Filtros</h1>
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Filtros</h1>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
-                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>

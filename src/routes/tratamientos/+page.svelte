@@ -2,12 +2,14 @@
     import Navbarr from '$lib/components/Navbarr.svelte';
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
+    import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
     import categorias from '$lib/stores/categorias';
     import estilos from '$lib/stores/estilos';
+    
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -22,9 +24,14 @@
     let tratamientos = $state([])
     let tratamientosrow = $state([])
 
+
     let buscar = $state("")
     let fechadesde = $state("")
     let fechahasta = $state("")
+    let buscarcategoria = $state("")
+    let buscartipo = $state("")
+    let isOpenFilter = $state(false)
+
     //Datos tipo tratamiento
     let nombretipotratamiento = $state("")
     let idtipotratamiento = $state("")
@@ -43,8 +50,10 @@
     let botonhabilitado=$state(false)
     //Validaciones tipo
     let botontipo = $state(false)
-
-
+    //Para el collapse de los filtros
+    function clickFilter(){
+            isOpenFilter = !isOpenFilter
+    }
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -310,7 +319,22 @@
 
     }
     function filterUpdate(){
-
+        tratamientosrow = tratamientos
+        if(buscar != ""){
+            tratamientosrow = tratamientosrow.filter(t=>t.expand.animal.caravana.includes(buscar))
+        }
+        if(fechadesde != ""){
+            tratamientosrow = tratamientosrow.filter(t=>t.fecha>=fechadesde)
+        }
+        if(fechahasta != ""){
+            tratamientosrow = tratamientosrow.filter(t=>t.fecha<=fechahasta)
+        }
+        if(buscarcategoria != ""){
+            tratamientosrow = tratamientosrow.filter(t=>t.categoria == buscarcategoria)
+        }
+        if(buscartipo != ""){
+            tratamientosrow = tratamientosrow.filter(t=>t.tipo==buscartipo)
+        }
     }
     onMount(async()=>{
         await getTratamientos()
@@ -328,39 +352,31 @@
     }
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Tratamientos</h1>  
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha desde
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechadesde} onchange={filterUpdate}
-            />
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+        <div>
+            <h1 class="text-2xl">Tratamientos</h1>
         </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha Hasta
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechahasta} onchange={filterUpdate}
-            />
+        <div class="flex col-span-2 gap-1 justify-end">
+            <div>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                    <span  class="text-xl">Nuevo</span>
+                </button>
+            </div>
+            <div>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openTiposModal()}>
+                    <span  class="text-xl">Tipos</span>
+                </button>
+            </div>
+            
         </div>
         <div>
-            Categoria
-        </div>
-        <div>
-            Tipo
+            <Exportar
+                titulo ={"Tratamientos"}
+                filtros = {[]}
+                confiltros = {false}
+                data = {tratamientosrow}
+                {prepararData}
+            />
         </div>
     </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
@@ -378,7 +394,102 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-2">
+                <h1 class="font-medium py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </button>
+        {#if isOpenFilter}
+            <div transition:slide>
+                <div class="grid grid-cols-2 lg:grid-cols-4" >
+                    <div class="">
+                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                          Fecha desde
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechadesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                          Fecha Hasta
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechahasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div>
+                        <label for = "categoria" class="label">
+                            <span class="label-text text-base">Categoria</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscarcategoria}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each categorias as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label for = "tipo" class="label">
+                            <span class="label-text text-base">Tipo</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscartipo}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each tipotratamientos as t}
+                                        <option value={t.id}>{t.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div>
+    <!--<div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
         <div >
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo tratamiento</span>
@@ -399,34 +510,38 @@
             />
         </div>
     </div>
-    <!--<div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12 lg:w-1/2">
             <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openTiposModal()}>
                 <span  class="text-xl">Tipo tratamientos</span>
             </button>
         </div>
     </div>-->
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha</th>
                     <th class="text-base mx-1 px-1">Animal</th>
+                    <th class="text-base mx-1 px-1">Categoria</th>
                     <th class="text-base mx-1 px-1">Tipo</th>
-                    <th class="text-base mx-1 px-1">Acciones</th>
+                    <!--<th class="text-base mx-1 px-1">Acciones</th>-->
                 </tr>
             </thead>
             <tbody>
                 {#each tratamientosrow as t}
-                    <tr>
+                    <tr onclick={()=>openEditModal(t.id)}>
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(t.fecha).toLocaleDateString()}</td>
                         <td class="text-base mx-1 px-1">
                             {`${t.expand.animal.caravana}`}
                         </td>
                         <td class="text-base mx-1 px-1">
+                            {`${t.expand.animal.categoria}`}
+                        </td>
+                        <td class="text-base mx-1 px-1">
                             {`${t.expand.tipo.nombre}`}
                         </td>
-                        <td class="flex gap-2 text-base mx-1 px-1">
+                        <!--<td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(t.id)}>
                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
@@ -441,7 +556,7 @@
                                     </svg>                              
                                 </button>
                             </div>
-                        </td>
+                        </td>-->
                     </tr>
                 {/each}
             </tbody>
@@ -566,8 +681,9 @@
                     <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
                     <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                    <button class="btn btn-error text-white" onclick={()=>eliminar(idtratamiento)}>Eliminar</button>
                   {/if}
-                  <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
+                  
                 </form>
             </div>
         </div>
