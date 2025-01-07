@@ -727,8 +727,8 @@
             
             <tbody>
                 {#each animalesrows as a}
-                <tr class="border-b border-border hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`/animales/${a.id}`)}>
-                    <td class="text-base p-3">
+                <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`/animales/${a.id}`)}>
+                    <td class="text-base p-3 border-b">
                         <div class="flex gap-1">
                             {`${a.caravana}`}
                             {#if !a.active}
@@ -743,16 +743,16 @@
                             {/if}
                         </div>
                     </td>
-                    <td class="text-base p-3"> {a.sexo}</td>
-                    <td class="text-base p-3"> {a.categoria}</td>
-                    <td class="text-base p-3"> {
+                    <td class="text-base p-3 border-b"> {a.sexo}</td>
+                    <td class="text-base p-3 border-b"> {a.categoria}</td>
+                    <td class="text-base p-3 border-b"> {
                         a.prenada==2?
                         "Preñada":
                         a.prenada==1?
                         "Dudosa":
                         "Vacia"
                     }</td>
-                    <td class="text-base p-3">
+                    <td class="text-base p-3 border-b">
                         {
                             a.expand?
                             a.expand.lote?
@@ -762,7 +762,7 @@
 
                         }
                     </td>
-                    <td class="text-base p-3">
+                    <td class="text-base p-3 border-b">
                         {
                             a.expand?
                             a.expand.rodeo?
