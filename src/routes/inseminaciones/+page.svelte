@@ -458,7 +458,7 @@
             />
         </div>
     </div>-->
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
