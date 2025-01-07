@@ -206,7 +206,7 @@
     function filterUpdate(){
         animalesrows = animales
         if(buscar != ""){
-            animalesrows = animalesrows.filter(a=>a.caravana.includes(buscar))
+            animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(sexobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexobuscar)
@@ -378,7 +378,7 @@
     </div>
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
         <button 
-            aria-label="Filtar" 
+            aria-label="Filtrar" 
             class="w-full"
             onclick={clickFilter}
         >

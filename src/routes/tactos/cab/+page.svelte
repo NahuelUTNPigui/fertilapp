@@ -2,6 +2,7 @@
     import Navbarr from "$lib/components/Navbarr.svelte";
     import Exportar from "$lib/components/Exportar.svelte";
     import PocketBase from 'pocketbase'
+    import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import sexos from '$lib/stores/sexos';
@@ -9,6 +10,7 @@
     import tiposanimal from '$lib/stores/tiposanimal';
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
+    import categorias from '$lib/stores/categorias';
     import { createCaber } from "$lib/stores/cab.svelte";
     import Tactos from "$lib/components/animal/Tactos.svelte";
     let caber = createCaber()
@@ -24,11 +26,14 @@
     let tactos = $state([])
     let animales = $state([])
     let tactosrow = $state([])
-
+    let isOpenFilter = $state(false)
     //Filtros
     let buscar = $state("")
     let fechadesde = $state("")
     let fechahasta = $state("")
+    let buscarcategoria = $state("")
+    let buscarestado = $state("")
+    let buscartipo = $state("")
     //Datos tacto
     let tacto = $state(null)
     let idtacto = $state("")
@@ -46,6 +51,10 @@
     let malanimal = $state("")
     let malvet = $state("")
     let botonhabilitado=$state(false)
+    //Funciones
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
     async function getTactos(){
         const recordst = await pb.collection('tactos').getFullList({
             filter:`cab='${cab.id}' && active=true`,
@@ -142,13 +151,22 @@
         
         tactosrow = tactos
         if(buscar!=""){
-            tactosrow = tactosrow.filter(t=>t.expand.animal.caravana.startsWith(buscar))
+            tactosrow = tactosrow.filter(t=>t.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(fechadesde!=""){
             tactosrow = tactosrow.filter(t=>t.fecha>=fechadesde)
         }
         if(fechahasta!=""){
             tactosrow = tactosrow.filter(t=>t.fecha<=fechahasta)
+        }
+        if(buscarcategoria!=""){
+            tactosrow = tactosrow.filter(t=>t.categoria == buscarcategoria)
+        }
+        if(buscartipo !=""){
+            tactosrow = tactosrow.filter(t=>t.tipo == buscartipo)
+        }
+        if(buscarestado !=""){
+            tactosrow = tactosrow.filter(t=>t.prenada == buscarestado)
         }
     }
     onMount(async ()=>{
@@ -263,52 +281,41 @@
             }
         }
     }
+    function capitalizeFirstLetter(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
     
+    }
     function prepararData(item){
         return {
-
+            ANIMAL:item.expand.animal.caravana,
+            FECHA:new Date(item.fecha).toISOString().split("T")[0],
+            OBSERVACION:item.observacion,
+            CATEGORIA:capitalizeFirstLetter(item.categoria),
+            TIPO:item=="eco"?"Ecografía":"Tacto",
+            ESTADO:item.prenada==2?"Preñada":item.prenada==1?"Dudosa":"Vacia"
         }
     }
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Tactos</h1>  
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha desde
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechadesde} onchange={filterUpdate}
-            />
-        </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha Hasta
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `}  
-                bind:value={fechahasta} onchange={filterUpdate}
-            />
-        </div>
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            Categoria   
+            <h1 class="text-2xl">Tactos</h1>
         </div>
-        <div>
-            Tipo
-        </div>
-        <div>
-            Estado
+        <div class="flex col-span-2 gap-1 justify-end">
+            <div>
+                <button class={` btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                    <span  class="text-xl">Nuevo</span>
+                </button>
+            </div>
+            <div class="">
+                <Exportar
+                    titulo ={"Tactos"}
+                    filtros = {[]}
+                    confiltros = {false}
+                    data = {tactosrow}
+                    {prepararData}
+                />
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
@@ -325,41 +332,174 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </button>
+        {#if isOpenFilter}
+            <div transition:slide>
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-1 w-full" >
+                    <div class="">
+                        <label class="block tracking-wide mb-2" for="grid-first-name">
+                          Fecha desde
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechadesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block tracking-wide mb-2" for="grid-first-name">
+                          Fecha Hasta
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `}  
+                            bind:value={fechahasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div>
+                        <label for = "categoria" class="tracking-wide label">
+                            <span class="label-text text-base">Categoria</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscarcategoria}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each categorias as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>  
+                    </div>
+                    <div>
+                        <label for = "categoria" class="tracking-wide label">
+                            <span class="label-text text-base">Tipo</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscartipo}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each tipostacto as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label for = "estado" class=" tracking-wide label">
+                            <span class="label-text text-base">Estado</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={buscarestado}
+                                onchange={filterUpdate}
+                            >
+                                    <option value="">Todos</option>
+                                    {#each estados as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div>
+    
+
+    <!--<div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
         <div>
             <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo tacto</span>
             </button>
         </div>
-        <div class="hidden">
-            <Exportar
-                titulo ={"Tactos"}
-                filtros = {[]}
-                confiltros = {false}
-                data = {tactosrow}
-                {prepararData}
-            />
-        </div>
-    </div>
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+        
+    </div>-->
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base w-3/12"  >Fecha</th>
-                    <th class="text-base w-3/12"  >Animal</th>
-                    <th class="text-base w-3/12"  >Acciones</th>
+                    <th class="text-base "  >Fecha</th>
+                    <th class="text-base "  >Animal</th>
+                    <th class="text-base "  >Categoria</th>
+                    <th class="text-base "  >Estado</th>
+                    <th class="text-base "  >Tipo</th>
+                    <th class="text-base "  >Observacion</th>
+                    
                 </tr>
             </thead>
             <tbody>
                 {#each tactosrow as t}
-                    <tr>
+                    <tr onclick={()=>openModalEdit(t.id) } class="overflow-x-auto">
                         <td class="text-base">
                             {`${new Date(t.fecha).toLocaleDateString()}`}
                         </td>
-                        <td class="tex-base">
+                        <td class="text-base">
                             {`${t.expand.animal.caravana}`}
                         </td>
-                        <td class="flex gap-2">
+                        <td class="text-base">
+                            {`${capitalizeFirstLetter(t.expand.animal.categoria)}`}
+                        </td>
+                        <td class="text-base p-3"> {
+                            t.prenada==2?
+                            "Preñada":
+                            t.prenada==1?
+                            "Dudosa":
+                            "Vacia"
+                        }</td>
+                        <td class="text-base">
+                            {`${t.tipo=="eco"?"Ecografía":"Tacto"}`}
+                        </td>
+                        <td class="text-base">
+                            {`${t.observacion}`}
+                        </td>
+                        <!--<td class="flex gap-2">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openModalEdit(t.id)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -374,7 +514,7 @@
                                     </svg>                              
                                 </button>
                             </div>
-                        </td>
+                        </td>-->
                     </tr>
                 {/each}
             </tbody>
@@ -579,8 +719,9 @@
                     <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                   {:else}
                     <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editarTacto} >Editar</button>
+                    <button class="btn btn-error text-white" onclick={()=>eliminar(idtacto)}>Eliminar</button>
                   {/if}
-                  <button class="btn btn-error text-white" onclick={cerrar}>Cancelar</button>
+                  
                 </form>
             </div>
         </div>

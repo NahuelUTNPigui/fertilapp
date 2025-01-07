@@ -2,6 +2,7 @@
     import Navbarr from '$lib/components/Navbarr.svelte';
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
+    import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import sexos from '$lib/stores/sexos';
@@ -22,6 +23,9 @@
     let buscar = $state("")
     let fechadesde = $state("")
     let fechahasta = $state("")
+    let isOpenFilter = $state(false)
+    let buscarmadre = $state("")
+    let buscarpadre = $state("")
     //Datos nacimiento
     let nacimiento = $state(null)
     let idnacimiento = $state("")
@@ -44,6 +48,9 @@
     let malcaravana = $state(false)
     let malsexo = $state(false)
     let botonhabilitado=$state(false)
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
@@ -165,7 +172,7 @@
     function filterUpdate(){
         nacimientosrow = nacimientos
         if(buscar != ""){
-            nacimientosrow = nacimientosrow.filter(n=>n.caravana.startsWith(buscar))
+            nacimientosrow = nacimientosrow.filter(n=>n.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(fechadesde != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.fecha>=fechadesde)
@@ -173,6 +180,13 @@
         if(fechahasta != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.fecha<=fechahasta)
         }
+        if(buscarmadre != ""){
+            nacimientosrow = nacimientosrow.filter(t=>t.nombremadre.toLocaleLowerCase().includes(buscarmadre.toLocaleLowerCase()))
+        }
+        if(buscarpadre != ""){
+            nacimientosrow = nacimientosrow.filter(t=>t.nombrepadre.toLocaleLowerCase().includes(buscarpadre.toLocaleLowerCase()))
+        }
+        
     }
     function openNewModal(){
         idnacimiento = ""
@@ -364,43 +378,26 @@
     }
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Nacimientos</h1>  
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha desde
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechadesde} onchange={filterUpdate}
-            />
-        </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Fecha Hasta
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechahasta} onchange={filterUpdate}
-            />
-        </div>
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            Madre
+            <h1 class="text-2xl">Nacimientos</h1>  
         </div>
-        <div>
-            Padre
+        <div class="flex col-span-2 gap-1 justify-end">
+            <div >
+                <button class={`btn flex btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                    <span  class="text-xl">Nuevo</span>
+                </button>
+            </div>
+            <div>
+                <Exportar
+                    titulo ={"Nacimientos"}
+                    filtros = {[]}
+                    confiltros = {false}
+                    data = {nacimientosrow}
+                    {prepararData}
+                />
+            </div>
         </div>
-        
     </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
         <div class="w-full lg:w-1/2">
@@ -417,40 +414,128 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div >
-            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo nacimiento</span>
-            </button>
-        </div>
-        <div>
-            <Exportar
-            titulo ={"Nacimientos"}
-            filtros = {[]}
-            confiltros = {false}
-            data = {nacimientosrow}
-            {prepararData}
-            />
-        </div>
-    </div>  
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4">
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div> 
+        </button>
+        {#if isOpenFilter}
+            <div transition:slide>
+                <div class="grid grid-cols-2 lg:grid-cols-3 mb-2 lg:mb-3 gap-1" >
+                    <div class="">
+                        <label class="block tracking-wide  mb-2" for="grid-first-name">
+                          Fecha desde
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechadesde} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label class="block tracking-wide mb-2" for="grid-first-name">
+                          Fecha Hasta
+                        </label>
+                        <input id ="fechadesde" type="date"  
+                            class={`
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={fechahasta} onchange={filterUpdate}
+                        />
+                    </div>
+                    <div>
+                        <label for = "nombremadre" class="label">
+                            <span class="label-text text-base">Madre</span>
+                        </label>
+                        <label class="input-group">
+                            <input 
+                                id ="nombremadre" 
+                                type="text"  
+                                class={`
+                                    input 
+                                    input-bordered 
+                                    border border-gray-300 rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 focus:ring-green-500 
+                                    focus:border-green-500
+                                    w-full 
+                                    ${estilos.bgdark2} 
+                                `}
+                                bind:value={buscarmadre}
+                                oninput={filterUpdate}
+                            />
+                        </label>
+                    </div>
+                    <div>
+                        <label for = "nombrepadre" class="label">
+                            <span class="label-text text-base">Padre</span>
+                        </label>
+                        <label class="input-group">
+                            <input 
+                                id ="nombrepadre" 
+                                type="text"  
+                                class={`
+                                    input 
+                                    input-bordered 
+                                    border border-gray-300 rounded-md
+                                    focus:outline-none 
+                                    focus:ring-2 focus:ring-green-500 
+                                    focus:border-green-500
+                                    w-full 
+                                    ${estilos.bgdark2} 
+                                `}
+                                bind:value={buscarpadre}
+                                oninput={filterUpdate}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    </div> 
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha</th>
                     <th class="text-base mx-1 px-1">Caravana</th>
-                    <th class="text-base mx-1 px-1">Acciones</th>
+                    <th class="text-base mx-1 px-1">Madre</th>
+                    <th class="text-base mx-1 px-1">Padre</th>
+                    <th class="text-base mx-1 px-1">Observacion</th>
+                    
                 </tr>
             </thead>
             <tbody>
                 {#each nacimientosrow as n}
-                    <tr>
+                    <tr onclick={()=>openEditModal(n.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(n.fecha).toLocaleDateString()}</td>
                         <td class="text-base mx-1 px-1">
                             {`${n.caravana}`}
                         </td>
-                        
-                        <td class="flex gap-2 text-base mx-1 px-1">
+                        <td class="text-base mx-1 px-1">
+                            {`${n.nombremadre}`}
+                        </td>
+                        <td class="text-base mx-1 px-1">
+                            {`${n.nombrepadre}`}
+                        </td>
+                        <td class="text-base mx-1 px-1">
+                            {`${n.observacion}`}
+                        </td>
+                        <!--<td class="flex gap-2 text-base mx-1 px-1">
                             <div class="tooltip" data-tip="Editar">
                                 <button aria-label="Editar" onclick={()=>openEditModal(n.id)}>
                                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
@@ -465,7 +550,7 @@
                                     </svg>                              
                                 </button>
                             </div>
-                        </td>
+                        </td>-->
                     </tr>
                 {/each}
             </tbody>
@@ -710,8 +795,9 @@
                     <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
                     <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
+                    <button class="btn btn-error text-white" onclick={()=>eliminar(idnacimiento)}>Eliminar</button>
                   {/if}
-                  <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
+                  
                 </form>
             </div>
         </div>

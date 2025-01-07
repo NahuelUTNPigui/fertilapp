@@ -208,7 +208,7 @@
         inseminacionesrow = inseminaciones
         
         if(buscar !=""){
-            inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.startsWith(buscar))
+            inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(fechainseminacionhasta!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion <= fechainseminacionhasta)
@@ -216,6 +216,17 @@
         if(fechainseminaciondesde!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion >= fechainseminaciondesde)
         }
+        if(fechainseminacionhasta!=""){
+            inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto <= fechapartodesde)
+        }
+        if(fechainseminaciondesde!=""){
+            inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto >= fechapartohasta)
+        }
+        if(buscarpadre!=""){
+            
+            inseminacionesrow = inseminacionesrow.filter(i =>i.pajuela.toLocaleLowerCase().includes(buscarpadre.toLocaleLowerCase()))
+        }
+
     }
     onMount(async ()=>{
         await getAnimales()
@@ -470,19 +481,27 @@
             <thead>
                 <tr>
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha inseminacion</th>
+                    <th class="text-base mx-1 px-1">Fecha Parto</th>
                     <th class="text-base mx-1 px-1">Caravana</th>
-                    <th class="text-base mx-1 px-1">Acciones</th>
+                    <th class="text-base mx-1 px-1">Categoria</th>
+                    <th class="text-base mx-1 px-1">Pajuela</th>
                 </tr>
             </thead>
             <tbody>
                 {#each inseminacionesrow as i}
-                <tr>
+                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>openEditModal(i.id)}>
                     <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechainseminacion).toLocaleDateString()}</td>
+                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(i.fechaparto).toLocaleDateString()}</td>
                     <td class="text-base mx-1 px-1">
                         {`${i.expand.animal.caravana}`}
                     </td>
-                    
-                    <td class="flex gap-2 text-base mx-1 px-1">
+                    <td class="text-base mx-1 px-1">
+                        {`${i.expand.animal.categoria}`}
+                    </td>
+                    <td class="text-base mx-1 px-1">
+                        {`${i.pajuela}`}
+                    </td>
+                    <!--<td class="flex gap-2 text-base mx-1 px-1">
                         <div class="tooltip" data-tip="Editar">
                             <button aria-label="Editar" onclick={()=>openEditModal(i.id)}>
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
@@ -497,7 +516,7 @@
                                 </svg>                              
                             </button>
                         </div>
-                    </td>
+                    </td>-->
                 </tr>
                 {/each}
             </tbody>
@@ -663,8 +682,9 @@
                         <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
                     {:else}
                         <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
+                        <button class="btn btn-error text-white" onclick={()=>eliminar(idins)}>Eliminar</button>
                     {/if}
-                    <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>
+                    
                 </form>
             </div>
         </div>

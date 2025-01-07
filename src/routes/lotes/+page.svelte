@@ -129,8 +129,7 @@
     function filterUpdate(){
         lotesrows = lotes
         if(buscar != ""){
-            lotesrows = lotesrows.filter(r=>r.nombre.startsWith(buscar))
-
+            lotesrows = lotesrows.filter(r=>r.nombre.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
     }
     function cerrarModal(){

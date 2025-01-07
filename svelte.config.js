@@ -34,7 +34,8 @@ const config = {
 				"/importar",
 				"/lotes",
 				"/movimientos",
-				"/user/new"]
+				"/user/new",
+				"/reportes"]
 		}
 	}
 };

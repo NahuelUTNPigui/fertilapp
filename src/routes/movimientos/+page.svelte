@@ -3,6 +3,7 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
+    import { slide } from 'svelte/transition';
     import estilos from '$lib/stores/estilos';
     import { createCaber } from '$lib/stores/cab.svelte';
     import categorias from "$lib/stores/categorias";
@@ -28,7 +29,7 @@
     let lotes = $state([])
     let rodeos = $state([])
     let tipos = $state([])
-    
+    let isOpenFilter = $state(false)
     //Seleccionados
     let selectanimales = $state([])
     let selecthashmap = $state({})
@@ -55,7 +56,9 @@
     let selectrodeo = $state(false)
     let selecttratamiento = $state(false)
 
-
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
     function filterUpdate(){
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
@@ -69,7 +72,7 @@
         ninguno = true
         animalesrows = animales
         if(buscar != ""){
-            animalesrows = animalesrows.filter(a=>a.caravana.startsWith(buscar))
+            animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(sexo != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexo)
@@ -380,121 +383,142 @@
 
 </script>
 <Navbarr>
-    <div class="w-full grid justify-items-start mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Movimientos</h1>  
+    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+        <div>
+            <h1 class="text-2xl">Movimientos</h1>
+        </div>
+        <div class="flex col-span-2 gap-1 justify-end">
+            <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <span  class="text-xl">Nuevo</span>
+            </button>
+        </div>
     </div>
+    
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12">
             <label class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}>
                 <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
             </label>
         </div>
-        
     </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div>
-            <label for = "sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={sexo}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each sexos as s}
-                            <option value={s.id}>{s.nombre}</option>
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "rodeos" class="label">
-                <span class="label-text text-base">Rodeos</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} 
-                    bind:value={rodeo}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each rodeos as r}
-                            <option value={r.id}>{r.nombre}</option>    
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "rodeos" class="label">
-                <span class="label-text text-base">Lotes</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} 
-                    bind:value={lote}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each lotes as r}
-                            <option value={r.id}>{r.nombre}</option>    
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "rodeos" class="label">
-                <span class="label-text text-base">Categorias</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} 
-                    bind:value={categoria}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each categorias as r}
-                            <option value={r.id}>{r.nombre}</option>    
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        
-    
-    </div>
-    <div  class="w-full grid grid-cols-1 lg:grid-cols-4 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10">
-        <button class={`w-11/12 btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-            <span  class="text-xl">Nuevo movimiento</span>
+    <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Filtrar" 
+            class="w-full"
+            onclick={clickFilter}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div> 
         </button>
+        {#if isOpenFilter}
+            <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
+                <div>
+                    <label for = "sexo" class="label">
+                        <span class="label-text text-base">Sexo</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={sexo}
+                            onchange={filterUpdate}
+                        >
+                                <option value="">Todos</option>
+                                {#each sexos as s}
+                                    <option value={s.id}>{s.nombre}</option>
+                                {/each}
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label for = "rodeos" class="label">
+                        <span class="label-text text-base">Rodeos</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none 
+                                focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={rodeo}
+                            onchange={filterUpdate}
+                        >
+                                <option value="">Todos</option>
+                                {#each rodeos as r}
+                                    <option value={r.id}>{r.nombre}</option>    
+                                {/each}
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label for = "rodeos" class="label">
+                        <span class="label-text text-base">Lotes</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none 
+                                focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={lote}
+                            onchange={filterUpdate}
+                        >
+                                <option value="">Todos</option>
+                                {#each lotes as r}
+                                    <option value={r.id}>{r.nombre}</option>    
+                                {/each}
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <label for = "rodeos" class="label">
+                        <span class="label-text text-base">Categorias</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none 
+                                focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} 
+                            bind:value={categoria}
+                            onchange={filterUpdate}
+                        >
+                                <option value="">Todos</option>
+                                {#each categorias as r}
+                                    <option value={r.id}>{r.nombre}</option>    
+                                {/each}
+                        </select>
+                    </label>
+                </div>
+                
+            
+            </div>
+        {/if}
     </div>
     <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-5/6 overflow-x-auto" >
         <table class="table table-lg w-full " >

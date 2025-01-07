@@ -129,7 +129,7 @@
     function filterUpdate(){
         rodeosrows = rodeos
         if(buscar != ""){
-            rodeosrows = rodeosrows.filter(r=>r.nombre.startsWith(buscar))
+            rodeosrows = rodeosrows.filter(r=>r.nombre.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
 
         }
     }

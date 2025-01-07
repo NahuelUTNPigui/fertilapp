@@ -16,4 +16,5 @@
 * Para buildear
 ```bash
     pnpm run build --mode production
+    npm run build --mode production
 ```

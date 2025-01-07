@@ -133,7 +133,7 @@
         observacionesrow = observaciones
         
         if(buscar != ""){
-            observacionesrow = observacionesrow.filter(o=>o.expand.animal.caravana.startsWith(buscar))
+            observacionesrow = observacionesrow.filter(o=>o.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
         }
         if(fechadesde!=""){
             observacionesrow = observacionesrow.filter(o=>o.fecha>=fechadesde)
@@ -343,7 +343,7 @@
             onclick={clickFilter}
         >
             <div class="flex justify-between items-center px-2">
-                <h1 class="font-medium py-2">Filtros</h1>
+                <h1 class="font-bold text-lg py-2">Filtros</h1>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
@@ -356,7 +356,7 @@
             <div transition:slide>
                 <div class="grid grid-cols-2 lg:grid-cols-4" >
                     <div class="">
-                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                        <label class="block tracking-wide  mb-2" for="grid-first-name">
                             Fecha desde
                         </label>
                         <input id ="fechadesde" type="date"  
@@ -368,7 +368,7 @@
                         />
                     </div>
                     <div class="">
-                        <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
+                        <label class="block tracking-wide mb-2" for="grid-first-name">
                             Fecha Hasta
                         </label>
                         <input id ="fechadesde" type="date"  
@@ -380,7 +380,7 @@
                         />
                     </div>
                     <div>
-                        <label for = "categoria" class="label">
+                        <label for = "categoria" class="tracking-wide label">
                             <span class="label-text text-base">Categoria</span>
                         </label>
                         <label class="input-group ">
