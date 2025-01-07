@@ -126,7 +126,7 @@
             let data = {
                 cab:cab.id,
                 animal: idanimal,
-                fechaparto:fechaparto +' 03:00:00',
+                fechaparto: fechaparto +' 03:00:00',
                 fechainseminacion: fechainseminacion + ' 03:00:00',
                 active:true,
                 padre,
@@ -229,9 +229,15 @@
         if(isEmpty(pajuela)){
             botonhabilitado = false
         }
-        if(isEmpty(fechaparto)){
+        if(isEmpty(fechainseminacion)){
             botonhabilitado = false
         }
+    
+    }
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
     }
     function oninput(campo){
         validarBoton()
@@ -266,6 +272,7 @@
             }
             else{
                 malfechainseminacion = false
+                fechaparto = addDays(fechainseminacion, 280).toISOString().split("T")[0]
             }
         }
     }
@@ -630,7 +637,7 @@
                     <span class="label-text text-base">Fecha estimada de parto</span>
                 </label>
                 <label class="input-group ">
-                    <input id ="fechaparto" type="date" 
+                    <input disabled id="fechaparto" type="date" 
                         class={`
                             input input-bordered w-full
                             border border-gray-300 rounded-md
