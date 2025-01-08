@@ -202,23 +202,8 @@
             await pb.collection('animales').update(animal,{
                 prenada
             })
-            /*
-            let a = animales.filter(an=>an.id == animal)[0]
-            console.log(a)
-            let item = {
-                ...record,
-                expand:{
-                    animal:{
-                        caravana:a.caravana,id:a.id
-                    }
-                }
-            }
-            */
+
             await getTactos()
-            filterUpdate()
-            
-            tactos.push(item)
-            tactos.sort((t1,t2)=>new Date(t1.fecha)>new Date(t2.fecha)?-1:1)
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }

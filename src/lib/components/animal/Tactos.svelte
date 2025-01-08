@@ -70,6 +70,8 @@
         return tipostacto.filter(t=>t.id==tipo)[0].nombre
     }
     function getCategoriaNombre(cat){
+        console.log(tiposanimal)
+        console.log(cat)
         return tiposanimal.filter(c=>c.id==cat)[0].nombre
     }
     async function getTactos(){
