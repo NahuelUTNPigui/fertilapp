@@ -32,6 +32,9 @@
     
     function openNewModal(){
         nuevoModal.showModal()
+        generarReporte = false
+        generarReporteLotes = false
+        generarReporteRodeos = false
     }
 
     function ordenar(lista){
