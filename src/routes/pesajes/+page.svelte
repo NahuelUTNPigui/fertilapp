@@ -8,6 +8,7 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
+    import {capitalize} from "$lib/stringutil/lib"
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -42,6 +43,7 @@
     let ninguno = $state(true)
 
     //movimiento
+    let fecha = $state("")
     let nuevospesos = $state({})
 
     //Seleecionar
@@ -195,12 +197,18 @@
             let ps = selectanimales[i]
             
             try{
-                let data = {
+                let dataupdate = {
                     peso:ps.pesonuevo
                 }
+                let data ={
+                    pesonuevo:ps.pesonuevo,
+                    pesoanterio:ps.peso,
+                    fecha,
+                    animal:ps.id
+                }
                 
-                let r = await pb.collection('animales').update(selectanimales[i].id, data);
-                
+                let r = await pb.collection('animales').update(selectanimales[i].id, dataupdate);
+                await pb.collection("pesaje").create(data)
             }
             catch(err){
                 console.error(err)
@@ -223,13 +231,17 @@
 <Navbarr>
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Pesajes</h1>
+            <h1 class="text-2xl">Pesajes </h1>
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo</span>
+                <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
+            <a class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" href="/pesajes/lista">
+                <span  class="text-xl">Historia</span>
+            </a>
         </div>
+        
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12">
@@ -446,12 +458,29 @@
             </form>
             
             <h3 class="text-lg font-bold">Movimiento</h3>
+            <label for = "fechapesaje" class="label">
+                <span class="label-text text-base">Fecha </span>
+            </label>
+            <label class="input-group ">
+                <input id ="fechapesaje" type="date" max={HOY}  
+                    class={`
+                        input input-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={fecha}
+                />
+                
+            </label>
             <div class="w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
                 <table class="table table-lg w-full " >
                     <thead>
                         <tr>
                             <th class="text-base p-0">Caravana</th>
-                            <th class="text-base p-0">Peso viejo</th>
+                            <th class="text-base p-0">Peso anterio</th>
                             <th class="text-base ">Peso nuevo</th>
                         </tr>
                         

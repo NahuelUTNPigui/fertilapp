@@ -56,7 +56,7 @@
 </script>
 
 <div class="w-full flex justify-items-start gap-2">
-    <div>
+    <div class="hidden">
         <button
             aria-label="Expandir"
             onclick={()=>expandirObservacion.showModal()}
@@ -77,7 +77,7 @@
                 ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
             `}
         >
-            + Nuevo
+            Nuevo
         </button>
     </div>
 </div>

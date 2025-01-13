@@ -70,8 +70,7 @@
         return tipostacto.filter(t=>t.id==tipo)[0].nombre
     }
     function getCategoriaNombre(cat){
-        console.log(tiposanimal)
-        console.log(cat)
+        
         return tiposanimal.filter(c=>c.id==cat)[0].nombre
     }
     async function getTactos(){
@@ -90,7 +89,7 @@
 
 </script>
 <div class="w-full flex justify-items-start gap-2">
-    <div>
+    <div class="hidden">
         <button
             aria-label="Expandir"
             onclick={()=>expandirTacto.showModal()}
@@ -111,7 +110,7 @@
                 ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
             `}
         >
-            + Nuevo
+            Nuevo
         </button>
     </div>
 </div>

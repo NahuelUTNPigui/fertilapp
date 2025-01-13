@@ -17,6 +17,7 @@
     import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
     import Tratamientos from "$lib/components/animal/Tratamientos.svelte";
     import Observaciones from "$lib/components/animal/Observaciones.svelte";
+    import Pesajes from "$lib/components/animal/Pesajes.svelte";
     
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -151,6 +152,9 @@
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
         <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+    </CardAnimal>
+    <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
+        <Pesajes pesoanterior={peso} {caravana}></Pesajes>
     </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
         <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
