@@ -9,6 +9,7 @@
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
     import {capitalize} from "$lib/stringutil/lib"
+    import {guardarHistorial} from "$lib/historial/lib"
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -206,7 +207,7 @@
                     fecha:" 03:00:00",
                     animal:ps.id
                 }
-                
+                await guardarHistorial(pb,selectanimales[i].id)
                 let r = await pb.collection('animales').update(selectanimales[i].id, dataupdate);
                 await pb.collection("pesaje").create(data)
             }

@@ -8,6 +8,7 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
+    import {guardarHistorial} from "$lib/historial/lib"
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -217,7 +218,10 @@
             for(let i = 0;i<lista.length;i++){
                 
                 if(!selecttratamiento){
+                    await guardarHistorial(pb,lista[i].id)
                     await pb.collection('animales').update(lista[i].id, data);
+                    
+                    
                 }
                 else{
                     let a = lista[i]

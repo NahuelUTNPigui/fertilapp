@@ -13,7 +13,7 @@
     import categorias from '$lib/stores/categorias';
     import { createCaber } from "$lib/stores/cab.svelte";
     import Tactos from "$lib/components/animal/Tactos.svelte";
-    import {guardarHistorialTacto} from "$lib/historial/lib"
+    import {guardarHistorial} from "$lib/historial/lib"
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -203,7 +203,7 @@
             await pb.collection('animales').update(animal,{
                 prenada
             })
-            await guardarHistorialTacto(pb,animal,prenada)
+            await guardarHistorial(pb,animal)
             await getTactos()
             filterUpdate()
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
