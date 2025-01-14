@@ -4,6 +4,7 @@
     import { page } from '$app/stores';
     import { onMount } from "svelte";
     import { createCaber } from '$lib/stores/cab.svelte';
+    import {createUserer} from "$lib/stores/user.svelte"
     import { goto } from "$app/navigation";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
@@ -14,7 +15,9 @@
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
+    let userer = createUserer()
     let cab = caber.cab
+    let userid = userer.userid
     let id = $state("")
     let nombrerodeo = $state("")
     let nombrelote = $state("")
@@ -166,7 +169,22 @@
                 nacimiento:recordparicion.id,
                 fechanacimiento:fecha + " 03:00:00",
             }
+            let datahistorial = {
+                prenada,
+                sexo,
+                peso,
+                caravana,
+                active:true,
+                delete: false,
+                fechanacimiento:fechaviejo+ " 03:00:00",
+                lote,
+                rodeo,
+                user:userid,
+                categoria,
+                animal:id
+            }
             const record = await pb.collection('animales').update(id, datanimal);
+            await pb.collection("historialanimales").create(datahistorial)
             Swal.fire("Éxito guardar","Se pudo guardar el nacimiento","success")
             connacimiento = true
             nacimiento = recordparicion
@@ -185,8 +203,23 @@
             nombrepadre,
             observacion,
         }
+        let datahistorial = {
+            prenada,
+            sexo,
+            peso,
+            caravana,
+            active:true,
+            delete: false,
+            fechanacimiento:fechaviejo+ " 03:00:00",
+            lote,
+            rodeo,
+            user:userid,
+            categoria,
+            animal:id
+        }
         try{
             const recordparicion = await pb.collection('nacimientos').update(idnacimiento,data);
+            await pb.collection("historialanimales").create(datahistorial)
             
         }
         catch(err){
@@ -211,9 +244,24 @@
             prenada,
             categoria
         }
+        let datahistorial = {
+            prenada:prenadaviejo,
+            sexo:sexoviejo,
+            peso:pesoviejo,
+            caravana:caravanavieja,
+            active:true,
+            delete: false,
+            fechanacimiento:fecha+ " 03:00:00",
+            lote:loteviejo,
+            rodeo:rodeovieja,
+            user:userid,
+            categoria:categoriavieja,
+            animal:id
+        }
         try{
             const record = await pb.collection('animales').update(id, data);
-            const recordhistorial = await pb.collection('historialanimales').create(data)
+            
+            await pb.collection("historialanimales").create(datahistorial)
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana

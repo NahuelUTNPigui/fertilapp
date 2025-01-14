@@ -12,6 +12,7 @@
     import DatosBasicos from "$lib/components/animal/DatosBasicos.svelte";
     import Pariciones from "$lib/components/animal/Pariciones.svelte";
     import Tactos from "$lib/components/animal/Tactos.svelte";
+    import Historial from "$lib/components/animal/Historial.svelte";
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
     import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
@@ -166,13 +167,16 @@
         <Observaciones cabid={cab.id} />
     </CardAnimal>
     {#if sexo=="H"}
-    <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-        <Tactos cabid={cab.id}  />
-    </CardAnimal>
-    <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
-        <Inseminaciones cabid={cab.id} />
-    </CardAnimal>
+        <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
+            <Tactos cabid={cab.id}  />
+        </CardAnimal>
+        <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
+            <Inseminaciones cabid={cab.id} />
+        </CardAnimal>
     {/if}
+    <CardAnimal cardsize="max-w-7xl" titulo="Historial">
+        <Historial  />
+    </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
         <Acciones 
             caravana = {caravana}

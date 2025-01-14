@@ -4,6 +4,7 @@
     import estilos from "$lib/stores/estilos";
     import PocketBase from 'pocketbase'
     import {isEmpty} from "$lib/stringutil/lib"
+    import Chart from 'chart.js/auto';
     let ruta = import.meta.env.VITE_RUTA
     const HOY = new Date().toISOString().split("T")[0]
     const pb = new PocketBase(ruta);
@@ -14,10 +15,17 @@
     let pesajes = $state([])
     let fecha = $state("")
     let pesonuevo = $state("")
+    let xs = $state([])
+    let ys = $state([])
     //Validaciones
     let malfecha = $state(false)
     let malpeso = $state(false)
     let botonhabilitado = $state(false)
+
+    //chart js
+    let ctx;
+	let canvas;
+    let chart
     async function guardarPesaje(){
 
         let data ={
@@ -42,12 +50,48 @@
             nuevoPesaje.close()
         }
     }
+    function createChart(){
+        ctx = canvas.getContext('2d');
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: xs.map(x=>new Date(x).toLocaleDateString()),
+                datasets: [
+                {
+                    label: "Evolucion pesos",
+                    backgroundColor: "rgb(255, 99, 132)",
+                    borderColor: "rgb(255, 99, 132)",
+                    data: ys.map(r=>r)
+                }
+                ]
+            },
+            
+        });
+    }
     async function getPesajes(){
         pesajes = await pb.collection("pesaje").getFullList({
             filter:`animal='${id}'`,
-            sort:"-fecha"
+            sort:"-fecha",
+            expand:"animal"
         })
+        xs = []
+        ys = []
+        xs.push(pesajes[0].expand.animal.created)
+        ys.push(pesajes[0].pesoanterior)
+        
+        for(let i = 0;i < pesajes.length;i++){
+            xs.push(pesajes[i].fecha)
+            ys.push(pesajes[i].pesonuevo)
+            
+        }
+        createChart()
+        
     }
+    
     function openNewModal(){
         malfecha = false
         malpeso = false
@@ -102,6 +146,17 @@
             Nuevo
         </button>
     </div>
+    <div>
+        <button
+            aria-label="Evolucion"
+            onclick={()=>chartpesaje.showModal()}
+            class={`
+                ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+            `}
+        >
+            Evolucion
+        </button>
+    </div>
 </div>
 <div class="w-full flex justify-items-center mx-1 lg:w-3/4 overflow-x-auto">
     {#if pesajes.length == 0}
@@ -134,7 +189,7 @@
 <dialog id="nuevoPesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
     <div 
         class="
-            modal-box w-11/12 max-w-5xl
+            modal-box w-11/12 max-w-10xl
             bg-gradient-to-br from-white to-gray-100 
             dark:from-gray-900 dark:to-gray-800
         "
@@ -215,4 +270,33 @@
             <button class="btn btn-error text-white" onclick={()=>nuevoPesaje.close()}>Cancelar</button>
         </div>
     </div>
+
 </dialog>
+<dialog id="chartpesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl ">
+    <div 
+        class="
+            modal-box  max-w-5xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form> 
+        <h3 class="text-lg font-bold">Evolucion pesaje</h3>  
+        <div class="chart-container justify-items-center">
+            <canvas class="" bind:this={canvas} >
+            </canvas>
+        </div>
+        
+        <div class="modal-action justify-start ">
+            <button class="btn btn-error text-white" onclick={()=>chartpesaje.close()}>Cerrar</button>
+        </div>
+    </div>
+</dialog>
+<style>
+.chart-container {
+    width: 800px;
+    height:400px;
+ }
+</style>

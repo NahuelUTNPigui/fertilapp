@@ -100,7 +100,7 @@
                 ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
             `}
         >
-            Nuevo
+                Nuevo
         </button>
     </div>
 </div>

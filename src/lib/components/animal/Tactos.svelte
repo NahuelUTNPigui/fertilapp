@@ -11,11 +11,6 @@
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
-    const DESDE = new Date(today.getFullYear(), today.getMonth() - 1, 1);    
-    const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    let buscar = $state("")
-    let fechadesde = $state("")
-    let fechahasta = $state("")
     let tactos=$state([])
     let id = $state("")
     let {cabid} = $props()

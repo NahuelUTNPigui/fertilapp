@@ -203,7 +203,7 @@
                 let data ={
                     pesonuevo:ps.pesonuevo,
                     pesoanterio:ps.peso,
-                    fecha,
+                    fecha:" 03:00:00",
                     animal:ps.id
                 }
                 
