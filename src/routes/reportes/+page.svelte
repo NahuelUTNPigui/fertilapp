@@ -33,6 +33,7 @@
     function openNewModal(){
         nuevoModal.showModal()
         generarReporte = false
+        generarReportePersonalizado = false
         generarReporteLotes = false
         generarReporteRodeos = false
     }
@@ -206,14 +207,15 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Nombre del rodeo:{r.nombre}</th>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
+                            <th class="text-base ml-3 pl-3 mr-1 pr-1 justify-start">Nombre del rodeo</th>
                             <th class="text-base mx-1 px-1">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{r.nombre}</td>
+                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b justify-start">
+                                {r.nombre}
+                            </td>
                             <td class="text-base mx-1 px-1 border-b">{r.total}</td>
                         </tr>
                     </tbody>
@@ -225,14 +227,13 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Nombre del lote:{l.nombre}</th>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
+                            <th class="text-base ml-3 pl-3 mr-1 pr-1 justify-start">Nombre del lote</th>
                             <th class="text-base mx-1 px-1">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{l.nombre}</td>
+                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b justify-start">{l.nombre}</td>
                             <td class="text-base mx-1 px-1 border-b">{l.total}</td>
                         </tr>
                     </tbody>
