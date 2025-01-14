@@ -9,7 +9,7 @@
     let caber = createCaber()
     let cab = caber.cab
     let animales = $state([])
-    
+    let loading = $state(false)
 
     const pb = new PocketBase(ruta);
     let filename = $state("")
@@ -57,6 +57,7 @@
         
         let observaciones = []
         let observacioneshashmap = {}
+        loading = true
         for (const [key, value ] of Object.entries(sheetobservaciones)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
@@ -126,6 +127,7 @@
 
             }
         }
+        loading = false
         filename = ""
         wkbk = null
         Swal.fire("Éxito importar","Se lograron importar los datos","success")

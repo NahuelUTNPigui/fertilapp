@@ -7,6 +7,7 @@
     import tiposanimal from '$lib/stores/tiposanimal';
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
+    import {guardarHistorial} from "$lib/historial/lib"
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -50,6 +51,7 @@
                active:true
             }
             const record = await pb.collection('tactos').create(data);
+            await guardarHistorial(pb,id)
             await pb.collection('animales').update(id,{
                 prenada
             })

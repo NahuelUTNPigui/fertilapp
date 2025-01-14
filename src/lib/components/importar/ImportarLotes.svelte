@@ -14,6 +14,7 @@
     let filename = $state("")
     let wkbk = $state(null)
     let lotes = $state([])
+    let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
             nombre:"",
@@ -52,6 +53,7 @@
         
         let lotes = []
         let loteshashmap = {}
+        loading = true
         for (const [key, value ] of Object.entries(sheetlotes)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
@@ -103,6 +105,7 @@
             }
         }
         filename = ""
+        loading = false
         wkbk = null
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
     }
@@ -144,7 +147,11 @@
               `}
               
         >
-              {filename ? filename : 'Seleccionar archivo'}
+        {#if loading}
+            <span class="loading loading-spinner loading-xl"></span>
+        {:else}
+            {filename ? filename : 'Seleccionar archivo'}
+        {/if}
         </label>
     </div>
     <div class="flex justify-start">

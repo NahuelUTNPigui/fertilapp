@@ -5,6 +5,7 @@
     import PocketBase from 'pocketbase'
     import {isEmpty} from "$lib/stringutil/lib"
     import Chart from 'chart.js/auto';
+    import {guardarHistorial} from "$lib/historial/lib"
     let ruta = import.meta.env.VITE_RUTA
     const HOY = new Date().toISOString().split("T")[0]
     const pb = new PocketBase(ruta);
@@ -39,6 +40,7 @@
         }
         try{
             
+            await guardarHistorial(pb,id)
             await pb.collection("pesaje").create(data)
             await pb.collection("animales").update(id,dataupdate)
 

@@ -15,6 +15,7 @@
     let wkbk = $state(null)
     let lotes = $state([])
     let rodeos = $state([])
+    let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -60,6 +61,8 @@
         
         let animales = []
         let animaleshashmap = {}
+        loading = true
+        
         for (const [key, value ] of Object.entries(sheetanimales)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
@@ -155,6 +158,8 @@
 
             }
         }
+        loading = false
+        
         filename = ""
         wkbk = null
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
@@ -202,8 +207,11 @@
                 dark:hover:bg-gray-500 cursor-pointer
               `}
               
-        >
-              {filename ? filename : 'Seleccionar archivo'}
+        >   {#if loading}
+                <span class="loading loading-spinner loading-xl"></span>
+            {:else}
+                {filename ? filename : 'Seleccionar archivo'}
+            {/if}
         </label>
     </div>
     <div class="flex justify-start">

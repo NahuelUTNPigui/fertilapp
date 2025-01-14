@@ -5,6 +5,7 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import {guardarHistorial} from "$lib/historial/lib"
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
@@ -13,16 +14,15 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
+    let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
             peso:"0",
-            sexo:"H/M",
             fecha:"DD/MM/AAAA"
         }].map(item=>({
             CARAVANA:item.caravana,
             PESO:item.peso,
-            SEXO:item.sexo,
             FECHA:item.fecha
         }))
         const wb = XLSX.utils.book_new();
@@ -56,6 +56,7 @@
         
         let pesajes = []
         let pesajeshashmap = {}
+        loading = true
         for (const [key, value ] of Object.entries(sheetpesajes)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
@@ -70,9 +71,6 @@
                     pesajeshashmap[tail].peso = value.v
                 }
                 if(firstLetter=="C"){
-                    pesajeshashmap[tail].sexo = value.v
-                }
-                if(firstLetter=="D"){
                     pesajeshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
                 }
                 
@@ -88,9 +86,6 @@
                     pesajeshashmap[tail].peso = value.v
                 }
                 if(firstLetter=="C"){
-                    pesajeshashmap[tail].sexo = value.v 
-                }
-                if(firstLetter=="D"){
                     pesajeshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
                 }                
             }
@@ -101,39 +96,33 @@
         for(let i = 0;i<pesajes.length;i++){
             let pe = pesajes[i]          
 
-            let dataadd = {
-                caravana:pe.caravana,
-                active:true,
-                delete:false,
-                sexo:pe.sexo,
-                peso:pe.peso,
+            let datapesaje = {
+                pesonuevo:pe.peso,
                 cab:cab.id,
                 fecha:pe.fecha
             }
 
             let datamod = {
-                caravana:pe.caravana,
-                sexo:pe.sexo,
-                peso:pe.peso,
-                fecha:pe.fecha                    
+                peso:pe.peso,                   
             }
 
             try{
-                const record = await pb.collection('pesajes').getFirstListItem(`
-                    caravana="${an.caravana}" && cab='${cab.id}' && active = True`,
-                {});
-                await pb.collection('pesajes').update(record.id, datamod);
+                let recordanimal = await pb.collection("animales").getFirstListItem(`caravana="${an.caravana}" && cab='${cab.id}' && active = True`)
+                datapesaje.animal = recordanimal.id
+                datapesaje.pesoanterior  = recordanimal.peso
+                const record = await pb.collection('pesajes').create(datapesaje);
+                await guardarHistorial(pb,recordanimal.id)
+                await pb.collection('animales').update(recordanimal, datamod);
 
                 
             }
             catch(err){
-                
-                await pb.collection('pesajes').create(dataadd);
-
+                console.error(err)
             }
         }
         filename = ""
         wkbk = null
+        loading = false
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
         
     }
@@ -169,7 +158,11 @@
               `}
               
         >
-              {filename ? filename : 'Seleccionar archivo'}
+        {#if loading}
+            <span class="loading loading-spinner loading-xl"></span>
+        {:else}
+            {filename ? filename : 'Seleccionar archivo'}
+        {/if}
         </label>
     </div>
     <div class="flex justify-start">

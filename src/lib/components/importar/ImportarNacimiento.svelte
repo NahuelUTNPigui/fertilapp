@@ -8,7 +8,7 @@
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
-
+    let loading = $state(false)
 
     const pb = new PocketBase(ruta);
     let filename = $state("")
@@ -71,6 +71,7 @@
         
         let animales = []
         let animaleshashmap = {}
+        loading = true
         for (const [key, value ] of Object.entries(sheetanimales)) {
             const firstLetter = key.charAt(0);  // Get the first character
             const tail = key.slice(1);
@@ -219,6 +220,7 @@
             }
         }
         filename = ""
+        loading = false
         wkbk = null
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
         
@@ -273,7 +275,11 @@
               `}
               
         >
-              {filename ? filename : 'Seleccionar archivo'}
+        {#if loading}
+            <span class="loading loading-spinner loading-xl"></span>
+        {:else}
+            {filename ? filename : 'Seleccionar archivo'}
+        {/if}
         </label>
     </div>
     <div class="flex justify-start">
