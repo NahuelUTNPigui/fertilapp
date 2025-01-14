@@ -1,6 +1,7 @@
 <script>
     import Navbarr from "$lib/components/Navbarr.svelte";
     import PocketBase from 'pocketbase';
+    import { slide } from 'svelte/transition';
     import Swal from "sweetalert2";
     import { onMount } from "svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
@@ -17,19 +18,24 @@
     let generarReporte = $state(false)
     let generarReportePersonalizado =$state(false)
 
+    let animales = $state([])
+
     let lotesrows = $state([])
     let lotes = $state([])
     let rodeosrows = $state([])
     let rodeos = $state([])
-    let categoriasrows = [
+    let categoriasrows = $state([
         {nombre: "Vaca", total: 0},
         {nombre: "Vaquillona", total: 0},
         {nombre: "Ternero", total: 0},
         {nombre: "Novillo", total: 0},
         {nombre: "Torito", total: 0},
         {nombre: "Toro", total: 0}
-    ]
+    ])
     
+    let categoriasrodeosrows = $state([])
+    let categoriaslotesrows = $state([])
+
     function openNewModal(){
         nuevoModal.showModal()
         generarReporte = false
@@ -43,12 +49,7 @@
     }
 
     async function getCategoriasRows(){
-        const record = await pb.collection('animales').getFullList({
-            filter:`active=True && cab='${cab.id}'`
-        });
-        
-        let animales = record
-        
+
         for (let i = 0; i < animales.length; i++) {
             if (animales[i].categoria == "vaca"){
                 categoriasrows[0].total += 1
@@ -82,6 +83,36 @@
         for(let i = 0;i<lotes.length;i++){
             let total = await getAnimalesTotalLotes(lotes[i].id)
             lotes[i].total = total
+
+            lotes[i].categoriaslotes = [                
+                {nombre: "Vaca", total: 0},
+                {nombre: "Vaquillona", total: 0},
+                {nombre: "Ternero", total: 0},
+                {nombre: "Novillo", total: 0},
+                {nombre: "Torito", total: 0},
+                {nombre: "Toro", total: 0}
+            ]
+
+            for (let j = 0;j<animales.length;j++){
+                if (animales[j].categoria == "vaca" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[0].total += 1
+                }
+                if (animales[j].categoria == "vaquillona" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[1].total += 1
+                }
+                if (animales[j].categoria == "ternero" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[2].total += 1
+                }
+                if (animales[j].categoria == "novillo" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[3].total += 1
+                }
+                if (animales[j].categoria == "torito" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[4].total += 1
+                }
+                if (animales[j].categoria == "toro" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[5].total += 1
+                }
+            }
         }
     }
 
@@ -96,7 +127,45 @@
         for(let i = 0;i<rodeos.length;i++){
             let total = await getAnimalesTotalRodeos(rodeos[i].id)
             rodeos[i].total = total
-        }
+
+            rodeos[i].categoriasrodeos = [
+                {nombre: "Vaca", total: 0},
+                {nombre: "Vaquillona", total: 0},
+                {nombre: "Ternero", total: 0},
+                {nombre: "Novillo", total: 0},
+                {nombre: "Torito", total: 0},
+                {nombre: "Toro", total: 0}
+            ]
+
+            for (let j = 0;j<animales.length;j++){
+                if (animales[j].categoria == "vaca" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[0].total += 1
+                }
+                if (animales[j].categoria == "vaquillona" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[1].total += 1
+                }
+                if (animales[j].categoria == "ternero" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[2].total += 1
+                }
+                if (animales[j].categoria == "novillo" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[3].total += 1
+                }
+                if (animales[j].categoria == "torito" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[4].total += 1
+                }
+                if (animales[j].categoria == "toro" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[5].total += 1
+                }
+            }
+        }        
+    }
+
+    async function getAnimales() {
+        const record = await pb.collection('animales').getFullList({
+            filter: `active = true && delete = false && cab = '${cab.id}'`
+        })
+
+        animales = record
     }
 
     async function getAnimalesTotalRodeos(id){
@@ -114,11 +183,16 @@
     }
 
     onMount(async ()=>{
+        await getAnimales()
         await getLotes()
         await getRodeos()
         await getCategoriasRows()
     })
 
+    let isOpenFilter = $state(false)
+    function clickFilter(){
+        isOpenFilter = !isOpenFilter
+    }
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
@@ -207,14 +281,48 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 justify-start">Nombre del rodeo</th>
+                            <th class="text-base justify-start">Nombre del rodeo</th>
                             <th class="text-base mx-1 px-1">Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b justify-start">
-                                {r.nombre}
+                            <td class="text-base  border-b justify-start">
+                                <button 
+                                    aria-label="Filtrar" 
+                                    class="w-full"
+                                    onclick={clickFilter}
+                                >
+                                <div class="flex justify-between items-center px-1">
+                                    <h1 class="font-semibold text-lg py-2">{r.nombre}</h1>
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>            
+                                </button>
+                                {#if isOpenFilter}
+                                    <div transition:slide>
+                                        {#each r.categoriasrodeos as cr}
+                                            <table>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
+                                                        <th class="text-base mx-1 px-1">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cr.nombre}</td>
+                                                        <td class="text-base mx-1 px-1 border-b">{cr.total}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        {/each}
+                                    </div>
+                                {/if}
                             </td>
                             <td class="text-base mx-1 px-1 border-b">{r.total}</td>
                         </tr>
@@ -233,7 +341,41 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b justify-start">{l.nombre}</td>
+                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b justify-start">
+                                <button 
+                                    aria-label="Filtrar" 
+                                    class="w-full"
+                                    onclick={clickFilter}
+                                >
+                                <div class="flex justify-between items-center px-1">
+                                    <h1 class="font-semibold text-lg py-2">{l.nombre}</h1>
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>            
+                                </button>
+                                {#if isOpenFilter}
+                                    {#each l.categoriaslotes as cl}
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
+                                                    <th class="text-base mx-1 px-1">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cl.nombre}</td>
+                                                    <td class="text-base mx-1 px-1 border-b">{cl.total}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    {/each}
+                                {/if}
+                            </td>
                             <td class="text-base mx-1 px-1 border-b">{l.total}</td>
                         </tr>
                     </tbody>
