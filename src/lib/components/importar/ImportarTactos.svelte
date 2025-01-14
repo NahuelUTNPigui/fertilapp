@@ -82,7 +82,7 @@
                     tactoshashmap[tail].caravana = value.v
                 }
                 if(firstLetter=="D"){
-                    tactoshashmap[tail].categoria = value.v
+                    tactoshashmap[tail].categoria = value.v.toLowerCase()
                 }
                 if(firstLetter=="E"){
                     if (value.v == "preñada"){
@@ -96,7 +96,7 @@
                     }
                 }
                 if(firstLetter=="F"){
-                    tactoshashmap[tail].tipo = value.v
+                    tactoshashmap[tail].tipo = value.v.toLowerCase()
                 }
                 if(firstLetter=="G"){
                     tactoshashmap[tail].nombreveterinario = value.v
@@ -116,7 +116,7 @@
                     tactoshashmap[tail].caravana = value.v
                 }
                 if(firstLetter=="D"){
-                    tactoshashmap[tail].categoria = value.v
+                    tactoshashmap[tail].categoria = value.v.toLowerCase()
                 }
                 if(firstLetter=="E"){
                     if (value.v == "preñada"){
@@ -130,7 +130,7 @@
                     }
                 }
                 if(firstLetter=="F"){
-                    tactoshashmap[tail].tipo = value.v
+                    tactoshashmap[tail].tipo = value.v.toLowerCase()
                 }
                 if(firstLetter=="G"){
                     tactoshashmap[tail].nombreveterinario = value.v
@@ -166,10 +166,12 @@
             try{
                 const record = await pb.collection('tactos').getFirstListItem(`fecha="${ta.fecha + " 03:00:00"}" && animal="${an.id}"`,{});
                 await pb.collection('tactos').update(record.id, datamod);               
+                await pb.collection("animales").update(an.id,{prenada:ta.prenada})
             }
             catch(err){
                 
                 await pb.collection('tactos').create(dataadd);
+                await pb.collection("animales").update(an.id,{prenada:ta.prenada})
 
             }
         }

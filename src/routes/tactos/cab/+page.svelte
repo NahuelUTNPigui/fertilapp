@@ -12,7 +12,6 @@
     import estados from "$lib/stores/estados";
     import categorias from '$lib/stores/categorias';
     import { createCaber } from "$lib/stores/cab.svelte";
-    import Tactos from "$lib/components/animal/Tactos.svelte";
     import {guardarHistorial} from "$lib/historial/lib"
     let caber = createCaber()
     let cab = caber.cab
