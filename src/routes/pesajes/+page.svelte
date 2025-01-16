@@ -203,8 +203,8 @@
                 }
                 let data ={
                     pesonuevo:ps.pesonuevo,
-                    pesoanterio:ps.peso,
-                    fecha:" 03:00:00",
+                    pesoanterior:ps.peso,
+                    fecha:fecha+" 03:00:00",
                     animal:ps.id
                 }
                 await guardarHistorial(pb,selectanimales[i].id)

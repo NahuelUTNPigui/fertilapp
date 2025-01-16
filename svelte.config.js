@@ -36,7 +36,9 @@ const config = {
 				"/movimientos",
 				"/user/new",
 				"/reportes",
-				"/pesajes"]
+				"/pesajes",
+				"/establecimiento",
+				"/pesajes/lista"]
 		}
 	}
 };

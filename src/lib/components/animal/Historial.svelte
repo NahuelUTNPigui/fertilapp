@@ -20,6 +20,10 @@
         })
 
     }
+    function getEstadoNombre(estado){
+        let e = estados.filter(est=>est.id==estado)[0]
+        return e.nombre
+    }
     onMount(async ()=>{
         id = $page.params.slug
         await getHistorial()
@@ -37,6 +41,7 @@
                     <th class="text-base mx-1 px-1"  >Lote</th>
                     <th class="text-base mx-1 px-1"  >Rodeo</th>
                     <th class="text-base mx-1 px-1"  >Categoria</th>
+                    <th class="text-base mx-1 px-1"  >Estado</th>
                     <th class="text-base mx-1 px-1"  >Peso</th>
                     <th class="text-base mx-1 px-1"  >Nacimiento</th>
                     <th class="text-base mx-1 px-1"  >Sexo</th>
@@ -72,6 +77,9 @@
                             {capitalize(h.categoria)}
                         </td>
                         <td class="text-base">
+                            {getEstadoNombre(h.prenada)}
+                        </td>
+                        <td class="text-base">
                             {h.peso}
                         </td>
                         <td class="text-base">
@@ -83,6 +91,7 @@
                         <td class="text-base">
                             {h.caravana}
                         </td>
+                        
                     </tr>
                 {/each}
             </tbody>

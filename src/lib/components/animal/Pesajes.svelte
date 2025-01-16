@@ -80,17 +80,37 @@
             sort:"-fecha",
             expand:"animal"
         })
-        xs = []
-        ys = []
-        xs.push(pesajes[0].expand.animal.created)
-        ys.push(pesajes[0].pesoanterior)
-        
-        for(let i = 0;i < pesajes.length;i++){
-            xs.push(pesajes[i].fecha)
-            ys.push(pesajes[i].pesonuevo)
+        if(pesajes.length != 0){
+            xs = []
+            ys = []
+            xs.push(pesajes[0].expand.animal.created)
+            ys.push(pesajes[0].pesoanterior)
             
+            for(let i = 0;i < pesajes.length;i++){
+                xs.push(pesajes[i].fecha)
+                ys.push(pesajes[i].pesonuevo)
+                
+            }
+            let list = [];
+            for (let j = 0; j < xs.length; j++) 
+                list.push({'x': xs[j], 'y': ys[j]});
+
+            //2) sort:
+            list.sort(function(a, b) {
+                return new Date(a.x) < new Date(b.x) ? -1 : 1;
+                //Sort could be modified to, for example, sort on the age 
+                // if the name is the same. See Bonus section below
+            });
+
+            //3) separate them back out:
+            for (var k = 0; k < list.length; k++) {
+                xs[k] = list[k].x;
+                ys[k] = list[k].y;
+            }
+                        
+            createChart()
         }
-        createChart()
+        
         
     }
     
@@ -148,6 +168,7 @@
             Nuevo
         </button>
     </div>
+    {#if pesajes.length != 0}
     <div>
         <button
             aria-label="Evolucion"
@@ -159,6 +180,7 @@
             Evolucion
         </button>
     </div>
+    {/if}
 </div>
 <div class="w-full flex justify-items-center mx-1 lg:w-3/4 overflow-x-auto">
     {#if pesajes.length == 0}

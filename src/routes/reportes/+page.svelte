@@ -17,7 +17,8 @@
     let generarReporteLotes = $state(false)
     let generarReporte = $state(false)
     let generarReportePersonalizado =$state(false)
-
+    let opensFilterlotes = $state([])
+    let opensFilterrodeos = $state([])
     let animales = $state([])
 
     let lotesrows = $state([])
@@ -81,6 +82,7 @@
         ordenar(lotes)
         lotesrows = lotes
         for(let i = 0;i<lotes.length;i++){
+            opensFilterlotes.push(false)
             let total = await getAnimalesTotalLotes(lotes[i].id)
             lotes[i].total = total
 
@@ -188,10 +190,13 @@
         await getRodeos()
         await getCategoriasRows()
     })
-
+    
     let isOpenFilter = $state(false)
     function clickFilter(){
         isOpenFilter = !isOpenFilter
+    }
+    function clickFilterlote(i){
+        opensFilterlotes[i] = !opensFilterlotes[i]
     }
 </script>
 <Navbarr>
@@ -331,7 +336,7 @@
             {/each}
         {/if}
         {#if generarReporteLotes}
-            {#each lotesrows as l}
+            {#each lotesrows as l,i}
                 <table>
                     <thead>
                         <tr>
@@ -345,21 +350,22 @@
                                 <button 
                                     aria-label="Filtrar" 
                                     class="w-full"
-                                    onclick={clickFilter}
+                                    onclick={()=>clickFilterlote(i)}
                                 >
                                 <div class="flex justify-between items-center px-1">
                                     <h1 class="font-semibold text-lg py-2">{l.nombre}</h1>
                                     <svg 
                                         xmlns="http://www.w3.org/2000/svg" 
-                                        class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                                        class={`size-6 transition-all duration-300 ${opensFilterlotes[i]? 'transform rotate-180':''}`}
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>            
                                 </button>
-                                {#if isOpenFilter}
+                                {#if opensFilterlotes[i]}
+                                    <div transition:slide>
                                     {#each l.categoriaslotes as cl}
-                                        <table>
+                                        <table >
                                             <thead>
                                                 <tr>
                                                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
@@ -374,6 +380,7 @@
                                             </tbody>
                                         </table>
                                     {/each}
+                                    </div>
                                 {/if}
                             </td>
                             <td class="text-base mx-1 px-1 border-b">{l.total}</td>
