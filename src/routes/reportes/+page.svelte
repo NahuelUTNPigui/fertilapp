@@ -3,6 +3,7 @@
     import PocketBase from 'pocketbase';
     import { slide } from 'svelte/transition';
     import Swal from "sweetalert2";
+    import Chart from 'chart.js/auto';
     import { onMount } from "svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
     import estilos from '$lib/stores/estilos';
@@ -21,6 +22,10 @@
     let opensFilterrodeos = $state([])
     let animales = $state([])
 
+    let ctx;
+	let canvas;
+    let chart
+
     let lotesrows = $state([])
     let lotes = $state([])
     let rodeosrows = $state([])
@@ -36,6 +41,39 @@
     
     let categoriasrodeosrows = $state([])
     let categoriaslotesrows = $state([])
+
+    function createChart(){
+        ctx = canvas.getContext('2d');
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: [categoriasrows[0].nombre,
+                categoriasrows[1].nombre,
+                categoriasrows[2].nombre,
+                categoriasrows[3].nombre,
+                categoriasrows[4].nombre,
+                categoriasrows[5].nombre],
+                datasets: [
+                    {
+                        label: "Pesos promedios por categoria",
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        data: [categoriasrows[0].pesoProm,
+                        categoriasrows[1].pesoProm,
+                        categoriasrows[2].pesoProm,
+                        categoriasrows[3].pesoProm,
+                        categoriasrows[4].pesoProm,
+                        categoriasrows[5].pesoProm
+                        ]
+                    }
+                ]
+            }            
+        });
+    }
 
     function openNewModal(){
         nuevoModal.showModal()
@@ -90,6 +128,8 @@
         categoriasrows[3].pesoProm = Number((pesoNovillo / categoriasrows[3].total).toFixed(2))
         categoriasrows[4].pesoProm = Number((pesoTorito / categoriasrows[4].total).toFixed(2))
         categoriasrows[5].pesoProm = Number((pesoToro / categoriasrows[5].total).toFixed(2))
+
+        createChart()
     }
 
     async function getLotes(){
@@ -320,7 +360,18 @@
                     </tr>
                 </tbody>
             </table>
-        {/each}        
+        {/each}
+        <div>
+            <button
+                aria-label="Evolucion"
+                onclick={()=>chartpesaje.showModal()}
+                class={`
+                    ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                `}
+            >
+                Mostrar grafico
+            </button>
+        </div>      
     {/if}
     {#if generarReportePersonalizado}
         {#if generarReporteRodeos}
@@ -436,4 +487,32 @@
             {/each}
         {/if}
     {/if}
+    <dialog id="chartpesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl ">
+        <div 
+            class="
+                modal-box  max-w-5xl
+                bg-gradient-to-br from-white to-gray-100 
+                dark:from-gray-900 dark:to-gray-800
+            "
+        >
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            </form> 
+            <h3 class="text-lg font-bold">Pesos promedios</h3>  
+            <div class="chart-container justify-items-center">
+                <canvas class="" bind:this={canvas} >
+                </canvas>
+            </div>
+            
+            <div class="modal-action justify-start ">
+                <button class="btn btn-error text-white" onclick={()=>chartpesaje.close()}>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+    <style>
+    .chart-container {
+        width: 800px;
+        height:400px;
+     }
+    </style>
 </Navbarr>
