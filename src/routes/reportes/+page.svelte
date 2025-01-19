@@ -363,6 +363,7 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
         
     {/if}
     {#if generarReporte}
