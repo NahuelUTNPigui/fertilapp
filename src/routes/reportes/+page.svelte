@@ -3,6 +3,7 @@
     import PocketBase from 'pocketbase';
     import { slide } from 'svelte/transition';
     import Swal from "sweetalert2";
+    import Chart from 'chart.js/auto';
     import { onMount } from "svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
     import estilos from '$lib/stores/estilos';
@@ -20,23 +21,59 @@
     let opensFilterlotes = $state([])
     let opensFilterrodeos = $state([])
     let animales = $state([])
-    let total = $state(0)
+
+    let ctx;
+	let canvas;
+    let chart
 
     let lotesrows = $state([])
     let lotes = $state([])
     let rodeosrows = $state([])
     let rodeos = $state([])
     let categoriasrows = $state([
-        {nombre: "Vaca", total: 0},
-        {nombre: "Vaquillona", total: 0},
-        {nombre: "Ternero", total: 0},
-        {nombre: "Novillo", total: 0},
-        {nombre: "Torito", total: 0},
-        {nombre: "Toro", total: 0}
+        {nombre: "Vaca", total: 0, pesoProm: 0},
+        {nombre: "Vaquillona", total: 0, pesoProm: 0},
+        {nombre: "Ternero", total: 0, pesoProm: 0},
+        {nombre: "Novillo", total: 0, pesoProm: 0},
+        {nombre: "Torito", total: 0, pesoProm: 0},
+        {nombre: "Toro", total: 0, pesoProm: 0}
     ])
     
     let categoriasrodeosrows = $state([])
     let categoriaslotesrows = $state([])
+
+    function createChart(){
+        ctx = canvas.getContext('2d');
+        if (chart) {
+            chart.destroy();
+        }
+
+        chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: [categoriasrows[0].nombre,
+                categoriasrows[1].nombre,
+                categoriasrows[2].nombre,
+                categoriasrows[3].nombre,
+                categoriasrows[4].nombre,
+                categoriasrows[5].nombre],
+                datasets: [
+                    {
+                        label: "Pesos promedios por categoria",
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        data: [categoriasrows[0].pesoProm,
+                        categoriasrows[1].pesoProm,
+                        categoriasrows[2].pesoProm,
+                        categoriasrows[3].pesoProm,
+                        categoriasrows[4].pesoProm,
+                        categoriasrows[5].pesoProm
+                        ]
+                    }
+                ]
+            }            
+        });
+    }
 
     function openNewModal(){
         nuevoModal.showModal()
@@ -51,28 +88,49 @@
     }
 
     async function getCategoriasRows(){
+        let pesoVaca = 0
+        let pesoVaquillona = 0
+        let pesoTernero = 0
+        let pesoNovillo = 0
+        let pesoTorito = 0
+        let pesoToro = 0
 
         for (let i = 0; i < animales.length; i++) {
             total += 1
             if (animales[i].categoria == "vaca"){
                 categoriasrows[0].total += 1
+                pesoVaca += animales[i].peso
             }
             if (animales[i].categoria == "vaquillona"){
                 categoriasrows[1].total += 1
+                pesoVaquillona += animales[i].peso
             }
             if (animales[i].categoria == "ternero"){
                 categoriasrows[2].total += 1
+                pesoTernero += animales[i].peso
             }
             if (animales[i].categoria == "novillo"){
                 categoriasrows[3].total += 1
+                pesoNovillo += animales[i].peso
             }
             if (animales[i].categoria == "torito"){
                 categoriasrows[4].total += 1
+                pesoTorito += animales[i].peso
             }
             if (animales[i].categoria == "toro"){
                 categoriasrows[5].total += 1
+                pesoToro += animales[i].peso
             }
         }
+
+        categoriasrows[0].pesoProm = Number((pesoVaca / categoriasrows[0].total).toFixed(2))
+        categoriasrows[1].pesoProm = Number((pesoVaquillona / categoriasrows[1].total).toFixed(2))
+        categoriasrows[2].pesoProm = Number((pesoTernero / categoriasrows[2].total).toFixed(2))
+        categoriasrows[3].pesoProm = Number((pesoNovillo / categoriasrows[3].total).toFixed(2))
+        categoriasrows[4].pesoProm = Number((pesoTorito / categoriasrows[4].total).toFixed(2))
+        categoriasrows[5].pesoProm = Number((pesoToro / categoriasrows[5].total).toFixed(2))
+
+        createChart()
     }
 
     async function getLotes(){
@@ -89,35 +147,56 @@
             lotes[i].total = total
 
             lotes[i].categoriaslotes = [                
-                {nombre: "Vaca", total: 0},
-                {nombre: "Vaquillona", total: 0},
-                {nombre: "Ternero", total: 0},
-                {nombre: "Novillo", total: 0},
-                {nombre: "Torito", total: 0},
-                {nombre: "Toro", total: 0}
+                {nombre: "Vaca", total: 0, pesoProm: 0},
+                {nombre: "Vaquillona", total: 0, pesoProm: 0},
+                {nombre: "Ternero", total: 0, pesoProm: 0},
+                {nombre: "Novillo", total: 0, pesoProm: 0},
+                {nombre: "Torito", total: 0, pesoProm: 0},
+                {nombre: "Toro", total: 0, pesoProm: 0}
             ]
+
+            let pesoVaca = 0
+            let pesoVaquillona = 0
+            let pesoTernero = 0
+            let pesoNovillo = 0
+            let pesoTorito = 0
+            let pesoToro = 0
 
             for (let j = 0;j<animales.length;j++){
                 if (animales[j].categoria == "vaca" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[0].total += 1
+                    pesoVaca += animales[j].peso
                 }
                 if (animales[j].categoria == "vaquillona" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[1].total += 1
+                    pesoVaquillona += animales[j].peso
                 }
                 if (animales[j].categoria == "ternero" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[2].total += 1
+                    pesoTernero += animales[j].peso
                 }
                 if (animales[j].categoria == "novillo" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[3].total += 1
+                    pesoNovillo += animales[j].peso
                 }
                 if (animales[j].categoria == "torito" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[4].total += 1
+                    pesoTorito += animales[j].peso
                 }
                 if (animales[j].categoria == "toro" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[5].total += 1
+                    pesoToro += animales[j].peso
                 }
             }
+
+            lotes[i].categoriaslotes[0].pesoProm = Number((pesoVaca / lotes[i].categoriaslotes[0].total).toFixed(2))
+            lotes[i].categoriaslotes[1].pesoProm = Number((pesoVaquillona / lotes[i].categoriaslotes[1].total).toFixed(2))
+            lotes[i].categoriaslotes[2].pesoProm = Number((pesoTernero / lotes[i].categoriaslotes[2].total).toFixed(2))
+            lotes[i].categoriaslotes[3].pesoProm = Number((pesoNovillo / lotes[i].categoriaslotes[3].total).toFixed(2))
+            lotes[i].categoriaslotes[4].pesoProm = Number((pesoTorito / lotes[i].categoriaslotes[4].total).toFixed(2))
+            lotes[i].categoriaslotes[5].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[5].total).toFixed(2))
         }
+        
     }
 
     async function getRodeos(){
@@ -129,38 +208,59 @@
         ordenar(rodeos)
         rodeosrows = rodeos
         for(let i = 0;i<rodeos.length;i++){
+            opensFilterrodeos.push(false)
             let total = await getAnimalesTotalRodeos(rodeos[i].id)
             rodeos[i].total = total
 
+            let pesoVaca = 0
+            let pesoVaquillona = 0
+            let pesoTernero = 0
+            let pesoNovillo = 0
+            let pesoTorito = 0
+            let pesoToro = 0
+
             rodeos[i].categoriasrodeos = [
-                {nombre: "Vaca", total: 0},
-                {nombre: "Vaquillona", total: 0},
-                {nombre: "Ternero", total: 0},
-                {nombre: "Novillo", total: 0},
-                {nombre: "Torito", total: 0},
-                {nombre: "Toro", total: 0}
+                {nombre: "Vaca", total: 0, pesoProm: 0},
+                {nombre: "Vaquillona", total: 0, pesoProm: 0},
+                {nombre: "Ternero", total: 0, pesoProm: 0},
+                {nombre: "Novillo", total: 0, pesoProm: 0},
+                {nombre: "Torito", total: 0, pesoProm: 0},
+                {nombre: "Toro", total: 0, pesoProm: 0}
             ]
 
             for (let j = 0;j<animales.length;j++){
                 if (animales[j].categoria == "vaca" && animales[j].rodeo == rodeos[i].id){
-                    rodeos[i].categoriasrodeos[0].total += 1    
+                    rodeos[i].categoriasrodeos[0].total += 1
+                    pesoVaca += animales[j].peso
                 }
                 if (animales[j].categoria == "vaquillona" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[1].total += 1
+                    pesoVaquillona += animales[j].peso
                 }
                 if (animales[j].categoria == "ternero" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[2].total += 1
+                    pesoTernero += animales[j].peso
                 }
                 if (animales[j].categoria == "novillo" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[3].total += 1
+                    pesoNovillo += animales[j].peso
                 }
                 if (animales[j].categoria == "torito" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[4].total += 1
+                    pesoTorito += animales[j].peso
                 }
                 if (animales[j].categoria == "toro" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[5].total += 1
+                    pesoToro += animales[j].peso
                 }
             }
+
+            rodeos[i].categoriasrodeos[0].pesoProm = Number((pesoVaca / rodeos[i].categoriasrodeos[0].total).toFixed(2))
+            rodeos[i].categoriasrodeos[1].pesoProm = Number((pesoVaquillona / rodeos[i].categoriasrodeos[1].total).toFixed(2))
+            rodeos[i].categoriasrodeos[2].pesoProm = Number((pesoTernero / rodeos[i].categoriasrodeos[2].total).toFixed(2))
+            rodeos[i].categoriasrodeos[3].pesoProm = Number((pesoNovillo / rodeos[i].categoriasrodeos[3].total).toFixed(2))
+            rodeos[i].categoriasrodeos[4].pesoProm = Number((pesoTorito / rodeos[i].categoriasrodeos[4].total).toFixed(2))
+            rodeos[i].categoriasrodeos[5].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[5].total).toFixed(2))
         }        
     }
 
@@ -199,6 +299,9 @@
     }
     function clickFilterlote(i){
         opensFilterlotes[i] = !opensFilterlotes[i]
+    }
+    function clickFilterrodeo(i){
+        opensFilterrodeos[i] = !opensFilterrodeos[i]
     }
 </script>
 <Navbarr>
@@ -240,9 +343,8 @@
             </div>
         </div>
     </dialog>
-    <!--
     {#if generarReporte}
-        {#each rodeosrows as r}
+            <div class="overflow-x-auto">
             <table>
                 <thead>
                     <tr>
@@ -263,36 +365,40 @@
             </table>
         {/each}
     {/if}
-    -->
     {#if generarReporte}
-            <div class="overflow-x-auto">
+        {#each categoriasrows as c}
             <table>
                 <thead>
                     <tr>
-                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Establecimiento</th>
+                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
                         <th class="text-base mx-1 px-1">Total</th>
-                        {#each categoriasrows as c}
-                            <th class="text-base mx-1 px-1">{c.nombre}</th>
-                        {/each}          
-                        
+                        <th class="text-base mx-1 px-1">Peso promedio</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cab.nombre}</td>
-                        <td class="text-base mx-1 px-1 border-b">{total}</td>
-                        {#each categoriasrows as c}
-                            <th class="text-base mx-1 px-1 border-b">{c.total}</th>
-                        {/each}
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{c.nombre}</td>
+                        <td class="text-base mx-1 px-1 border-b">{c.total}</td>
+                        <td class="text-base mx-1 px-1 border-b">{c.pesoProm}</td>
                     </tr>
                 </tbody>
             </table>
-            </div>
-           
+        {/each}
+        <div>
+            <button
+                aria-label="Evolucion"
+                onclick={()=>chartpesaje.showModal()}
+                class={`
+                    ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                `}
+            >
+                Mostrar grafico
+            </button>
+        </div>      
     {/if}
     {#if generarReportePersonalizado}
         {#if generarReporteRodeos}
-            {#each rodeosrows as r}
+            {#each rodeosrows as r, i}
                 <table>
                     <thead>
                         <tr>
@@ -302,23 +408,23 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-base  border-b justify-start">
+                            <td class="text-base border-b justify-start">
                                 <button 
                                     aria-label="Filtrar" 
                                     class="w-full"
-                                    onclick={clickFilter}
+                                    onclick={()=>clickFilterrodeo(i)}
                                 >
                                 <div class="flex justify-between items-center px-1">
                                     <h1 class="font-semibold text-lg py-2">{r.nombre}</h1>
                                     <svg 
                                         xmlns="http://www.w3.org/2000/svg" 
-                                        class={`size-6 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
+                                        class={`size-6 transition-all duration-300 ${opensFilterrodeos[i]? 'transform rotate-180':''}`}
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>            
                                 </button>
-                                {#if isOpenFilter}
+                                {#if opensFilterrodeos[i]}
                                     <div transition:slide>
                                         {#each r.categoriasrodeos as cr}
                                             <table>
@@ -326,12 +432,14 @@
                                                     <tr>
                                                         <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
                                                         <th class="text-base mx-1 px-1">Total</th>
+                                                        <th class="text-base mx-1 px-1">Peso Promedio</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
                                                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cr.nombre}</td>
                                                         <td class="text-base mx-1 px-1 border-b">{cr.total}</td>
+                                                        <td class="text-base mx-1 px-1 border-b">{cr.pesoProm}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -381,12 +489,14 @@
                                                 <tr>
                                                     <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
                                                     <th class="text-base mx-1 px-1">Total</th>
+                                                    <th class="text-base mx-1 px-1">Peso Promedio</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cl.nombre}</td>
                                                     <td class="text-base mx-1 px-1 border-b">{cl.total}</td>
+                                                    <td class="text-base mx-1 px-1 border-b">{cl.pesoProm}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -401,4 +511,32 @@
             {/each}
         {/if}
     {/if}
+    <dialog id="chartpesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl ">
+        <div 
+            class="
+                modal-box  max-w-5xl
+                bg-gradient-to-br from-white to-gray-100 
+                dark:from-gray-900 dark:to-gray-800
+            "
+        >
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            </form> 
+            <h3 class="text-lg font-bold">Pesos promedios</h3>  
+            <div class="chart-container justify-items-center">
+                <canvas class="" bind:this={canvas} >
+                </canvas>
+            </div>
+            
+            <div class="modal-action justify-start ">
+                <button class="btn btn-error text-white" onclick={()=>chartpesaje.close()}>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+    <style>
+    .chart-container {
+        width: 800px;
+        height:400px;
+     }
+    </style>
 </Navbarr>
