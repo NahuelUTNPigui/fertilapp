@@ -363,7 +363,7 @@
                     </tr>
                 </tbody>
             </table>
-        {/each}
+        
     {/if}
     {#if generarReporte}
         {#each categoriasrows as c}
