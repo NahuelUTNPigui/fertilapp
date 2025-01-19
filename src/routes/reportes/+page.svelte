@@ -20,6 +20,7 @@
     let opensFilterlotes = $state([])
     let opensFilterrodeos = $state([])
     let animales = $state([])
+    let total = $state(0)
 
     let lotesrows = $state([])
     let lotes = $state([])
@@ -52,6 +53,7 @@
     async function getCategoriasRows(){
 
         for (let i = 0; i < animales.length; i++) {
+            total += 1
             if (animales[i].categoria == "vaca"){
                 categoriasrows[0].total += 1
             }
@@ -141,7 +143,7 @@
 
             for (let j = 0;j<animales.length;j++){
                 if (animales[j].categoria == "vaca" && animales[j].rodeo == rodeos[i].id){
-                    rodeos[i].categoriasrodeos[0].total += 1
+                    rodeos[i].categoriasrodeos[0].total += 1    
                 }
                 if (animales[j].categoria == "vaquillona" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[1].total += 1
@@ -263,22 +265,30 @@
     {/if}
     -->
     {#if generarReporte}
-        {#each categoriasrows as c}
+            <div class="overflow-x-auto">
             <table>
                 <thead>
                     <tr>
-                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Categoria</th>
+                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Establecimiento</th>
                         <th class="text-base mx-1 px-1">Total</th>
+                        {#each categoriasrows as c}
+                            <th class="text-base mx-1 px-1">{c.nombre}</th>
+                        {/each}          
+                        
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{c.nombre}</td>
-                        <td class="text-base mx-1 px-1 border-b">{c.total}</td>
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{cab.nombre}</td>
+                        <td class="text-base mx-1 px-1 border-b">{total}</td>
+                        {#each categoriasrows as c}
+                            <th class="text-base mx-1 px-1 border-b">{c.total}</th>
+                        {/each}
                     </tr>
                 </tbody>
             </table>
-        {/each}        
+            </div>
+           
     {/if}
     {#if generarReportePersonalizado}
         {#if generarReporteRodeos}
@@ -342,6 +352,7 @@
                         <tr>
                             <th class="text-base ml-3 pl-3 mr-1 pr-1 justify-start">Nombre del lote</th>
                             <th class="text-base mx-1 px-1">Total</th>
+
                         </tr>
                     </thead>
                     <tbody>
