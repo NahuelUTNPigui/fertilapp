@@ -96,7 +96,6 @@
         let pesoToro = 0
 
         for (let i = 0; i < animales.length; i++) {
-            total += 1
             if (animales[i].categoria == "vaca"){
                 categoriasrows[0].total += 1
                 pesoVaca += animales[i].peso
@@ -344,29 +343,6 @@
         </div>
     </dialog>
     {#if generarReporte}
-            <div class="overflow-x-auto">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Nombre de rodeo: {r.nombre}</th>
-                        <th class="text-base mx-1 px-1">Caravana</th>
-                        <th class="text-base mx-1 px-1">Sexo</th>
-                        <th class="text-base mx-1 px-1">Categoria</th>
-                        <th class="text-base mx-1 px-1">Peso</th>
-                        <th class="text-base mx-1 px-1">Estado</th>
-                        <th class="text-base mx-1 px-1">Edad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-    {/if}
-    {#if generarReporte}
         {#each categoriasrows as c}
             <table>
                 <thead>
@@ -461,7 +437,6 @@
                         <tr>
                             <th class="text-base ml-3 pl-3 mr-1 pr-1 justify-start">Nombre del lote</th>
                             <th class="text-base mx-1 px-1">Total</th>
-
                         </tr>
                     </thead>
                     <tbody>
