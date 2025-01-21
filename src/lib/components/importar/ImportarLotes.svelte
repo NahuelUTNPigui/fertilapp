@@ -5,10 +5,13 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import { createPer } from "$lib/stores/permisos.svelte";
+    import { getPermisosList } from "$lib/permisosutil/lib";
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
-    
+    let per = createPer()
+    let userpermisos = getPermisosList(per.per.permisos)
 
     const pb = new PocketBase(ruta);
     let filename = $state("")
@@ -41,14 +44,20 @@
         reader.readAsBinaryString(file);
     }
     async function procesarArchivo(){
+        if(!userpermisos[2]){
+            Swal.fire("Error","No tienes permisos de importar","error")
+            return
+        }
         if(filename == ""){
             Swal.fire("Error","Seleccione un archivo","error")
+            return
         }
 
         let sheetlotes = wkbk.Sheets.Lotes
-        console.log(wkbk.Sheets.Lotes)
+        
         if(!sheetlotes){
             Swal.fire("Error","Debe subir un archivo válido","error")
+            return
         }
         
         let lotes = []

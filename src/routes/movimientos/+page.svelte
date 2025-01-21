@@ -9,11 +9,15 @@
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
     import {guardarHistorial} from "$lib/historial/lib"
+    import {createPer} from "$lib/stores/permisos.svelte"
+    import { getPermisosList } from '$lib/permisosutil/lib';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
     let cab = caber.cab
+    let per = createPer()
+    let userpermisos = getPermisosList(per.per.permisos)
 
     //boton
     let textoboton = $state("Mover")
@@ -172,7 +176,13 @@
         animalesrows = animales
     }
     function openNewModal(){
-        nuevoModal.showModal()   
+        if(userpermisos[3]){
+            nuevoModal.showModal()   
+        }
+        else{
+            Swal.fire("Error movimiento","No tienes permisos para hacer movimientos","error")
+        }
+        
     }
     async function mover(){
         if(ninguno){

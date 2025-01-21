@@ -144,7 +144,7 @@
             catch(err){
                 
 
-                Swal.fire('Error historial', 'No existe el animal', 'error');
+                Swal.fire('Error animal', 'No existe el animal', 'error');
             }
 
         }

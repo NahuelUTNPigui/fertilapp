@@ -16,6 +16,7 @@
     import { createUserer } from '$lib/stores/user.svelte';
     import {createPer} from "$lib/stores/permisos.svelte"
     import { getPermisosList } from '$lib/permisosutil/lib';
+    import RadioButton from '$lib/components/RadioButton.svelte';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -58,6 +59,7 @@
     let peso = $state("")
     let rodeo = $state("")
     let lote = $state("")
+    let categoria = $state("")
     //Datos paricion
     let madre = $state("")
     let padre = $state("")
@@ -176,12 +178,13 @@
                 caravana,
                 active:true,
                 delete:false,
-                prenada:0,
+                prenada,
                 fechanacimiento:fechanacimiento +" 03:00:00",
                 sexo,
                 peso,
                 lote,
                 rodeo,
+                categoria,
                 cab:cab.id
             }
             if(conparicion){
@@ -887,10 +890,14 @@
                     />
                 </label>
                 {#if sexo == "H"}
-                    <label for = "estado" class="label">
+                    <div class="m-1 mt-3">
+                        <RadioButton bind:option={prenada} deshabilitado={false}/>
+                    </div>
+                    
+                    <label for = "estado" class="hidden label">
                         <span class="label-text text-base">Estado</span>
                     </label>
-                    <label class="input-group ">
+                    <label class="input-group hidden">
                         <select 
                             class={`
                                 select select-bordered w-full
@@ -905,6 +912,23 @@
                         </select>
                     </label>
                 {/if}
+                <label for = "categoria" class="label">
+                    <span class="label-text text-base">Categoria</span>
+                </label>
+                <label class="input-group">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2}
+                        `} bind:value={categoria}>
+                        {#each categorias as r}
+                            <option value={r.id}>{r.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
                 <label for = "rodeo" class="label">
                     <span class="label-text text-base">Rodeo</span>
                 </label>

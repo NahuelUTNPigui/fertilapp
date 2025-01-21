@@ -8,6 +8,7 @@
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
     import {guardarHistorial} from "$lib/historial/lib"
+    import RadioButton from "../RadioButton.svelte";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -242,9 +243,11 @@
             </label>
             <div class="form-group">
                 <label for = "prenada" class="label">
-                    <span class="label-text text-base">Preñada</span>
+                    <span class="label-text text-base">Estado</span>
                 </label>
-                <label class="input-group ">
+
+                <RadioButton class="m-1 my-3" bind:option={prenada} deshabilitado={false}/>
+                <label class="input-group hidden">
                     <select 
                         class={`
                             select select-bordered w-full

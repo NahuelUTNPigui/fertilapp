@@ -5,12 +5,16 @@
     import { onMount } from 'svelte';
     import estilos from '$lib/stores/estilos';
     import { createCaber } from '$lib/stores/cab.svelte';
+    import {createPer} from "$lib/stores/permisos.svelte"
+    import { getPermisosList } from '$lib/permisosutil/lib';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
     let cab = caber.cab
+    let per = createPer()
+    let userpermisos = getPermisosList(per.per.permisos)
 
     //Datos para mostrar
     let lotes = $state([])
@@ -43,9 +47,15 @@
         }
     }
     function openNewModal(){
-        idlote = ""
+        if(userpermisos[1]){
+            idlote = ""
         nombre = ""
         nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Error lotes","No tienes permisos para guardar lotes","error")
+        }
+        
     }
     async function guardar(){
         try{

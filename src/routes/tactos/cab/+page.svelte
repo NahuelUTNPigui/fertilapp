@@ -13,8 +13,14 @@
     import categorias from '$lib/stores/categorias';
     import { createCaber } from "$lib/stores/cab.svelte";
     import {guardarHistorial} from "$lib/historial/lib"
+    import RadioButton from "$lib/components/RadioButton.svelte";
+    import { createPer } from "$lib/stores/permisos.svelte";
+    import { getPermisosList } from "$lib/permisosutil/lib";
+    import permisos from "$lib/stores/permisos";
     let caber = createCaber()
     let cab = caber.cab
+    let per = createPer()
+    let userpermisos = getPermisosList(per.per.permisos)
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -78,34 +84,45 @@
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
     }
     function openNewModal(){
-        tacto = null
-        idtacto = ""   
-        fecha = ""
-        observacion =  ""
-        animal = ""
-        categoria = "vaca"
-        prenada = 0
-        tipo = "tacto"
-        nombreveterinario = ""
-        botonhabilitado = false
-        malfecha = false
-        malanimal = false
-        nuevoModal.showModal()
+        if(permisos[4]){
+            tacto = null
+            idtacto = ""   
+            fecha = ""
+            observacion =  ""
+            animal = ""
+            categoria = "vaca"
+            prenada = 0
+            tipo = "tacto"
+            nombreveterinario = ""
+            botonhabilitado = false
+            malfecha = false
+            malanimal = false
+            nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para crear eventos","error")
+        }
+        
     }
     function openModalEdit(id){
-        botonhabilitado = true
-        malanimal = false
-        malfecha = false
-        idtacto = id
-        tacto = tactos.filter(t=>t.id==idtacto)[0]
-        fecha = tacto.fecha.split(" ")[0]
-        observacion = tacto.observacion
-        animal = tacto.animal
-        categoria = tacto.categoria
-        prenada = tacto.prenada
-        tipo = tacto.tipo
-        nombreveterinario = tacto.nombreveterinario
-        nuevoModal.showModal()
+        if(permisos[4]){
+            botonhabilitado = true
+            malanimal = false
+            malfecha = false
+            idtacto = id
+            tacto = tactos.filter(t=>t.id==idtacto)[0]
+            fecha = tacto.fecha.split(" ")[0]
+            observacion = tacto.observacion
+            animal = tacto.animal
+            categoria = tacto.categoria
+            prenada = tacto.prenada
+            tipo = tacto.tipo
+            nombreveterinario = tacto.nombreveterinario
+            nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para crear eventos","error")
+        }
     }
     function eliminar(id){
         Swal.fire({
@@ -569,6 +586,13 @@
                       </select>
                 </label>
                 <div class="form-group">
+                    <label for = "prenada" class="label">
+                        <span class="label-text text-base">Estado</span>
+                    </label>
+    
+                    <RadioButton class="m-1 my-3" bind:option={prenada} deshabilitado={false}/>
+                </div>
+                <div class="form-group hidden">
                     <label for = "prenada" class="label">
                         <span class="label-text text-base">Preñada</span>
                     </label>

@@ -11,6 +11,8 @@
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
     import RadioButton from "$lib/components/RadioButton.svelte";
+    import { createPer } from "$lib/stores/permisos.svelte";
+    import { getPermisosList } from "$lib/permisosutil/lib";
     let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -18,6 +20,8 @@
     let caber = createCaber()
     let userer = createUserer()
     let cab = caber.cab
+    let per = createPer()
+    let userpermisos = getPermisosList(per.per.permisos)
     let userid = userer.userid
     let id = $state("")
     let nombrerodeo = $state("")
@@ -109,14 +113,20 @@
         }
     }
     function openEditar(){
-        modoedicion = true
-        pesoviejo = peso
-        sexoviejo = sexo
-        loteviejo = lote
-        rodeovieja = rodeo
-        caravanavieja = caravana
-        categoriavieja = categoria
-        prenadaviejo  = prenada
+        if(userpermisos[5]){
+            modoedicion = true
+            pesoviejo = peso
+            sexoviejo = sexo
+            loteviejo = lote
+            rodeovieja = rodeo
+            caravanavieja = caravana
+            categoriavieja = categoria
+            prenadaviejo  = prenada
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
+        }
+        
     }
     function cancelarEditar(){
         modoedicion = false
@@ -141,10 +151,16 @@
         }
     }
     function openNewModal(){
-        fecha  = fechanacimiento
-        nuevoModal.showModal()
+        if(userpermisos[5]){
+            fecha  = fechanacimiento
+            nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
+        }
     }
     function openEditModal(){
+        if(userpermisos[5]){
         fechaviejo =  fecha
         nombremadreviejo = nombremadre
         nombrepadreviejo = nombrepadre
@@ -153,6 +169,11 @@
         observacionviejo = observacion
         
         nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
+        }
+        
     }
     async function guardarNaciminento(){
         try{
