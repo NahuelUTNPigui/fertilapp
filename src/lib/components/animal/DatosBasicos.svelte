@@ -10,6 +10,7 @@
     import Swal from "sweetalert2";
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
+    import RadioButton from "$lib/components/RadioButton.svelte";
     let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -486,12 +487,12 @@
             </label>
         {/if}
     </div>
-    <div class="mb-1 lg:mb-0">
+    <div class="mb-1 lg:mb-0 col-span-2 lg:w-1/2">
         <label for = "prenada" class="label">
             <span class="label-text text-base">Estado</span>
         </label>
         {#if modoedicion}
-            
+            <!--
             <label class="input-group ">
                 <select 
                     class={`
@@ -507,34 +508,11 @@
                 </select>
 
             </label>
-            <div class=" hidden flex inline">
-                <button
-                    
-                    class={`
-                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
-                    `}
-                    >
-                        Vacia
-                </button>
-                <button
-                    
-                    class={`
-                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
-                    `}
-                    >
-                        Dudosa
-                </button>
-                <button
-                    
-                    class={`
-                        ${estilos.basico} ${estilos.chico} ${estilos.secundario}
-                    `}
-                    >
-                        Preñada
-                </button>
-
-            </div>
+            -->
+            <RadioButton bind:option={prenada} deshabilitado={false}/>
         {:else}
+            <RadioButton bind:option={prenada} deshabilitado={true}/>
+            <!--
             <label for = "prenada" class="label">
                 <span class="label-text text-base p-1">
                     {
@@ -544,6 +522,7 @@
                     }
                 </span>
             </label>
+            -->
             
         {/if}
     </div>

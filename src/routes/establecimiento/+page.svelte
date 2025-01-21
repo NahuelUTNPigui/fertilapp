@@ -7,20 +7,22 @@
     import { goto } from '$app/navigation';
     import { createCaber } from "$lib/stores/cab.svelte";
     import CardBase from '$lib/components/CardBase.svelte';
+    import Colaboradores from '$lib/components/establecimiento/Colaboradores.svelte';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = ""
-    let cab ={
+    let cab = $state({
         exist:false,
         nombre:"",
         id:""
-    }
+    })
     let caber = createCaber()
-    let modoedicion = false
+    let colabs = $state([])
+    let modoedicion = $state(false)
     //Datos cabaña
-    let nombre = ""
-    let direccion = ""
-    let contacto = ""
+    let nombre = $state("")
+    let direccion = $state("")
+    let contacto = $state("")
     async function getCabaña(){
         try{
             const record = await pb.collection('cabs').getFirstListItem(`user='${usuarioid}' && active=true`, {});
@@ -37,6 +39,47 @@
             goto("/")
         }
         
+    }
+    async function getColabs(){
+        const records = await pb.collection('estxcolabs').getFullList({
+            expand:"colab",
+            filter:`cab='${cab.id}'`,
+            sort:"colab.apellido"
+        });
+        colabs = records
+    }
+    async function guardarColab(data){
+        try{
+            console.log(data)
+            let userdata = {
+                username:data.email.split("@")[0],
+                email:data.email,
+                emailVisibility:true,
+                password:data.contra,
+                passwordConfirm:data.contra,
+                name:data.email,
+                active:true
+
+            }
+            const recorduser = await pb.collection('users').create(userdata);
+            let colabdata={
+                nombre:data.nombre,
+                apellido:data.apellido,
+                telefono:data.telefono,
+                user:recorduser.id
+            }
+            const recordcolab = await pb.collection('colaboradores').create(colabdata);
+            let estxcolabdata = {
+                colab:recordcolab.id,
+                cab:cab.id
+            }
+            await pb.collection('estxcolabs').create(estxcolabdata);
+            await getColabs()
+
+        }
+        catch(err){
+            console.error(err)
+        }
     }
     async function guardarCabaña(){
         const data = {
@@ -76,6 +119,9 @@
             Swal.fire("Error modificar","No se pudo modificar la cabaña con éxito","error")
         }
     }
+    function mostrarcolab(data){
+        console.log("padre: "+data)
+    }
     onMount(async ()=>{
         
         cab = caber.cab
@@ -83,6 +129,7 @@
         usuarioid = pb_json.model.id
         if(cab.exist){
            await getCabaña()
+           await getColabs()
         }
     })
  
@@ -224,6 +271,7 @@
                 {/if}
                 
             </div>
+            <Colaboradores {mostrarcolab} {guardarColab}/>
         </CardBase>
     {:else}
         <CardBase titulo="Registra tu establecimiento">
