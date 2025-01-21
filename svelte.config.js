@@ -38,7 +38,8 @@ const config = {
 				"/reportes",
 				"/pesajes",
 				"/establecimiento",
-				"/pesajes/lista"]
+				"/pesajes/lista",
+				"/colaboradores/1"]
 		}
 	}
 };

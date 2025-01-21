@@ -8,6 +8,7 @@
     import { createCaber } from "$lib/stores/cab.svelte";
     import CardBase from '$lib/components/CardBase.svelte';
     import Colaboradores from '$lib/components/establecimiento/Colaboradores.svelte';
+    import ListaColabs from '$lib/components/establecimiento/ListaColabs.svelte';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = ""
@@ -73,7 +74,13 @@
                 colab:recordcolab.id,
                 cab:cab.id
             }
-            await pb.collection('estxcolabs').create(estxcolabdata);
+            const recordexc = await pb.collection('estxcolabs').create(estxcolabdata);
+            let permisosdata={
+                estxcolab:recordexc.id,
+                permisos:""
+            }
+            await pb.collection('permisos').create(permisosdata);
+
             await getColabs()
 
         }
@@ -272,6 +279,7 @@
                 
             </div>
             <Colaboradores {mostrarcolab} {guardarColab}/>
+            <ListaColabs {colabs}/>
         </CardBase>
     {:else}
         <CardBase titulo="Registra tu establecimiento">
