@@ -2,6 +2,7 @@
     import {enabled} from '$lib/stores/enabled'
     import {usuario} from '$lib/stores/usuario'
     import { createCaber } from '$lib/stores/cab.svelte';
+    import {createPer} from "$lib/stores/permisos.svelte"
     import Swal from 'sweetalert2'
     import { goto } from '$app/navigation';
     import Oscuro from "$lib/components/OscuroLogin.svelte";
@@ -33,6 +34,7 @@
 
         try{
             let caber = createCaber()
+            let per = createPer()
             const authData = await pb.collection('users').authWithPassword(
                 usuarioname,
                 contra,
@@ -48,9 +50,23 @@
                     try{
                         const record = await pb.collection('cabs').getFirstListItem(`user='${authData.record.id}' && active=true`, {});
                         caber.setCab(record.nombre,record.id)
+                        per.setPer("0,1,2,3,4,5",authData.record.id)
                     }
                     catch(err){
-                        caber.setDefault()
+                        try{
+                            const recordcab = await pb.collection('estxcolabs').getFirstListItem(`colab.user='${authData.record.id}'`, {
+                                expand: 'colab,cab,colab.user',
+                            })
+                            const recordper = await pb.collection("permisos").getFirstListItem(`estxcolab='${recordcab.id}'`)
+                            per.setPer(recordper.permisos,authData.record.id)
+                            caber.setCab(recordcab.expand.cab.nombre,recordcab.expand.cab.id)
+                            
+                        }
+                        catch(err){
+                            caber.setDefault()
+                            per.setDefault()
+                        }
+                        
                     }
                     goto('/')
                 }

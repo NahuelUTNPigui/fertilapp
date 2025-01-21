@@ -6,9 +6,11 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { createCaber } from "$lib/stores/cab.svelte";
+    import {createPer} from "$lib/stores/permisos.svelte"
     import CardBase from '$lib/components/CardBase.svelte';
     import Colaboradores from '$lib/components/establecimiento/Colaboradores.svelte';
     import ListaColabs from '$lib/components/establecimiento/ListaColabs.svelte';
+    import { usuario } from '$lib/stores/usuario';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = ""
@@ -18,6 +20,7 @@
         id:""
     })
     let caber = createCaber()
+    let per = createPer()
     let colabs = $state([])
     let modoedicion = $state(false)
     //Datos cabaña
@@ -26,13 +29,14 @@
     let contacto = $state("")
     async function getCabaña(){
         try{
-            const record = await pb.collection('cabs').getFirstListItem(`user='${usuarioid}' && active=true`, {});
+            const record = await pb.collection('cabs').getFirstListItem(`id='${cab.id}' && active=true`, {});
             nombre = record.nombre
             direccion = record.direccion
             contacto = record.contacto
             caber.setCab(record.nombre,record.id)
         }
         catch(err){
+            
             caber.setDefault()
             nombre = ""
             direccion = ""
@@ -51,7 +55,6 @@
     }
     async function guardarColab(data){
         try{
-            console.log(data)
             let userdata = {
                 username:data.email.split("@")[0],
                 email:data.email,
@@ -101,6 +104,7 @@
             const record = await pb.collection('cabs').create(data);
             Swal.fire("Exito guadar","Se pudo guardar la cabaña con éxito","success")
             caber.setCab(nombre,record.id)
+            per.setPer("0,1,2,3,4,5",usuarioid)
             goto("/")
         }
         catch(err){

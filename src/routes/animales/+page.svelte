@@ -14,14 +14,17 @@
     import { goto }  from '$app/navigation';
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
-    
+    import {createPer} from "$lib/stores/permisos.svelte"
+    import { getPermisosList } from '$lib/permisosutil/lib';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
     let userer = createUserer()
+    let per = createPer()
     let cab = caber.cab
+    let userpermisos = getPermisosList(per.per.permisos)
     let usuarioid = userer.userid
     let filtros = false
 
@@ -110,20 +113,26 @@
     
     
     function openNewModal(){
-        idanimal=""
-        botonhabilitado = false
-        caravana = ""
-        conparicion = false
-        peso = ""
-        sexo = "F"
-        fechanacimiento = ""
-        nombremadre = ""
-        nombrepadre = ""
-        padre = ""
-        madre = ""
-        animal = null
-        observacion = ""
-        nuevoModal.showModal()
+        if(userpermisos[5]){
+            idanimal=""
+            botonhabilitado = false
+            caravana = ""
+            conparicion = false
+            peso = ""
+            sexo = "F"
+            fechanacimiento = ""
+            nombremadre = ""
+            nombrepadre = ""
+            padre = ""
+            madre = ""
+            animal = null
+            observacion = ""
+            nuevoModal.showModal()
+        }
+        else{
+            Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
+        }
+        
     }
     
     function getDetail(id){
