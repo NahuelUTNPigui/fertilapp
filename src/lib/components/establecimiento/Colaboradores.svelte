@@ -204,7 +204,7 @@
                 <span class="label-text text-base">Teléfono</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="password"  
+                <input id ="nombre" type="text"  
                     class={`
                         input input-bordered 
                         w-full
@@ -221,7 +221,7 @@
                 <span class="label-text text-base">Contraseña</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="text"  
+                <input id ="nombre" type="password"  
                     class={`
                         input input-bordered 
                         w-full
