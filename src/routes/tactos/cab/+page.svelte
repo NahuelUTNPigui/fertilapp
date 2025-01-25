@@ -189,8 +189,8 @@
     onMount(async ()=>{
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.model.id
-        fechadesde = DESDE.toISOString().split("T")[0]
-        fechahasta = HASTA.toISOString().split("T")[0]
+        fechadesde = ""//DESDE.toISOString().split("T")[0]
+        fechahasta = ""//HASTA.toISOString().split("T")[0]
         await getTactos()
         filterUpdate()
         await getAnimales()
