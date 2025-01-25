@@ -42,6 +42,7 @@
     let categoria = $state("")
     let fecha = $state("")
     let tipo = $state("")
+    let totalTratamientosEncontrados = $state(0)
     //Validaciones
     let malanimal = $state(false)
     let malcategoria = $state(false)
@@ -322,18 +323,23 @@
         tratamientosrow = tratamientos
         if(buscar != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalTratamientosEncontrados = tratamientosrow.length
         }
         if(fechadesde != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.fecha>=fechadesde)
+            totalTratamientosEncontrados = tratamientosrow.length
         }
         if(fechahasta != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.fecha<=fechahasta)
+            totalTratamientosEncontrados = tratamientosrow.length
         }
         if(buscarcategoria != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.categoria == buscarcategoria)
+            totalTratamientosEncontrados = tratamientosrow.length
         }
         if(buscartipo != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.tipo==buscartipo)
+            totalTratamientosEncontrados = tratamientosrow.length
         }
     }
     onMount(async()=>{
@@ -561,6 +567,9 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div>
+        <h3>Total de tratamientos encontrados: {totalTratamientosEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="

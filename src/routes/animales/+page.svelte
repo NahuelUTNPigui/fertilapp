@@ -45,6 +45,7 @@
     let estadobuscar = $state("")
     let categoriabuscar = $state("")
     let fallecidobuscar = $state("vivos")
+    let totalAnimalesEncontrados = $state(0)
     
 
     //Datos animal
@@ -219,24 +220,31 @@
         animalesrows = animales
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(sexobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexobuscar)
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(rodeobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.rodeo == rodeobuscar)
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(lotebuscar != ""){
             animalesrows = animalesrows.filter(a=>a.lote == lotebuscar)
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(estadobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.prenada == estadobuscar)
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(categoriabuscar !=""){
             animalesrows = animalesrows.filter(a=>a.categoria == categoriabuscar)
+            totalAnimalesEncontrados = animalesrows.length
         }
         if(fallecidobuscar == "vivos"){
             animalesrows = animalesrows.filter(a=>a.active == true)
+            totalAnimalesEncontrados = animalesrows.length
         }
     }
 
@@ -554,7 +562,6 @@
                         </div>
                     </div>
                 </div>
-                
             {/if}
     </div>
    <!-- <div class="grid grid-cols-2 lg:grid-cols-3 m-1 gap-2 lg:gap-10 mb-2 lg:mx-10 w-11/12 lg:w-full" >
@@ -810,6 +817,9 @@
                 </tr>
                 {/each}
         </table>
+    </div>
+    <div>
+        <h3>Total de animales encontrados: {totalAnimalesEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" 
         class="

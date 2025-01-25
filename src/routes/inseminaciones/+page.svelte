@@ -25,6 +25,7 @@
     let inseminacionesrow = $state([])
     let buscar = $state("")
     let isOpenFilter = $state(false)
+    let totalInseminacionesEncontradas = $state(0)
     //Datos inseminaciones
     let idins = $state("")
     // La inseminacion es a un animal hembra que luego sera un nacimiento
@@ -212,22 +213,28 @@
         
         if(buscar !=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
         if(fechainseminacionhasta!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion <= fechainseminacionhasta)
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
         if(fechainseminaciondesde!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechainseminacion >= fechainseminaciondesde)
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
         if(fechainseminacionhasta!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto <= fechapartodesde)
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
         if(fechainseminaciondesde!=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.fechaparto >= fechapartohasta)
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
         if(buscarpadre!=""){
             
             inseminacionesrow = inseminacionesrow.filter(i =>i.pajuela.toLocaleLowerCase().includes(buscarpadre.toLocaleLowerCase()))
+            totalInseminacionesEncontradas = inseminacionesrow.length
         }
 
     }
@@ -524,6 +531,9 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div>
+        <h3>Total de inseminaciones encontradas: {totalInseminacionesEncontradas}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="
