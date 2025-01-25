@@ -46,6 +46,7 @@
     let fecha = $state("")
     let observacion = $state("")
     let animal = $state("")
+    let totalTactosEncontrados = $state(0)
     //Tipo animal
     let categoria = $state("vaca")
     let prenada = $state(0)
@@ -169,21 +170,27 @@
         tactosrow = tactos
         if(buscar!=""){
             tactosrow = tactosrow.filter(t=>t.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalTactosEncontrados = tactosrow.length
         }
         if(fechadesde!=""){
             tactosrow = tactosrow.filter(t=>t.fecha>=fechadesde)
+            totalTactosEncontrados = tactosrow.length
         }
         if(fechahasta!=""){
             tactosrow = tactosrow.filter(t=>t.fecha<=fechahasta)
+            totalTactosEncontrados = tactosrow.length
         }
         if(buscarcategoria!=""){
             tactosrow = tactosrow.filter(t=>t.categoria == buscarcategoria)
+            totalTactosEncontrados = tactosrow.length
         }
         if(buscartipo !=""){
             tactosrow = tactosrow.filter(t=>t.tipo == buscartipo)
+            totalTactosEncontrados = tactosrow.length
         }
         if(buscarestado !=""){
             tactosrow = tactosrow.filter(t=>t.prenada == buscarestado)
+            totalTactosEncontrados = tactosrow.length
         }
     }
     onMount(async ()=>{
@@ -526,6 +533,9 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div>
+        <h3>Total de tactos encontrados: {totalTactosEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div 

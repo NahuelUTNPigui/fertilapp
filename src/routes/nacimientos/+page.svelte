@@ -41,6 +41,7 @@
     let padres = $state([])
     let idanimal = $state("")
     let observacion = $state("")
+    let totalNacimientosEncontrados = $state(0)
     //Validacion
     let malmadre = $state(false)
     let malpadre = $state(false)
@@ -173,18 +174,23 @@
         nacimientosrow = nacimientos
         if(buscar != ""){
             nacimientosrow = nacimientosrow.filter(n=>n.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalNacimientosEncontrados = nacimientosrow.length
         }
         if(fechadesde != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.fecha>=fechadesde)
+            totalNacimientosEncontrados = nacimientosrow.length
         }
         if(fechahasta != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.fecha<=fechahasta)
+            totalNacimientosEncontrados = nacimientosrow.length
         }
         if(buscarmadre != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.nombremadre.toLocaleLowerCase().includes(buscarmadre.toLocaleLowerCase()))
+            totalNacimientosEncontrados = nacimientosrow.length
         }
         if(buscarpadre != ""){
             nacimientosrow = nacimientosrow.filter(t=>t.nombrepadre.toLocaleLowerCase().includes(buscarpadre.toLocaleLowerCase()))
+            totalNacimientosEncontrados = nacimientosrow.length
         }
         
     }
@@ -555,6 +561,9 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div>
+        <h3>Total de nacimientos encontrados: {totalNacimientosEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="

@@ -23,12 +23,13 @@
     let observaciones = $state([])
     let observacionesrow = $state([])
 
-    //Datos observacioens
+    //Datos observaciones
     let idobservacion = $state("")
     let animal = $state("")
     let categoria = $state("")
     let fecha = $state("")
     let observacion = $state("")
+    let totalObservacionesEncontradas = $state(0)
     //Validacioones
     let malanimal = $state(false)
     let malfecha = $state(false)
@@ -134,15 +135,19 @@
         
         if(buscar != ""){
             observacionesrow = observacionesrow.filter(o=>o.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+            totalObservacionesEncontradas = observacionesrow.length
         }
         if(fechadesde!=""){
             observacionesrow = observacionesrow.filter(o=>o.fecha>=fechadesde)
+            totalObservacionesEncontradas = observacionesrow.length
         }
         if(fechahasta!=""){
             observacionesrow = observacionesrow.filter(o=>o.fecha<=fechahasta)
+            totalObservacionesEncontradas = observacionesrow.length
         }
         if(buscarcategoria != ""){
             observacionesrow = observacionesrow.filter(o=>o.categoria==buscarcategoria)
+            totalObservacionesEncontradas = observacionesrow.length
         }
     }
     onMount(async ()=>{
@@ -456,7 +461,9 @@
             </tbody>
         </table>
     </div>
-
+    <div>
+        <h3>Total de observaciones encontradas: {totalObservacionesEncontradas}</h3>
+    </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div 
             class="

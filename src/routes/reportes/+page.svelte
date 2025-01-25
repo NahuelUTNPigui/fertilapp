@@ -24,7 +24,15 @@
 
     let ctx;
 	let canvas;
-    let chart
+    let chart;
+
+    let ctxPersonalizadoLotes;
+	let canvasPersonalizadoLotes;
+    let chartPersonalizadoLotes;
+
+    let ctxPersonalizadoRodeos;
+	let canvasPersonalizadoRodeos;
+    let chartPersonalizadoRodeos;
 
     let lotesrows = $state([])
     let lotes = $state([])
@@ -68,6 +76,72 @@
                         categoriasrows[3].pesoProm,
                         categoriasrows[4].pesoProm,
                         categoriasrows[5].pesoProm
+                        ]
+                    }
+                ]
+            }            
+        });
+    }
+
+    function createChartPersonalizadoRodeos(i){
+        ctxPersonalizadoRodeos = canvasPersonalizadoRodeos.getContext('2d');
+        if (chartPersonalizadoRodeos) {
+            chartPersonalizadoRodeos.destroy();
+        }
+
+        chartPersonalizadoRodeos = new Chart(ctxPersonalizadoRodeos, {
+            type: "bar",
+            data: {
+                labels: [categoriasrows[0].nombre,
+                categoriasrows[1].nombre,
+                categoriasrows[2].nombre,
+                categoriasrows[3].nombre,
+                categoriasrows[4].nombre,
+                categoriasrows[5].nombre],
+                datasets: [
+                    {
+                        label: "Pesos promedios por categoria",
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        data: [rodeos[i].categoriasrodeos[0].pesoProm,
+                        rodeos[i].categoriasrodeos[1].pesoProm,
+                        rodeos[i].categoriasrodeos[2].pesoProm,
+                        rodeos[i].categoriasrodeos[3].pesoProm,
+                        rodeos[i].categoriasrodeos[4].pesoProm,
+                        rodeos[i].categoriasrodeos[5].pesoProm
+                        ]
+                    }
+                ]
+            }            
+        });
+    }
+
+    function createChartPersonalizadoLotes(i){
+        ctxPersonalizadoLotes = canvasPersonalizadoLotes.getContext('2d');
+        if (chartPersonalizadoLotes) {
+            chartPersonalizadoLotes.destroy();
+        }
+
+        chartPersonalizadoLotes = new Chart(ctxPersonalizadoLotes, {
+            type: "bar",
+            data: {
+                labels: [categoriasrows[0].nombre,
+                categoriasrows[1].nombre,
+                categoriasrows[2].nombre,
+                categoriasrows[3].nombre,
+                categoriasrows[4].nombre,
+                categoriasrows[5].nombre],
+                datasets: [
+                    {
+                        label: "Pesos promedios por categoria",
+                        backgroundColor: "rgb(255, 99, 132)",
+                        borderColor: "rgb(255, 99, 132)",
+                        data: [lotes[i].categoriaslotes[0].pesoProm,
+                        lotes[i].categoriaslotes[1].pesoProm,
+                        lotes[i].categoriaslotes[2].pesoProm,
+                        lotes[i].categoriaslotes[3].pesoProm,
+                        lotes[i].categoriaslotes[4].pesoProm,
+                        lotes[i].categoriaslotes[5].pesoProm
                         ]
                     }
                 ]
@@ -188,12 +262,43 @@
                 }
             }
 
-            lotes[i].categoriaslotes[0].pesoProm = Number((pesoVaca / lotes[i].categoriaslotes[0].total).toFixed(2))
-            lotes[i].categoriaslotes[1].pesoProm = Number((pesoVaquillona / lotes[i].categoriaslotes[1].total).toFixed(2))
-            lotes[i].categoriaslotes[2].pesoProm = Number((pesoTernero / lotes[i].categoriaslotes[2].total).toFixed(2))
-            lotes[i].categoriaslotes[3].pesoProm = Number((pesoNovillo / lotes[i].categoriaslotes[3].total).toFixed(2))
-            lotes[i].categoriaslotes[4].pesoProm = Number((pesoTorito / lotes[i].categoriaslotes[4].total).toFixed(2))
-            lotes[i].categoriaslotes[5].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[5].total).toFixed(2))
+            if (pesoVaca == 0) {
+                lotes[i].categoriaslotes[0].pesoProm = 0                
+            } else {
+                lotes[i].categoriaslotes[0].pesoProm = Number((pesoVaca / lotes[i].categoriaslotes[0].total).toFixed(2))
+            }
+            
+            if (pesoVaquillona == 0) {
+                lotes[i].categoriaslotes[1].pesoProm = 0  
+            } else {
+                lotes[i].categoriaslotes[1].pesoProm = Number((pesoVaquillona / lotes[i].categoriaslotes[1].total).toFixed(2))
+            }
+
+            if (pesoTernero == 0) {
+                lotes[i].categoriaslotes[2].pesoProm = 0                
+            } else {
+                lotes[i].categoriaslotes[2].pesoProm = Number((pesoTernero / lotes[i].categoriaslotes[2].total).toFixed(2))
+            }
+            
+            if (pesoNovillo == 0) {
+                lotes[i].categoriaslotes[3].pesoProm = 0  
+            } else {
+                lotes[i].categoriaslotes[3].pesoProm = Number((pesoNovillo / lotes[i].categoriaslotes[3].total).toFixed(2))
+            }
+            
+            if (pesoTorito == 0) {
+                lotes[i].categoriaslotes[4].pesoProm = 0                
+            } else {
+                lotes[i].categoriaslotes[4].pesoProm = Number((pesoTorito / lotes[i].categoriaslotes[4].total).toFixed(2))
+            }
+            
+            if (pesoToro == 0) {
+                lotes[i].categoriaslotes[5].pesoProm = 0  
+            } else {
+                lotes[i].categoriaslotes[5].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[5].total).toFixed(2))
+            }
+
+            lotes[i].chart = createChartPersonalizadoLotes(i)
         }
         
     }
@@ -254,12 +359,43 @@
                 }
             }
 
-            rodeos[i].categoriasrodeos[0].pesoProm = Number((pesoVaca / rodeos[i].categoriasrodeos[0].total).toFixed(2))
-            rodeos[i].categoriasrodeos[1].pesoProm = Number((pesoVaquillona / rodeos[i].categoriasrodeos[1].total).toFixed(2))
-            rodeos[i].categoriasrodeos[2].pesoProm = Number((pesoTernero / rodeos[i].categoriasrodeos[2].total).toFixed(2))
-            rodeos[i].categoriasrodeos[3].pesoProm = Number((pesoNovillo / rodeos[i].categoriasrodeos[3].total).toFixed(2))
-            rodeos[i].categoriasrodeos[4].pesoProm = Number((pesoTorito / rodeos[i].categoriasrodeos[4].total).toFixed(2))
-            rodeos[i].categoriasrodeos[5].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[5].total).toFixed(2))
+            if (pesoVaca == 0) {
+                rodeos[i].categoriasrodeos[0].pesoProm = 0                
+            } else {
+                rodeos[i].categoriasrodeos[0].pesoProm = Number((pesoVaca / rodeos[i].categoriasrodeos[0].total).toFixed(2))
+            }
+            
+            if (pesoVaquillona == 0) {
+                rodeos[i].categoriasrodeos[1].pesoProm = 0  
+            } else {
+                rodeos[i].categoriasrodeos[1].pesoProm = Number((pesoVaquillona / rodeos[i].categoriasrodeos[1].total).toFixed(2))
+            }
+
+            if (pesoTernero == 0) {
+                rodeos[i].categoriasrodeos[2].pesoProm = 0                
+            } else {
+                rodeos[i].categoriasrodeos[2].pesoProm = Number((pesoTernero / rodeos[i].categoriasrodeos[2].total).toFixed(2))
+            }
+            
+            if (pesoNovillo == 0) {
+                rodeos[i].categoriasrodeos[3].pesoProm = 0  
+            } else {
+                rodeos[i].categoriasrodeos[3].pesoProm = Number((pesoNovillo / rodeos[i].categoriasrodeos[3].total).toFixed(2))
+            }
+            
+            if (pesoTorito == 0) {
+                rodeos[i].categoriasrodeos[4].pesoProm = 0                
+            } else {
+                rodeos[i].categoriasrodeos[4].pesoProm = Number((pesoTorito / rodeos[i].categoriasrodeos[4].total).toFixed(2))
+            }
+            
+            if (pesoToro == 0) {
+                rodeos[i].categoriasrodeos[5].pesoProm = 0  
+            } else {
+                rodeos[i].categoriasrodeos[5].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[5].total).toFixed(2))
+            }
+
+            createChartPersonalizadoRodeos(i)
         }        
     }
 
@@ -302,6 +438,7 @@
     function clickFilterrodeo(i){
         opensFilterrodeos[i] = !opensFilterrodeos[i]
     }
+
 </script>
 <Navbarr>
     <div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
@@ -422,6 +559,17 @@
                                             </table>
                                         {/each}
                                     </div>
+                                <div>
+                                    <button
+                                        aria-label="Pesaje Rodeos"
+                                        onclick={()=>chartpesajepersonalizadorodeos.showModal()}
+                                        class={`
+                                            ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                                        `}
+                                    >
+                                        Mostrar grafico
+                                    </button>
+                                </div>
                                 {/if}
                             </td>
                             <td class="text-base mx-1 px-1 border-b">{r.total}</td>
@@ -478,6 +626,17 @@
                                         </table>
                                     {/each}
                                     </div>
+                                    <div>
+                                        <button
+                                            aria-label="Pesaje Lotes"
+                                            onclick={()=>chartpesajepersonalizadolotes.showModal()}
+                                            class={`
+                                                ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                                            `}
+                                        >
+                                            Mostrar grafico
+                                        </button>
+                                    </div>
                                 {/if}
                             </td>
                             <td class="text-base mx-1 px-1 border-b">{l.total}</td>
@@ -506,6 +665,50 @@
             
             <div class="modal-action justify-start ">
                 <button class="btn btn-error text-white" onclick={()=>chartpesaje.close()}>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+    <dialog id="chartpesajepersonalizadolotes" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl ">
+        <div 
+            class="
+                modal-box  max-w-5xl
+                bg-gradient-to-br from-white to-gray-100 
+                dark:from-gray-900 dark:to-gray-800
+            "
+        >
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            </form> 
+            <h3 class="text-lg font-bold">Pesos promedios</h3>  
+            <div class="chart-container justify-items-center">
+                <canvas class="" bind:this={canvasPersonalizadoLotes} >
+                </canvas>
+            </div>
+            
+            <div class="modal-action justify-start ">
+                <button class="btn btn-error text-white" onclick={()=>chartpesajepersonalizadolotes.close()}>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+    <dialog id="chartpesajepersonalizadorodeos" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl ">
+        <div 
+            class="
+                modal-box  max-w-5xl
+                bg-gradient-to-br from-white to-gray-100 
+                dark:from-gray-900 dark:to-gray-800
+            "
+        >
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            </form> 
+            <h3 class="text-lg font-bold">Pesos promedios</h3>  
+            <div class="chart-container justify-items-center">
+                <canvas class="" bind:this={canvasPersonalizadoRodeos} >
+                </canvas>
+            </div>
+            
+            <div class="modal-action justify-start ">
+                <button class="btn btn-error text-white" onclick={()=>chartpesajepersonalizadorodeos.close()}>Cerrar</button>
             </div>
         </div>
     </dialog>
