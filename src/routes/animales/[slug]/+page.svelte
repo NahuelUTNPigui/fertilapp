@@ -41,6 +41,7 @@
     let nacimientoobj = {}
     let tactos = []
     let prenada = 0
+    
     async function  getPariciones(id){
         const recordpariciones =  await pb.collection('nacimientos').getFullList({
             filter:`madre='${id}' || padre='${id}'`,
@@ -154,29 +155,31 @@
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
         <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
     </CardAnimal>
-    <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
-        <Pesajes pesoanterior={peso} {caravana}></Pesajes>
-    </CardAnimal>
-    <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
-        <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
-    </CardAnimal>
-    <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
-        <Tratamientos cabid={cab.id}></Tratamientos>
-    </CardAnimal>
-    <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
-        <Observaciones cabid={cab.id} />
-    </CardAnimal>
-    {#if sexo=="H"}
-        <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-            <Tactos cabid={cab.id}  />
+    {#if !DatosBasicos.modohistoria}
+        <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
+            <Pesajes pesoanterior={peso} {caravana}></Pesajes>
         </CardAnimal>
-        <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
-            <Inseminaciones cabid={cab.id} />
+        <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
+            <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
+        </CardAnimal>
+        <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
+            <Tratamientos cabid={cab.id}></Tratamientos>
+        </CardAnimal>
+        <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
+            <Observaciones cabid={cab.id} />
+        </CardAnimal>
+        {#if sexo=="H"}
+            <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
+                <Tactos cabid={cab.id}  />
+            </CardAnimal>
+            <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
+                <Inseminaciones cabid={cab.id} />
+            </CardAnimal>
+        {/if}
+        <CardAnimal cardsize="max-w-7xl" titulo="Historial">
+            <Historial  />
         </CardAnimal>
     {/if}
-    <CardAnimal cardsize="max-w-7xl" titulo="Historial">
-        <Historial  />
-    </CardAnimal>
     <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
         <Acciones 
             caravana = {caravana}

@@ -13,6 +13,7 @@
     import RadioButton from "$lib/components/RadioButton.svelte";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
+    export {modohistoria};
     let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -27,6 +28,7 @@
     let nombrerodeo = $state("")
     let nombrelote = $state("")
     let modoedicion = $state(false)
+    let modohistoria = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
@@ -671,12 +673,19 @@
         
     </div>
 {/if}
-<div class="flex justify-start p-0 m-0">
-    <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-        </svg>          
-    </button>
+<div class="grid grid-cols-3 mx-1  mt-1 ">
+    <div class="flex justify-start p-0 m-0">
+        <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>          
+        </button>
+    </div>
+    <div class="flex col-span-2 gap-1 justify-end">
+        <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={modohistoria = true}>
+            <span  class="text-lg m-1">Mostrar historia clinica</span>      
+        </button>
+    </div>
 </div>
 
 <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
