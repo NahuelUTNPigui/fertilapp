@@ -152,8 +152,6 @@
     }
     onMount(async ()=>{
         
-        fechadesde = DESDE.toISOString().split("T")[0]
-        fechahasta = HASTA.toISOString().split("T")[0]
         await getObservaciones()
         filterUpdate()
         await getAnimales()
@@ -357,6 +355,9 @@
                 </svg>
             </div>
         </button>
+        <div>
+            <span class = "text-lg mx-1">Total de observaciones encontradas: {totalObservacionesEncontradas}</span>
+        </div>
         {#if isOpenFilter}
             <div transition:slide>
                 <div class="grid grid-cols-2 lg:grid-cols-4" >
@@ -460,9 +461,6 @@
                 {/each}
             </tbody>
         </table>
-    </div>
-    <div>
-        <h3>Total de observaciones encontradas: {totalObservacionesEncontradas}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div 

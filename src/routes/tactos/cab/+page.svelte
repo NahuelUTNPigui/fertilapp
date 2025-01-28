@@ -196,8 +196,6 @@
     onMount(async ()=>{
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.model.id
-        fechadesde = ""//DESDE.toISOString().split("T")[0]
-        fechahasta = ""//HASTA.toISOString().split("T")[0]
         await getTactos()
         filterUpdate()
         await getAnimales()
@@ -362,6 +360,9 @@
                 </svg>
             </div>
         </button>
+        <div>
+            <span class = "text-lg mx-1">Total de tactos encontrados: {totalTactosEncontrados}</span>
+        </div>
         {#if isOpenFilter}
             <div transition:slide>
                 <div class="grid grid-cols-2 lg:grid-cols-3 gap-1 w-full" >
@@ -534,9 +535,7 @@
             </tbody>
         </table>
     </div>
-    <div>
-        <h3>Total de tactos encontrados: {totalTactosEncontrados}</h3>
-    </div>
+    
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div 
             class="
