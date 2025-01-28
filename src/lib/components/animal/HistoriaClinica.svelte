@@ -65,24 +65,56 @@
     function getHistorialEventos(inseminaciones, pariciones, tactos, tratamientos, observaciones, pesajes) {
 
         if (inseminaciones.length != 0) {
-            historialeventos.push(inseminaciones)
+            historialeventos = historialeventos.concat(inseminaciones.map(i=>{
+                return{
+                    fecha:i.fechainseminacion,
+                    nombre:"Inseminación"
+                }
+            }))
+            //historialeventos.push(inseminaciones)
         }
         if (pariciones.length != 0) {
-            historialeventos.push(pariciones)
+            historialeventos = historialeventos.concat(pariciones.map(i=>{
+                return{
+                    fecha:i.fecha,
+                    nombre:"Parición"
+                }
+            }))
+            //historialeventos.push(pariciones)
         }
         if (tactos.length != 0) {
-            historialeventos.push(tactos)
+            historialeventos = historialeventos.concat(tactos.map(i=>{
+                return{
+                    fecha:i.fecha,
+                    nombre:"Tacto"
+                }
+            }))
         }
         if (tratamientos.length != 0) {
-            historialeventos.push(tratamientos)
+            historialeventos = historialeventos.concat(tratamientos.map(i=>{
+                return{
+                    fecha:i.fecha,
+                    nombre:"Tratamiento"
+                }
+            }))
         }
         if (observaciones.length != 0) {
-            historialeventos.push(observaciones)
+            historialeventos = historialeventos.concat(observaciones.map(i=>{
+                return{
+                    fecha:i.fecha,
+                    nombre:"Observación"
+                }
+            }))
         }
         if (pesajes.length != 0) {
-            historialeventos.push(pesajes)
+            historialeventos = historialeventos.concat(pesajes.map(i=>{
+                return{
+                    fecha:i.fecha,
+                    nombre:"Pesaje"
+                }
+            }))
         }
-
+        /*
         for (let i = 0; i < historialeventos.length; i++) {
             if (inseminaciones.includes(historialeventos[i])) {
                 historialeventos[i].nombre = "Inseminación"
@@ -103,6 +135,8 @@
                 historialeventos[i].nombre = "Observación"
             }
         }
+            */
+        historialeventos.sort((h1,h2)=>new Date(h1.fecha)< new Date(h2)?-1:1)
     }
 
     function getEstadoNombre(estado){
@@ -130,7 +164,7 @@
         <table class="table table-lg " >
             <thead>
                 <tr>
-                    <th class="text-base mx-1 px-1"  >Caravana</th>
+                    <th class="text-base mx-1 px-1"  >Fecha</th>
                     <th class="text-base mx-1 px-1"  >Evento</th>
                 </tr>
             </thead>
@@ -138,7 +172,7 @@
                 {#each historialeventos as h}
                     <tr>
                         <td class="text-base">
-                            {h.caravana}
+                            {new Date(h.fecha).toLocaleDateString()}
                         </td>
                         <td class="text-base">
                             {h.nombre}

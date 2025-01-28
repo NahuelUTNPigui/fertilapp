@@ -70,7 +70,13 @@
         pajuela = p.caravana
     }
     function getCategoriaNombre(cat){
-        return tiposanimal.filter(c=>c.id==cat)[0].nombre
+        let tp = tiposanimal.filter(c=>c.id==cat)[0]
+        if(tp){
+            return tp.nombre
+        }
+        else{
+            return ""
+        }
     }
     onMount(async ()=>{
         id = $page.params.slug
@@ -114,7 +120,7 @@
                 <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha parto</th>
                 <th class="text-base mx-1 px-1">Pajuela</th>
                 <th class="text-base mx-1 px-1">Categoria</th>
-                <th class="text-base mx-1 px-1">Fechas</th>
+                <th class="text-base mx-1 px-1">Fecha inseminacion</th>
             </tr>
         </thead>
         <tbody>
@@ -128,7 +134,7 @@
                     {`${i.categoria}`}
                 </td>
                 <td class="text-base mx-1 px-1">
-                    {`${new Date(i.fechadesde).toLocaleDateString()} - ${new Date(i.fechahasta).toLocaleDateString()}`}
+                    {`${new Date(i.fechainseminacion).toLocaleDateString()}`}
                 </td>
             </tr>
             {/each}

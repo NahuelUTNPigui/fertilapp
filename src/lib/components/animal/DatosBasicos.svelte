@@ -680,8 +680,8 @@
         </button>
     </div>
     <div class="flex col-span-2 gap-1 justify-end">
-        <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = true}>
-            <span  class="text-lg m-1">Mostrar historia clinica</span>      
+        <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = !modohistoria}>
+            <span  class="text-lg m-1">{modohistoria?"Ocultar":"Mostrar"} historia clinica</span>      
         </button>
     </div>
 </div>
