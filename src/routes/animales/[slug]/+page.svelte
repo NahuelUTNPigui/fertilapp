@@ -19,6 +19,7 @@
     import Tratamientos from "$lib/components/animal/Tratamientos.svelte";
     import Observaciones from "$lib/components/animal/Observaciones.svelte";
     import Pesajes from "$lib/components/animal/Pesajes.svelte";
+    import HistoriaClinica from "$lib/components/animal/HistoriaClinica.svelte";
     
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -179,6 +180,10 @@
         {/if}
         <CardAnimal cardsize="max-w-7xl" titulo="Historial">
             <Historial  />
+        </CardAnimal>
+    {:else}
+        <CardAnimal cardsize="max-w-7xl" titulo="Historia clínica">
+            <HistoriaClinica  />
         </CardAnimal>
     {/if}
     <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
