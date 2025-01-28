@@ -1,7 +1,8 @@
 <script>
+    import { goto } from "$app/navigation";
     import estilos from "$lib/stores/estilos";
     import {isEmpty} from "$lib/stringutil/lib"
-    let {colabs = $bindable(),mostrarcolab,guardarColab} = $props()
+    let {colabs = $bindable(),mostrarcolab,guardarColab,asos} = $props()
     let titulo = $state("Colaboradores")
     
     //Nuevo colaborador
@@ -113,7 +114,7 @@
         </button>
     </div>
     <div>
-        <button class={estilos.mediumsolidgreen}>
+        <button class={estilos.mediumsolidgreen} onclick={()=>goto("/colaboradores/asociar")}>
             Asociar
         </button>
     </div>
@@ -154,11 +155,11 @@
                     </div>
                 {/if}
             </label>
-            <label for = "nombre" class="label">
+            <label for = "ape" class="label">
                 <span class="label-text text-base">Apellido</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="text"  
+                <input id ="ape" type="text"  
                     class={`
                         input input-bordered 
                         w-full
@@ -177,11 +178,11 @@
                     </div>
                 {/if}
             </label>
-            <label for = "nombre" class="label">
+            <label for = "email" class="label">
                 <span class="label-text text-base">Correo</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="text"  
+                <input id ="email" type="text"  
                     class={`
                         input input-bordered 
                         w-full
@@ -200,11 +201,11 @@
                     </div>
                 {/if}
             </label>
-            <label for = "nombre" class="label">
+            <label for = "tel" class="label">
                 <span class="label-text text-base">Teléfono</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="text"  
+                <input id ="tel" type="text"  
                     class={`
                         input input-bordered 
                         w-full
@@ -217,11 +218,11 @@
                     bind:value={telefono}
                 />
             </label>
-            <label for = "nombre" class="label">
+            <label for = "pass" class="label">
                 <span class="label-text text-base">Contraseña</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="password"  
+                <input id ="pass" type="password"  
                     class={`
                         input input-bordered 
                         w-full
@@ -240,11 +241,11 @@
                     </div>
                 {/if}
             </label>
-            <label for = "nombre" class="label">
+            <label for = "confpass" class="label">
                 <span class="label-text text-base">Confirmar contraseña</span>
             </label>
             <label class="input-group">
-                <input id ="nombre" type="password"  
+                <input id ="confpass" type="password"  
                     class={`
                         input input-bordered 
                         w-full
@@ -273,3 +274,4 @@
         
     </div>
 </dialog>
+

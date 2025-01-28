@@ -53,6 +53,7 @@
         });
         colabs = records
     }
+    
     async function guardarColab(data){
         try{
             let userdata = {

@@ -6,6 +6,7 @@
     import permisos from '$lib/stores/permisos';
     import estilos from '$lib/stores/estilos';
     import Swal from 'sweetalert2';
+    import { goto } from '$app/navigation';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let id=$state("")
@@ -58,6 +59,26 @@
         }
         
     }
+    async function desasociar() {
+
+        
+        Swal.fire({
+            title: 'Desasociar colaborador',
+            text: '¿Seguro que deseas desasociar el colaborador?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No'
+        }).then(async result=>{
+            if(result.value){
+                await pb.collection("estxcolabs").delete(id)
+                goto("/establecimiento")
+            }
+        })
+    }
+    function volver(){
+        goto("/establecimiento")
+    }
     onMount(async ()=>{
         id = $page.params.id
         await getPermisos()
@@ -65,6 +86,13 @@
     })
 </script>
 <Navbarr>
+    <div class="mx-9 mt-1">
+        <div>
+            <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={volver}>
+                Volver         
+            </button>
+        </div>
+    </div>
     <dir class="mb-1">
         <h1 class="text-2xl font-bold">{apellido},{nombre}</h1>
     </dir>
@@ -121,9 +149,15 @@
                 </label>
             </div>
         </div>
-        <dir class="w-11/12 lg:w-1/2">
-            <button class={estilos.mediumsolidgreen} onclick={guardarPermiso}>Guardar permisos</button>
-        </dir>
+        <div class="grid grid-cols-2">
+            <dir class="w-11/12 lg:w-1/2 flex justify-start">
+                <button class={estilos.mediumsolidgreen} onclick={guardarPermiso}>Guardar permisos</button>
+            </dir>
+            <dir class="w-11/12 lg:w-1/2 flex justify-start">
+                <button class={estilos.mediumsolidred} onclick={desasociar}>Desasociar</button>
+            </dir>
+        </div>
+        
     </div>
 
     
