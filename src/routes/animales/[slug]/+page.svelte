@@ -25,22 +25,23 @@
     let caber = createCaber()
     let cab = caber.cab
     // Datos
-    let slug = ""
-    let caravana = ""
-    let usuarioid =""
-    let active = true
-    let fechanacimiento = ""
-    let sexo = ""
-    let nacimiento = ""
-    let rodeo = ""
-    let lote = ""
-    let peso = 0
-    let categoria = ""
-    let pariciones = []
-    let fechafall = ""
-    let nacimientoobj = {}
-    let tactos = []
-    let prenada = 0
+    let slug = $state("")
+    let caravana = $state("")
+    let usuarioid =$state("")
+    let active = $state(true)
+    let fechanacimiento = $state("")
+    let sexo = $state("")
+    let nacimiento = $state("")
+    let rodeo = $state("")
+    let lote = $state("")
+    let peso = $state(0)
+    let categoria = $state("")
+    let pariciones = $state([])
+    let fechafall = $state("")
+    let nacimientoobj = $state({})
+    let tactos = $state([])
+    let prenada = $state(0)
+    let modohistoria = $state(false)
     
     async function  getPariciones(id){
         const recordpariciones =  await pb.collection('nacimientos').getFullList({
@@ -153,9 +154,9 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento}/>
+        <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
     </CardAnimal>
-    {#if !DatosBasicos.modohistoria}
+    {#if !modohistoria}
         <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
             <Pesajes pesoanterior={peso} {caravana}></Pesajes>
         </CardAnimal>

@@ -13,8 +13,7 @@
     import RadioButton from "$lib/components/RadioButton.svelte";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
-    export {modohistoria};
-    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada} = $props()
+    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada,modohistoria=$bindable()} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -681,7 +680,7 @@
         </button>
     </div>
     <div class="flex col-span-2 gap-1 justify-end">
-        <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={modohistoria = true}>
+        <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = true}>
             <span  class="text-lg m-1">Mostrar historia clinica</span>      
         </button>
     </div>

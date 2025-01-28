@@ -362,6 +362,9 @@
                 </svg>
             </div>  
         </button>
+        <div>
+            <span class = "text-lg mx-1">Total de inseminaciones encontradas: {totalInseminacionesEncontradas}</span>
+        </div>
         {#if isOpenFilter}
             <div transition:slide>
                 <div class="grid grid-cols-2 lg:grid-cols-4" >
@@ -531,9 +534,6 @@
                 {/each}
             </tbody>
         </table>
-    </div>
-    <div>
-        <h3>Total de inseminaciones encontradas: {totalInseminacionesEncontradas}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="

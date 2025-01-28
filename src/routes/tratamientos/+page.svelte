@@ -416,6 +416,9 @@
                 </svg>
             </div>
         </button>
+        <div>
+            <span class = "text-lg mx-1">Total de tratamientos encontrados: {totalTratamientosEncontrados}</span>
+        </div>
         {#if isOpenFilter}
             <div transition:slide>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-1" >
@@ -567,9 +570,6 @@
                 {/each}
             </tbody>
         </table>
-    </div>
-    <div>
-        <h3>Total de tratamientos encontrados: {totalTratamientosEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
         <div class="

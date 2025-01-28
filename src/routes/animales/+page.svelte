@@ -396,6 +396,7 @@
             </label>
         </div>
     </div>
+    
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
         <button 
             aria-label="Filtrar" 
@@ -413,6 +414,9 @@
             </div>
             
         </button>
+        <div>
+            <span class = "text-lg mx-1">Total de animales encontrados: {totalAnimalesEncontrados}</span>
+        </div>
         {#if isOpenFilter}
                 <div transition:slide>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
@@ -817,9 +821,6 @@
                 </tr>
                 {/each}
         </table>
-    </div>
-    <div>
-        <h3>Total de animales encontrados: {totalAnimalesEncontrados}</h3>
     </div>
     <dialog id="nuevoModal" 
         class="
