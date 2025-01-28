@@ -28,7 +28,6 @@
     let nombrerodeo = $state("")
     let nombrelote = $state("")
     let modoedicion = $state(false)
-    let modohistoria = $state(false)
     //Datos edicion
     let pesoviejo = $state("")
     let sexoviejo = $state("")
