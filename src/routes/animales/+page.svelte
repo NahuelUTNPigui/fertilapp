@@ -76,6 +76,9 @@
         filtros != filtros
     }
     function ordenarNombre(lista){
+        if(lista.length==0){
+            return []
+        }
         lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
     }
     function isEmpty(str){
