@@ -221,6 +221,7 @@
     
     function filterUpdate(){
         animalesrows = animales
+        totalAnimalesEncontrados = animalesrows.length
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalAnimalesEncontrados = animalesrows.length

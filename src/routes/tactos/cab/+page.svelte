@@ -168,6 +168,7 @@
     function filterUpdate(){
         
         tactosrow = tactos
+        totalTactosEncontrados = tactosrow.length
         if(buscar!=""){
             tactosrow = tactosrow.filter(t=>t.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalTactosEncontrados = tactosrow.length

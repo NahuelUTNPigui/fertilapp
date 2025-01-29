@@ -136,7 +136,7 @@
             }
         }
             */
-        historialeventos.sort((h1,h2)=>new Date(h1.fecha)< new Date(h2)?-1:1)
+        historialeventos.sort((h1,h2)=>new Date(h1.fecha)< new Date(h2.fecha)?1:-1)
     }
 
     function getEstadoNombre(estado){

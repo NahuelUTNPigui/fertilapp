@@ -122,12 +122,22 @@
             console.error(err)
         }
     }
+    function volver(){
+        goto("/establecimiento")
+    }
     onMount(async ()=>{
         await getUsuarios()
         await getColabs()
     })
 </script>
 <Navbarr>
+    <div class="mx-9 mt-1">
+        <div>
+            <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={volver}>
+                Volver         
+            </button>
+        </div>
+    </div>
     <div class="bg-transparent p-2">
         <div class="flex items-center justify-center">
             <div 

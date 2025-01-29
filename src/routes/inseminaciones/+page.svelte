@@ -210,7 +210,7 @@
     function filterUpdate(){
         
         inseminacionesrow = inseminaciones
-        
+        totalInseminacionesEncontradas = inseminacionesrow.length
         if(buscar !=""){
             inseminacionesrow = inseminacionesrow.filter(i => i.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalInseminacionesEncontradas = inseminacionesrow.length
@@ -241,6 +241,7 @@
     onMount(async ()=>{
         await getAnimales()
         await getInseminaciones()
+        filterUpdate()
     })
     function validarBoton(){
         botonhabilitado = true

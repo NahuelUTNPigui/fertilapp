@@ -172,6 +172,7 @@
     }
     function filterUpdate(){
         nacimientosrow = nacimientos
+        totalNacimientosEncontrados = nacimientosrow.length
         if(buscar != ""){
             nacimientosrow = nacimientosrow.filter(n=>n.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalNacimientosEncontrados = nacimientosrow.length

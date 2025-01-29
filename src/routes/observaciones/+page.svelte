@@ -132,7 +132,7 @@
     }
     function filterUpdate(){
         observacionesrow = observaciones
-        
+        totalObservacionesEncontradas = observacionesrow.length
         if(buscar != ""){
             observacionesrow = observacionesrow.filter(o=>o.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalObservacionesEncontradas = observacionesrow.length

@@ -321,6 +321,7 @@
     }
     function filterUpdate(){
         tratamientosrow = tratamientos
+        totalTratamientosEncontrados = tratamientosrow.length
         if(buscar != ""){
             tratamientosrow = tratamientosrow.filter(t=>t.expand.animal.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
             totalTratamientosEncontrados = tratamientosrow.length
