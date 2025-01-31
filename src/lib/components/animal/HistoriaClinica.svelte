@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { page } from '$app/stores';
     import estilos from "$lib/stores/estilos";
+    import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import tiposanimal from '$lib/stores/tiposanimal';
     import categorias from "$lib/stores/categorias";
@@ -68,7 +69,9 @@
             historialeventos = historialeventos.concat(inseminaciones.map(i=>{
                 return{
                     fecha:i.fechainseminacion,
-                    nombre:"Inseminación"
+                    nombre:"Inseminación",
+                    info: "",
+                    caravana: historial[0].caravana
                 }
             }))
             //historialeventos.push(inseminaciones)
@@ -77,7 +80,9 @@
             historialeventos = historialeventos.concat(pariciones.map(i=>{
                 return{
                     fecha:i.fecha,
-                    nombre:"Parición"
+                    nombre:"Parición",
+                    info: "",
+                    caravana: historial[0].caravana
                 }
             }))
             //historialeventos.push(pariciones)
@@ -86,7 +91,9 @@
             historialeventos = historialeventos.concat(tactos.map(i=>{
                 return{
                     fecha:i.fecha,
-                    nombre:"Tacto"
+                    nombre:"Tacto",
+                    info: getEstadoNombre(i.prenada),
+                    caravana: historial[0].caravana
                 }
             }))
         }
@@ -94,7 +101,9 @@
             historialeventos = historialeventos.concat(tratamientos.map(i=>{
                 return{
                     fecha:i.fecha,
-                    nombre:"Tratamiento"
+                    nombre:"Tratamiento",
+                    info: i.tipo.nombre,
+                    caravana: historial[0].caravana
                 }
             }))
         }
@@ -102,7 +111,9 @@
             historialeventos = historialeventos.concat(observaciones.map(i=>{
                 return{
                     fecha:i.fecha,
-                    nombre:"Observación"
+                    nombre:"Observación",
+                    info: i.observacion,
+                    caravana: historial[0].caravana
                 }
             }))
         }
@@ -110,7 +121,9 @@
             historialeventos = historialeventos.concat(pesajes.map(i=>{
                 return{
                     fecha:i.fecha,
-                    nombre:"Pesaje"
+                    nombre:"Pesaje",
+                    info: i.pesonuevo,
+                    caravana: historial[0].caravana
                 }
             }))
         }
@@ -143,6 +156,15 @@
         let e = estados.filter(est=>est.id==estado)[0]
         return e.nombre
     }
+
+    function prepararData(item){
+        return {
+            FECHA: item.fecha?new Date(item.fecha).toLocaleDateString():"",
+            CARAVANA: item.caravana,
+            EVENTO: item.nombre,
+            INFO: item.info
+        }
+    }
     onMount(async ()=>{
         id = $page.params.slug
         await getHistorial()
@@ -153,7 +175,6 @@
         await getPesajes()
         await getPariciones()
         getHistorialEventos(inseminaciones, pariciones, tactos, tratamientos, observaciones, pesajes)
-        console.log(historialeventos)
     })
 </script>
 
@@ -165,7 +186,9 @@
             <thead>
                 <tr>
                     <th class="text-base mx-1 px-1"  >Fecha</th>
+                    <th class="text-base mx-1 px-1"  >Caravana</th>
                     <th class="text-base mx-1 px-1"  >Evento</th>
+                    <th class="text-base mx-1 px-1"  >Info</th>
                 </tr>
             </thead>
             <tbody>
@@ -175,11 +198,26 @@
                             {new Date(h.fecha).toLocaleDateString()}
                         </td>
                         <td class="text-base">
+                            {h.caravana}
+                        </td>
+                        <td class="text-base">
                             {h.nombre}
+                        </td>
+                        <td class="text-base">
+                            {h.info}
                         </td>
                     </tr>
                 {/each}
             </tbody>
         </table>
     {/if}
+    <div>
+        <Exportar
+        titulo = {"Historia clinica"}
+        filtros = {[]}
+        confiltros = {false}
+        data = {historialeventos}
+        {prepararData}
+    />
+    </div>
 </div>
