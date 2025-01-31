@@ -5,11 +5,13 @@
     import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
     import estilos from '$lib/stores/estilos';
+    import estados from "$lib/stores/estados";
     import { createCaber } from '$lib/stores/cab.svelte';
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
+    import tipostacto from '$lib/stores/tipostacto';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -21,7 +23,7 @@
     let cab = caber.cab
 
     //boton
-    let textoboton = $state("Mover")
+    let textoboton = $state("Tactos")
     //Datos animales
     let animales = $state([])
     let animalesrows = $state([])
@@ -30,12 +32,12 @@
     let lote = $state("")
     let rodeo = $state("")
     let categoria = $state("")
-    let sexo = $state("")
+    let sexo = $state("H")
 
     let lotes = $state([])
     let rodeos = $state([])
-    let tipos = $state([])
     let isOpenFilter = $state(false)
+
     //Seleccionados
     let selectanimales = $state([])
     let selecthashmap = $state({})
@@ -44,10 +46,13 @@
     let ninguno = $state(true)
 
     //movimiento
+    let tipotactoselect = $state("")
     let fecha = $state("")
-    let nuevospesos = $state({})
+    let estadosanimales = $state({})
+    let observaciones = $state({})
+    let tipotactoanimales = $state({})
 
-    //Seleecionar
+    //Seleccionar
     let selectcategoria = $state(true)
     let selectlote = $state(false)
     let selectrodeo = $state(false)
@@ -56,7 +61,9 @@
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
+    function onchangeTipoTacto(){
 
+    }
     function filterUpdate(){
         selectanimales = []
         let lista = []
@@ -87,7 +94,6 @@
         }
 
     }
-
     function ordenarNombre(lista){
         lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
     }
@@ -111,7 +117,6 @@
             }
         }
     }
-
     function clickTodos(){
         if(todos){
             todos = false
@@ -137,7 +142,6 @@
         }
         
     }
-
     async function getLotes(){
         const records = await pb.collection('lotes').getFullList({
             filter:`active = true && cab ~ '${cab.id}'`,
@@ -154,14 +158,6 @@
         rodeos = records
         //ordenarNombre(rodeos)
     }
-    async function getTipos(){
-        const records = await pb.collection('tipotratamientos').getFullList({
-            filter : `(cab='${cab.id}' || generico = true) && active = true`,
-            sort: '-created',
-        });
-        tipos = records
-        tipos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
-    }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
             filter:`active=true && delete=false && cab='${cab.id}'`,
@@ -173,76 +169,30 @@
         animalesrows = animales
     }
     function openNewModal(){
-        nuevoModal.showModal()   
-        if(ninguno){
-            Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            return
-        }
-        selectanimales = []
-        for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({...value,pesonuevo:value.peso})
-        }
-        if(selectanimales.length==0){
-            Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            return
-        }
-        
-
+        tipotactoselect = "tacto"
+        tactoMasivo.showModal()
     }
-    async function crearPesaje(){
-        let errores = false
-        
-        for(let i = 0;i<selectanimales.length ;i++){
-            
-            let ps = selectanimales[i]
-            
-            try{
-                let dataupdate = {
-                    peso:ps.pesonuevo
-                }
-                let data ={
-                    pesonuevo:ps.pesonuevo,
-                    pesoanterior:ps.peso,
-                    fecha:fecha+" 03:00:00",
-                    animal:ps.id
-                }
-                await guardarHistorial(pb,selectanimales[i].id)
-                let r = await pb.collection('animales').update(selectanimales[i].id, dataupdate);
-                await pb.collection("pesaje").create(data)
-            }
-            catch(err){
-                console.error(err)
-                errores = true
-            }
-        }
-        if(errores){
-            Swal.fire("Error pesaje","Hubo un error en algun pesaje","error")
-        }
-        await getAnimales()
-        filterUpdate()
+    function getEstadoName(est) {
+        let estado = estados.filter(e=>e.id==est)[0]
+        return estado.nombre
     }
     onMount(async ()=>{
         await getAnimales()
         await getRodeos()
         await getLotes()
-        await getTipos()
+        
     })
 </script>
 <Navbarr>
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Pesajes </h1>
+            <h1 class="text-2xl">Tactos </h1>
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
-            <a class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" href="/pesajes/lista">
-                <span  class="text-xl">Historia</span>
-            </a>
         </div>
-        
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12">
@@ -269,30 +219,7 @@
         </button>
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
-                <div>
-                    <label for = "sexo" class="label">
-                        <span class="label-text text-base">Sexo</span>
-                    </label>
-                    <label class="input-group ">
-                        <select 
-                            class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 
-                                focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                            bind:value={sexo}
-                            onchange={filterUpdate}
-                        >
-                                <option value="">Todos</option>
-                                {#each sexos as s}
-                                    <option value={s.id}>{s.nombre}</option>
-                                {/each}
-                        </select>
-                    </label>
-                </div>
+                
                 <div>
                     <label for = "rodeos" class="label">
                         <span class="label-text text-base">Rodeos</span>
@@ -318,7 +245,7 @@
                     </label>
                 </div>
                 <div>
-                    <label for = "rodeos" class="label">
+                    <label for = "lotes" class="label">
                         <span class="label-text text-base">Lotes</span>
                     </label>
                     <label class="input-group ">
@@ -342,7 +269,7 @@
                     </label>
                 </div>
                 <div>
-                    <label for = "rodeos" class="label">
+                    <label for = "categorias" class="label">
                         <span class="label-text text-base">Categorias</span>
                     </label>
                     <label class="input-group ">
@@ -365,12 +292,9 @@
                         </select>
                     </label>
                 </div>
-                
-            
             </div>
         {/if}
     </div>
-
     <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:w-11/12 overflow-x-auto" >
         <table class="table table-lg w-full " >
             <thead>
@@ -413,105 +337,136 @@
             </thead>
             <tbody>
                 {#each animalesrows as a}
-                    <tr>
-                        <td class="px-1 p-0 m-0">
-                            <button
-                                aria-label="fila"
-                                onclick={()=>clickAnimal(a.id)}
-                                class={`
-                                    font-medium bg-transparent rounded-lg
-                                    px-3 py-3 text-base
-                                    ${selecthashmap[a.id]?estilos.danger:estilos.primario}
-                                `}
-                            >
-                                {#if selecthashmap[a.id]}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>                                  
-                                {:else}             
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>
-                                {/if}
-                            </button>
-                        </td>
-                        <td class="text-base mx-1 px-0">{a.caravana}</td>
-                        <td class="text-base mx-1 px-0">{a.categoria}</td>
-                        <td class="text-base mx-1 px-0">{a.peso}</td>
-                        <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
-                        <td class="text-base mx-1 px-0">{a.expand?.lote?.nombre||''}</td>
-                        
-                    </tr>
+                <tr>
+                    <td class="px-1 p-0 m-0">
+                        <button
+                            aria-label="fila"
+                            onclick={()=>clickAnimal(a.id)}
+                            class={`
+                                font-medium bg-transparent rounded-lg
+                                px-3 py-3 text-base
+                                ${selecthashmap[a.id]?estilos.danger:estilos.primario}
+                            `}
+                        >
+                            {#if selecthashmap[a.id]}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>                                  
+                            {:else}             
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            {/if}
+                        </button>
+                    </td>
+                    <td class="text-base mx-1 px-0">{a.caravana}</td>
+                    <td class="text-base mx-1 px-0">{a.categoria}</td>
+                    <td class="text-base mx-1 px-0">{a.peso}</td>
+                    <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
+                    <td class="text-base mx-1 px-0">{a.expand?.lote?.nombre||''}</td>
+                    
+                </tr>
                 {/each}
             </tbody>
         </table>
     </div>
-    <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-        <div 
-            class="
-                modal-box w-11/12 max-w-xl
-                bg-gradient-to-br from-white to-gray-100 
-                dark:from-gray-900 dark:to-gray-800
-                "
-        >
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-            </form>
-            
-            <h3 class="text-lg font-bold">Movimiento</h3>
-            <label for = "fechapesaje" class="label">
-                <span class="label-text text-base">Fecha </span>
-            </label>
-            <label class="input-group ">
-                <input id ="fechapesaje" type="date" max={HOY}  
-                    class={`
-                        input input-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={fecha}
-                />
-                
-            </label>
-            <div class="w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
-                <table class="table table-lg w-full " >
-                    <thead>
-                        <tr>
-                            <th class="text-base p-0">Caravana</th>
-                            <th class="text-base p-0">Peso anterior</th>
-                            <th class="text-base ">Peso nuevo</th>
-                        </tr>
-                        
-                    </thead>
-                    <tbody>
-                        {#each selectanimales as a,i}
-                            <tr>
-                                <td class="text-base p-0">{a.caravana}</td>
-                                <td class="text-base p-0">{a.peso}</td>
-                                <td class="">
-                                    <input
-                                      
-                                      bind:value={selectanimales[i].pesonuevo}
-                                      
-                                      class="w-20 px-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      
-                                    />
-                                  </td>
-                                
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
+</Navbarr>
+<dialog id="tactoMasivo" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div 
+        class="
+            modal-box w-11/12 max-w-xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+            "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Tactos múltiples</h3>
+        <div class="grid grid-cols-2 gap-1">
+            <div>
+                <label for = "fechatacto" class="label">
+                    <span class="label-text text-base">Fecha </span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechatacto" type="date" max={HOY}  
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fecha}
+                    />
+                </label>
             </div>
-            <div class="modal-action justify-start ">
-                <form method="dialog" >
-                    <button class="btn btn-success text-white" onclick={crearPesaje} >Crear pesaje</button>
-                    <button class="btn btn-error text-white" >Cancelar</button>
-                </form>
+            <div>
+                <label for = "tipotacto" class="tracking-wide label">
+                    <span class="label-text text-base">Tipo</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={tipotactoselect}
+                        onchange={onchangeTipoTacto}
+                    >
+                            
+                            {#each tipostacto as s}
+                                <option value={s.id}>{s.nombre}</option>
+                            {/each}
+                      </select>
+                </label>
             </div>
         </div>
-    </dialog>
-</Navbarr>
+        <div class="w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
+            <table class="table table-lg w-full " >
+                <thead>
+                    <tr>
+                        <th class="text-base p-0">Caravana</th>
+                        <th class="text-base p-0">Estado anterior</th>
+                        <th class="text-base ">Estado nuevo</th>
+                        <th class="text-base ">Tipo</th>
+                        <th class="text-base ">Observación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each selectanimales as a,i}
+                        <tr>
+                            <td class="text-base p-0">{a.caravana}</td>
+                            <td class="text-base p-0">{getEstadoName(a.prenada)}</td>
+                            <td>
+                                <label class="input-group ">
+                                    <select 
+                                        class={`
+                                            select select-bordered w-full
+                                            rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2}
+                                        `}
+                                        bind:value={selectanimales[i].estadonuevo}
+                                    >
+                                            
+                                        {#each tipostacto as s}
+                                            <option value={s.id}>{s.nombre}</option>
+                                        {/each}
+                                      </select>
+                                </label>
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</dialog>

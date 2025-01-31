@@ -17,6 +17,7 @@
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
     import permisos from "$lib/stores/permisos";
+    import { goto } from "$app/navigation";
     let caber = createCaber()
     let cab = caber.cab
     let per = createPer()
@@ -329,6 +330,21 @@
                     {prepararData}
                 />
             </div>
+            <div class="">
+                <button
+                    onclick={()=>goto("/tactos/cab/movimiento")}
+                    class={`
+                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                        ${estilos.btnsecondary}
+                        rounded-full
+                        px-4 pt-2 pb-3
+                    `} 
+                    aria-label="Exportar"
+                >
+                    <span  class="text-xl font-semibold ">Múltiples</span>
+                    
+                </button>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
@@ -416,7 +432,7 @@
                         </label>  
                     </div>
                     <div>
-                        <label for = "categoria" class="tracking-wide label">
+                        <label for = "tipotacto" class="tracking-wide label">
                             <span class="label-text text-base">Tipo</span>
                         </label>
                         <label class="input-group ">
