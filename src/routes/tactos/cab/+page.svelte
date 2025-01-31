@@ -586,11 +586,15 @@
                         bind:value={animal}
                         onchange={()=>oninput("ANIMAL")}
                     >
+                        <option value="agregar">Agregar</option>    
                         {#each animales as a}
                             <option value={a.id}>{a.caravana}</option>    
                         {/each}
                       </select>
                 </label>
+                {#if animal == "agregar"}
+                    from
+                {/if}
                 <label for = "tipo" class="label">
                     <span class="label-text text-base">Categoria</span>
                 </label>
