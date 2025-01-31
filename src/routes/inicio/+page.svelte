@@ -595,7 +595,7 @@
 <Navbarr>
     
     {#if cab.exist}
-        <CardBase titulo="Bievenido a fertil" cardsize="max-w-5xl">
+        <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <a class={classbutton}
