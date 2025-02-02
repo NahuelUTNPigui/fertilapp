@@ -1,4 +1,5 @@
 <script>
+    import { goto } from '$app/navigation';   
     import Navbarr from '$lib/components/Navbarr.svelte';
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
@@ -310,11 +311,11 @@
     
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
             <h1 class="text-2xl">Inseminaciones</h1>
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
                 <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                     <span  class="text-lg">Nueva</span>
@@ -328,6 +329,21 @@
                     data = {inseminacionesrow}
                     {prepararData}
                 />
+            </div>
+            <div class="">
+                <button
+                    onclick={()=>goto("/inseminaciones/movimiento")}
+                    class={`
+                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                        ${estilos.btnsecondary}
+                        rounded-full
+                        px-4 pt-2 pb-3
+                    `} 
+                    aria-label="Exportar"
+                >
+                    <span  class="text-xl font-semibold ">Múltiples</span>
+                    
+                </button>
             </div>
             
         </div>

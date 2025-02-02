@@ -217,7 +217,10 @@
             }
         }
         if(errores){
-            Swal.fire("Error pesaje","Hubo un error en algun pesaje","error")
+            Swal.fire("Error pesaje","Hubo algun error en algun pesaje","error")
+        }
+        else{
+            Swal.fire("Éxito pesaje","Se lograron registar todos los pesajes","success")
         }
         await getAnimales()
         filterUpdate()

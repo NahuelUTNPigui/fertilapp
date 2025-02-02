@@ -9,6 +9,7 @@
     import { createUserer } from '$lib/stores/user.svelte';
     import categorias from '$lib/stores/categorias';
     import estilos from '$lib/stores/estilos';
+    import { goto } from "$app/navigation";
     
     let caber = createCaber()
     let cab = caber.cab
@@ -384,6 +385,21 @@
                 data = {tratamientosrow}
                 {prepararData}
             />
+        </div>
+        <div class="">
+            <button
+                onclick={()=>goto("/tratamientos/movimiento")}
+                class={`
+                    bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                    ${estilos.btnsecondary}
+                    rounded-full
+                    px-4 pt-2 pb-3
+                `} 
+                aria-label="Exportar"
+            >
+                <span  class="text-xl font-semibold ">Múltiples</span>
+                
+            </button>
         </div>
     </div>
     <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
