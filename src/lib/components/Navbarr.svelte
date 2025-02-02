@@ -49,7 +49,7 @@
         goto("/")
     }
     function cambiarRol(){
-      goto("/rol")
+      goto("/user/config")
     }
     let checked = $state('');
     function handleClick() {

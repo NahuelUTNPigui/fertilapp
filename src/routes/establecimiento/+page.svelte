@@ -149,7 +149,7 @@
 <Navbarr>
     
     {#if cab.exist}
-        <CardBase titulo="Bievenido a fertil" cardsize="max-w-5xl">
+        <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
             <div class="space-y-6">
                 <div>
                     <label for="nombre" 
