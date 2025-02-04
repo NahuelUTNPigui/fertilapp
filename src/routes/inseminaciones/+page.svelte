@@ -5,10 +5,12 @@
     import PocketBase from 'pocketbase'
     import { slide } from 'svelte/transition';
     import Swal from 'sweetalert2';
+    import sexos from '$lib/stores/sexos';
     import { onMount } from 'svelte';
     import { createCaber } from '$lib/stores/cab.svelte';
     import { createUserer } from '$lib/stores/user.svelte';
     import tiposanimal from '$lib/stores/tiposanimal';
+    import permisos from "$lib/stores/permisos";
     import estilos from '$lib/stores/estilos';
     let ruta = import.meta.env.VITE_RUTA
 
@@ -21,6 +23,10 @@
     let userer = createUserer()
     let cab = caber.cab
     let usuarioid = userer.userid
+    let caravana = $state("")
+    let malcaravana = $state(false)
+    let sexo = $state("")
+    let peso = $state(0)
     // Datos para mostrar
     let inseminaciones = $state([])
     let inseminacionesrow = $state([])
@@ -53,6 +59,7 @@
     let malfechainseminacion = $state(false)
     let malfechaparto = $state(false)
     let botonhabilitado = $state(false)
+    let botonhabilitadoAnimal = $state(false)
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
@@ -79,6 +86,19 @@
         pajuela = ""
         nuevoModal.showModal()
     }
+
+    function openNewAnimal(){
+        if(permisos[4]){
+            caravana = ""
+            sexo = ""
+            peso = 0
+            botonhabilitadoAnimal = false
+            nuevoModal.showModal()
+        } else{
+            Swal.fire("Sin permisos","No tienes permisos para crear eventos","error")
+        }
+    }
+
     function cerrarModal(){
         fechaparto = ""
         padre = ""
@@ -123,6 +143,29 @@
         inseminaciones = records
         inseminacionesrow = inseminaciones
     }
+
+    async function guardarAnimal(){
+        try{
+            let data = {
+                caravana,
+                active:true,
+                delete:false,
+                sexo,
+                peso,
+                cab:cab.id
+            }
+            let recorda = await pb.collection('animales').create(data)
+            Swal.fire("Éxito guardar","Se pudo guardar el animal con exito","success")
+            caravana = ""
+            sexo = "H"
+        }
+        catch(e){
+            console.error(e)
+            Swal.fire("Error guardar","Hubo un error para guardar el animal","error")
+        }
+        
+    }
+
     async function guardar(){
         try{
             let caravana = madres.filter(a=>a.id==idanimal)[0].caravana
@@ -153,10 +196,16 @@
             Swal.fire("Error guardar","Hubo un error para guardar la inseminación","error")
         }
     }
+
     function onSelectAnimal(){
-        let a = madres.filter(an=>an.id==idanimal)[0]
-        categoria = a.categoria
+        if (idanimal == "agregar"){
+            openNewAnimal()
+        } else {
+            let a = madres.filter(an=>an.id==idanimal)[0]
+            categoria = a.categoria
+        }
     }
+
     async function editar(){
         try {
             let data = {
@@ -244,6 +293,7 @@
         await getInseminaciones()
         filterUpdate()
     })
+
     function validarBoton(){
         botonhabilitado = true
         if(isEmpty(idanimal)){
@@ -255,8 +305,15 @@
         if(isEmpty(fechainseminacion)){
             botonhabilitado = false
         }
-    
     }
+
+    function validarBotonAnimal(){
+        botonhabilitadoAnimal = true
+        if(isEmpty(caravana)){
+            botonhabilitadoAnimal = false
+        }    
+    }
+
     function addDays(date, days) {
         var result = new Date(date);
         result.setDate(result.getDate() + days);
@@ -264,6 +321,7 @@
     }
     function oninput(campo){
         validarBoton()
+        validarBotonAnimal()
         if(campo == "ANIMAL"){
             if(isEmpty(idanimal)){
                 malanimal = true
@@ -273,6 +331,16 @@
                 malanimal = false
             }
         }
+
+        if(campo == "NOMBRE"){
+            if(isEmpty(caravana)){
+                malcaravana = true
+            }
+            else{
+                malcaravana = false
+            }
+        }
+
         if(campo == "PADRE"){
             if(isEmpty(pajuela)){
                 malpadre = true
@@ -583,6 +651,7 @@
                         bind:value={idanimal}
                         onchange={()=>oninput("ANIMAL")}
                     >
+                        <option value="agregar">Agregar</option>
                         {#each madres as m}
                             <option value={m.id}>{m.caravana}</option>    
                         {/each}
@@ -592,8 +661,72 @@
                             <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
                         </div>
                     {/if}
-
                 </label>
+                {#if idanimal == "agregar"}
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+                    </form>
+                    <label for = "nombre" class="label">
+                        <span class="label-text text-base">Caravana</span>
+                    </label>
+                    <label class="input-group">
+                        <input 
+                            id ="nombre" 
+                            type="text"  
+                            class={`
+                                input 
+                                input-bordered 
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                                w-full
+                                ${estilos.bgdark2} 
+                                ${malcaravana?"input-error":""}
+                            `}
+                            bind:value={caravana}
+                            oninput={()=>oninput("NOMBRE")}
+                        />
+                        <div class={`label ${malcaravana?"":"hidden"}`}>
+                            <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
+                        </div>
+                    </label>
+                    <label for = "sexo" class="label">
+                        <span class="label-text text-base">Sexo</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} bind:value={sexo}>
+                            {#each sexos as s}
+                                <option value={s.id}>{s.nombre}</option>    
+                            {/each}
+                          </select>
+                    </label>
+                    <label for = "peso" class="label">
+                        <span class="label-text text-base">Peso (KG)</span>
+                    </label>
+                    <label class="input-group">
+                        <input id ="peso" type="number"  
+                            class={`
+                                input input-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={peso}
+                        />
+                    </label>
+                    <div class="modal-action justify-start ">
+                        <form method="dialog" >
+                            <button class="btn btn-success text-white" disabled='{!botonhabilitadoAnimal}' onclick={guardarAnimal} >Guardar Animal</button>
+                        </form>
+                    </div>
+                {/if}
                 <label for = "tipo" class="label">
                     <span class="label-text text-base">Categoria</span>
                 </label>

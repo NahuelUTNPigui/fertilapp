@@ -125,7 +125,7 @@
             caravana = ""
             conparicion = false
             peso = ""
-            sexo = "F"
+            sexo = "H"
             fechanacimiento = ""
             nombremadre = ""
             nombrepadre = ""
@@ -202,14 +202,14 @@
             }
             animales.push(recorda)
             animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
-            madres = animales.filter(a=>a.sexo=="F")
+            madres = animales.filter(a=>a.sexo=="H")
             padres = animales.filter(a=>a.sexo=="M")
             filterUpdate()
-            Swal.fire("Éxito guardar","Se pudo guardar el animal con existo","success")
+            Swal.fire("Éxito guardar","Se pudo guardar el animal con exito","success")
             caravana = ""
             nacimiento = ""
             fechanacimiento = ""
-            sexo = "F"
+            sexo = "H"
 
         }
         catch(e){

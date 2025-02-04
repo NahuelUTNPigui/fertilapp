@@ -3,6 +3,8 @@
     import Exportar from '$lib/components/Exportar.svelte';
     import PocketBase from 'pocketbase'
     import { slide } from 'svelte/transition';
+    import sexos from '$lib/stores/sexos';
+    import permisos from '$lib/stores/permisos';
     import Swal from 'sweetalert2';
     import { onMount } from 'svelte';
     import { createCaber } from '$lib/stores/cab.svelte';
@@ -22,6 +24,10 @@
     let animales = $state([])
     let observaciones = $state([])
     let observacionesrow = $state([])
+    let caravana = $state("")
+    let malcaravana = $state(false)
+    let sexo = $state("")
+    let peso = $state(0)
 
     //Datos observaciones
     let idobservacion = $state("")
@@ -34,6 +40,7 @@
     let malanimal = $state(false)
     let malfecha = $state(false)
     let botonhabilitado = $state(false)
+    let botonhabilitadoAnimal = $state(false)
     //Filtros
     let buscar = $state("")
     let buscarcategoria = $state("")
@@ -76,6 +83,19 @@
         malfecha = false
         nuevoModal.showModal()
     }
+
+    function openNewAnimal(){
+        if(permisos[4]){
+            caravana = ""
+            sexo = ""
+            peso = 0
+            botonhabilitadoAnimal = false
+            nuevoModal.showModal()
+        } else{
+            Swal.fire("Sin permisos","No tienes permisos para crear eventos","error")
+        }
+    }
+
     function openModalEditar(id){
         botonhabilitado = true
         malanimal = false
@@ -189,6 +209,29 @@
         categoria = ""
         animal = ""
     }
+
+    async function guardarAnimal(){
+        try{
+            let data = {
+                caravana,
+                active:true,
+                delete:false,
+                sexo,
+                peso,
+                cab:cab.id
+            }
+            let recorda = await pb.collection('animales').create(data)
+            Swal.fire("Éxito guardar","Se pudo guardar el animal con exito","success")
+            caravana = ""
+            sexo = "H"
+        }
+        catch(e){
+            console.error(e)
+            Swal.fire("Error guardar","Hubo un error para guardar el animal","error")
+        }
+        
+    }
+    
     async function editar(){
         try{
             let data = {
@@ -221,12 +264,25 @@
             botonhabilitado=false
         }
     }
+
+    function validarBotonAnimal(){
+        botonhabilitadoAnimal = true
+        if(isEmpty(caravana)){
+            botonhabilitadoAnimal=false
+        }
+    }
+
     function onSelectAnimal(){
-        let a = animales.filter(an=>an.id==animal)[0]
-        categoria = a.categoria
+        if (animal == "agregar") {
+            openNewAnimal()
+        } else {
+            let a = animales.filter(an=>an.id==animal)[0]
+            categoria = a.categoria
+        }
     }
     function oninput(inputName){
         validarBoton()
+        validarBotonAnimal()
         if(inputName == "ANIMAL"){
             if(isEmpty(animal)){
                 malanimal = true
@@ -242,6 +298,14 @@
             }
             else{
                 malfecha = false
+            }
+        }
+        if(inputName=="NOMBRE"){
+            if(isEmpty(caravana)){
+                malcaravana = true
+            }
+            else{
+                malcaravana = false
             }
         }
     }
@@ -494,7 +558,8 @@
                         `}
                         bind:value={animal}
                         onchange={()=>oninput("ANIMAL")}
-                    >   
+                    >
+                        <option value="agregar">Agregar animal</option>
                         {#each animales as a}
                             <option value={a.id}>{a.caravana}</option>    
                         {/each}
@@ -505,6 +570,71 @@
                         </div>
                     {/if}
                 </label>
+                {#if animal == "agregar"}
+                    <form method="dialog">
+                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+                    </form>
+                    <label for = "nombre" class="label">
+                        <span class="label-text text-base">Caravana</span>
+                    </label>
+                    <label class="input-group">
+                        <input 
+                            id ="nombre" 
+                            type="text"  
+                            class={`
+                                input 
+                                input-bordered 
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                                w-full
+                                ${estilos.bgdark2} 
+                                ${malcaravana?"input-error":""}
+                            `}
+                            bind:value={caravana}
+                            oninput={()=>oninput("NOMBRE")}
+                        />
+                        <div class={`label ${malcaravana?"":"hidden"}`}>
+                            <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
+                        </div>
+                    </label>
+                    <label for = "sexo" class="label">
+                        <span class="label-text text-base">Sexo</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `} bind:value={sexo}>
+                            {#each sexos as s}
+                                <option value={s.id}>{s.nombre}</option>    
+                            {/each}
+                          </select>
+                    </label>
+                    <label for = "peso" class="label">
+                        <span class="label-text text-base">Peso (KG)</span>
+                    </label>
+                    <label class="input-group">
+                        <input id ="peso" type="number"  
+                            class={`
+                                input input-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={peso}
+                        />
+                    </label>
+                    <div class="modal-action justify-start ">
+                        <form method="dialog" >
+                            <button class="btn btn-success text-white" disabled='{!botonhabilitadoAnimal}' onclick={guardarAnimal} >Guardar Animal</button>
+                        </form>
+                    </div>
+                {/if}
                 <label for = "categoria" class="label">
                     <span class="label-text text-base">Categoria</span>
                 </label>
