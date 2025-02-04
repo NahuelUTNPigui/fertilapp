@@ -961,7 +961,7 @@
                         {/each}
                     </select>
                 </label>
-                <label for = "rodeo" class="label">
+                <label for = "lote" class="label">
                     <span class="label-text text-base">Lote</span>
                 </label>
                 <label class="input-group">
@@ -1149,7 +1149,6 @@
                         </label>
                     {/each}
                 {/if}
-                
             </div>
             <div class="modal-action justify-end ">
                 <form method="dialog" >
