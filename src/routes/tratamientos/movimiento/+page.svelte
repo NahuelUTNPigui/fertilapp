@@ -220,6 +220,7 @@
         maltipo = false
         tipotratamientoselect = ""
         botonhabilitado = false
+        selecthashmap = {}
         selectanimales = []
     }
     onMount(async ()=>{

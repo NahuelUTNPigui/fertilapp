@@ -230,6 +230,8 @@
         fecha = ""
         botonhabilitado = false
         malfecha = false
+        selecthashmap = {}
+        selectanimales = []
     }
     onMount(async ()=>{
         await getAnimales()

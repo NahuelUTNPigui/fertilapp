@@ -244,6 +244,8 @@
         botonhabilitado = false
         malfecha = false
         malpadre = false
+        selecthashmap = {}
+        selectanimales = []
 
     }
     function getNombrePadre(){
