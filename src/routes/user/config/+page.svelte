@@ -10,7 +10,8 @@
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = $state("")
-    let nombreusuario = $state('')
+    let username = $state("")
+    let usermail = $state("")
     let darker = createDarker()
     let modoedicion = $state(false)
 
@@ -22,10 +23,10 @@
 
     async function editarUsuario(){
         const data = {
-            nombreusuario
+            username
         };
         try{
-            const record = await pb.collection('users').update(usuarioid, data);
+            const record = await pb.collection("users").update(usuarioid, data);
             Swal.fire("Exito modificar","Se pudo modificar el usuario con éxito","success")
             
         }
@@ -36,12 +37,13 @@
     }
     
     onMount(async ()=>{
-      let caber = createCaber()
-      let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-      let usuarioid = pb_json.model.id
-      nombreusuario = pb_json.model.username
-      let light = !darker.dark
-      cab = caber.cab      
+        let caber = createCaber()
+        let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        usuarioid = pb_json.model.id
+        usermail = pb_json.model.email
+        username = pb_json.model.username
+        let light = !darker.dark
+        cab = caber.cab
     })
 </script>
 <Navbarr>
@@ -57,14 +59,14 @@
                     <label for="nombre" 
                         class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
                     >
-                        {nombreusuario}
+                        {username}
                     </label>
                 {:else}
                     <input 
                         type="text" 
                         id="nombre"
                         disabled={!modoedicion}
-                        bind:value={nombreusuario} 
+                        bind:value={username} 
                         required 
                         class={`
                             w-full px-3 py-2 border rounded-md shadow-sm
@@ -78,6 +80,16 @@
                         `}
                     />
                 {/if}
+                <label for="mail" 
+                    class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                >
+                    Mail:
+                </label>
+                <label for="mail" 
+                    class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                >
+                    {usermail}
+                </label>
             </div>
         </div>
         <div class="mt-8 flex justify-end">
