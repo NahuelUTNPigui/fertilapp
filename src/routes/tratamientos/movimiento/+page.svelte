@@ -237,7 +237,10 @@
         <div>
             <h1 class="text-2xl">Tratamientos </h1>
         </div>
-        <div class="flex gap-1 justify-end">
+        <div class="flex col-span-2 gap-1 justify-end">
+            <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <span  class="text-xl">{capitalize("nuevo")}</span>
+            </button>
             <button
                 onclick={()=>goto("/tratamientos")}
                 class={`
@@ -252,11 +255,7 @@
                 
             </button>
         </div>
-        <div class="flex gap-1 justify-end">
-            <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">{capitalize("nuevo")}</span>
-            </button>
-        </div>
+        
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
         <div class="w-11/12">

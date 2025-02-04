@@ -47,7 +47,7 @@
     })
 </script>
 <Navbarr>
-    <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
+    <CardBase titulo="Datos usuario" cardsize="max-w-5xl">
         <div class="space-y-6">
             <div>
                 <label for="nombre" 

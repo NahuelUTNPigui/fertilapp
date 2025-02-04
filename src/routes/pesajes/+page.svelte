@@ -173,7 +173,7 @@
         animalesrows = animales
     }
     function openNewModal(){
-        nuevoModal.showModal()   
+        
         if(ninguno){
             Swal.fire("Error pesaje","No hay animales seleccionados","error")
             return
@@ -187,6 +187,7 @@
             Swal.fire("Error pesaje","No hay animales seleccionados","error")
             return
         }
+        nuevoModal.showModal()   
         
 
     }

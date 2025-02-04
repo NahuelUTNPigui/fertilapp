@@ -409,6 +409,7 @@
         await getTratamientos()
         await getTiposTratamientos()
         await getAnimales()
+        filterUpdate()
     })
     function prepararData(item){
         return {

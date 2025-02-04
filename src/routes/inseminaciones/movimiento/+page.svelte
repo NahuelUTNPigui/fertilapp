@@ -315,6 +315,19 @@
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
+            <button
+                onclick={()=>goto("/tactos/cab")}
+                class={`
+                    bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                    ${estilos.btnsecondary}
+                    rounded-full
+                    px-4 pt-2 pb-3
+                `} 
+                aria-label="volver"
+            >
+            <span  class="text-xl font-semibold ">Volver</span>
+                
+            </button>
         </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >

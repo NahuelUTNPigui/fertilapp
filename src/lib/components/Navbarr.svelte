@@ -25,10 +25,13 @@
     
     let nombreusuario = $state('')
     let roler = createRoler()
+    
     let rol = roler.rol==""?"":roler.rol=="vet"?"Veterinario":"Establecimiento"
+    let nombreestablecimiento = $state("")
     //let rol = "cab"
     onMount(async ()=>{
       let caber = createCaber()
+      nombreestablecimiento = caber.cab.nombre
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
       let usuarioid = pb_json.model.id
       nombreusuario = pb_json.model.username
@@ -48,8 +51,11 @@
         
         goto("/")
     }
-    function cambiarRol(){
+    function editarUser(){
       goto("/user/config")
+    }
+    function cambiarEstablecimiento(){
+      goto("/establecimientos")
     }
     let checked = $state('');
     function handleClick() {
@@ -79,7 +85,7 @@
               <div class="flex-1">
                 <a href="/inicio" 
                 class={`pl-0 pr-1 btn btn-ghost text-2xl ${classtextnavbar}`}
-                >{rol}</a>
+                >{nombreestablecimiento}</a>
               </div>
               <div class="flex mr-1 pr-1 lg:mr-5 lg:pr-5">
                 <span class={classtextnavbar}>{nombreusuario}</span>
@@ -100,7 +106,8 @@
                   </summary>
                   <div class="pr-3 mr-3">
                     <ul class={`menu dropdown-content rounded-box z-[1] shadow ${classtextnavbar} ${bgnav}`}>
-                      <li><button onclick={cambiarRol}>Configuracion</button></li>
+                      <li><button onclick={editarUser}>Usuario</button></li>
+                      <li><button onclick={cambiarEstablecimiento}>Establecimientos</button></li>
                       <li><button onclick={salir}>Salir</button></li>
                       
                     </ul>
@@ -124,7 +131,7 @@
           "
         >
           <div class="border-b border-green-500 ">
-            <h1 class="text-lg text-green-600 dark:text-green-400 italic">Fertil</h1>
+            <h1 class="text-lg text-green-600 dark:text-green-400 italic">{`Fertil - ${nombreestablecimiento}`}</h1>
           </div>
           {#if rol=="Veterinario"}
             <li class={`mt-2 ${pageurl.includes("tactos")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
