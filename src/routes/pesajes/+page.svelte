@@ -224,6 +224,8 @@
         }
         await getAnimales()
         filterUpdate()
+        selecthashmap = {}
+        selectanimales = []
     }
     onMount(async ()=>{
         await getAnimales()
