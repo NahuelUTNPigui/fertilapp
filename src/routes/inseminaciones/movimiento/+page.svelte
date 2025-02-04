@@ -258,6 +258,13 @@
         onInput("PAJUELA")
 
     }
+    function getNombrePadreTabla(i){
+        let a = selectanimales[i]
+        let p = padres.filter(item=>item.id == a.padre)[0]
+        
+        selectanimales[i].pajuela = p.caravana
+        
+    }
     function addDays(date, days) {
         var result = new Date(date);
         result.setDate(result.getDate() + days);
@@ -657,6 +664,7 @@
                                                 ${estilos.bgdark2}
                                             `}
                                             bind:value={selectanimales[i].padre}
+                                            onchange={()=>getNombrePadreTabla(i)}
                                         >
                                                 
                                             {#each padres as p}
