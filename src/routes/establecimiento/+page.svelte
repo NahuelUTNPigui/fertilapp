@@ -134,6 +134,7 @@
     function mostrarcolab(data){
         console.log("padre: "+data)
     }
+    
     onMount(async ()=>{
         
         cab = caber.cab
