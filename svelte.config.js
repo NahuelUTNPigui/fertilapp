@@ -25,7 +25,7 @@ const config = {
 				"/rodeos",
 				"/rol",
 				"/tactos/cab",
-				"/tactos/cab/movimientos",
+				"/tactos/cab/movimiento",
 				"/tactos/vet",
 				"/user/config",
 				"/inseminaciones",
@@ -41,7 +41,11 @@ const config = {
 				"/establecimiento",
 				"/pesajes/lista",
 				"/colaboradores/asociar",
-				"/colaboradores/1"]
+				"/colaboradores/1",
+				"/establecimientos",
+				"/establecimientos/nuevo",
+				"/inseminaciones/movimiento",
+				"/tratamientos/movimiento"]
 		}
 	}
 };
