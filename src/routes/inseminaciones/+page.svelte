@@ -163,7 +163,7 @@
             console.error(e)
             Swal.fire("Error guardar","Hubo un error para guardar el animal","error")
         }
-        
+        await getAnimales()
     }
 
     async function guardar(){
