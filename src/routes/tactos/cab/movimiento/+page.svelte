@@ -1,4 +1,5 @@
 <script>
+    import { goto } from "$app/navigation";
     import Navbarr from "$lib/components/Navbarr.svelte";
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
@@ -21,9 +22,6 @@
     const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
     let caber = createCaber()
     let cab = caber.cab
-
-    //boton
-    let textoboton = $state("Tactos")
     //Datos animales
     let animales = $state([])
     let animalesrows = $state([])
