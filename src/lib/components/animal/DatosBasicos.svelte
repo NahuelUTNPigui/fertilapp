@@ -683,7 +683,7 @@
         <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = !modohistoria}>
             <span  class="text-lg m-1">{modohistoria?"Ocultar":"Mostrar"} historia clinica</span>      
         </button>
-    </div>
+    </div>  
 </div>
 
 <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
