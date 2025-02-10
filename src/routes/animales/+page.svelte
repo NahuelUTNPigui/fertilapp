@@ -17,6 +17,7 @@
     import {createPer} from "$lib/stores/permisos.svelte"
     import { getPermisosList } from '$lib/permisosutil/lib';
     import RadioButton from '$lib/components/RadioButton.svelte';
+    import MultiSelect from '$lib/components/MultiSelect.svelte';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -35,16 +36,17 @@
     let animalesrows = $state([])
     let rodeos = $state([])
     let lotes = $state([])
-    let fallecidos = [{id:"vivos",nombre:"Solo vivos"},{id:"todos",nombre:"Todos"}]
+    let activos = [{id:"todos",nombre:"Todos"},{id:"activos",nombre:"Solo activos"},{id:"inactivos",nombre:"Solo inactivos"}]
     let madres = $state([])
     let padres = $state([])
     let buscar = $state("")
     let rodeobuscar = $state("")
+    let rodeoseleccion = $state([])
     let sexobuscar = $state("")
     let lotebuscar = $state("")
     let estadobuscar = $state("")
     let categoriabuscar = $state("")
-    let fallecidobuscar = $state("vivos")
+    let activosbuscar = $state("activos")
     let totalAnimalesEncontrados = $state(0)
     
 
@@ -246,8 +248,12 @@
             animalesrows = animalesrows.filter(a=>a.categoria == categoriabuscar)
             totalAnimalesEncontrados = animalesrows.length
         }
-        if(fallecidobuscar == "vivos"){
+        if(activosbuscar == "activos"){
             animalesrows = animalesrows.filter(a=>a.active == true)
+            totalAnimalesEncontrados = animalesrows.length
+        }
+        if(activosbuscar == "inactivos"){
+            animalesrows = animalesrows.filter(a=>a.active == false)
             totalAnimalesEncontrados = animalesrows.length
         }
     }
@@ -425,6 +431,13 @@
                 <div transition:slide>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
                         <div>
+                            <MultiSelect
+                                opciones={rodeos}
+                                valores={rodeoseleccion}
+                                etiqueta="Elegir rodeo"
+                            />
+                        </div>
+                        <div>
                             <label for = "sexo" class="label">
                                 <span class="label-text text-base">Sexo</span>
                             </label>
@@ -547,7 +560,7 @@
                         </div>
                         <div>
                             <label for = "rodeos" class="label">
-                                <span class="label-text text-base">Fallecidos</span>
+                                <span class="label-text text-base">Activos</span>
                             </label>
                             <label class="input-group ">
                                 <select 
@@ -559,11 +572,11 @@
                                         focus:ring-green-500 focus:border-green-500
                                         ${estilos.bgdark2}
                                     `} 
-                                    bind:value={fallecidobuscar}
+                                    bind:value={activosbuscar}
                                     onchange={filterUpdate}
                                 >
-                                    {#each fallecidos as r}
-                                        <option value={r.id}>{r.nombre}</option>    
+                                    {#each activos as a}
+                                        <option value={a.id}>{a.nombre}</option>    
                                     {/each}
                                   </select>
                             </label>
@@ -572,180 +585,16 @@
                 </div>
             {/if}
     </div>
-   <!-- <div class="grid grid-cols-2 lg:grid-cols-3 m-1 gap-2 lg:gap-10 mb-2 lg:mx-10 w-11/12 lg:w-full" >
-        <div>
-            <label for = "sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={sexobuscar}
-                    onchange={filterUpdate}
-                >
-                        <option value="" class="rounded">Todos</option>
-                        {#each sexos as s}
-                            <option value={s.id} class="rounded">{s.nombre}</option>
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "rodeos" class="label">
-                <span class="label-text text-base">Rodeo</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} 
-                    bind:value={rodeobuscar}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each rodeos as r}
-                            <option value={r.id}>{r.nombre}</option>    
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "lote" class="label">
-                <span class="label-text text-base">Lote</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={lotebuscar}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each lotes as s}
-                            <option value={s.id}>{s.nombre}</option>
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={categoriabuscar}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each categorias as s}
-                            <option value={s.id}>{s.nombre}</option>
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "estado" class="label">
-                <span class="label-text text-base">Estado</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={estadobuscar}
-                    onchange={filterUpdate}
-                >
-                        <option value="">Todos</option>
-                        {#each estados as s}
-                            <option value={s.id}>{s.nombre}</option>
-                        {/each}
-                  </select>
-            </label>
-        </div>
-        <div>
-            <label for = "rodeos" class="label">
-                <span class="label-text text-base">Fallecidos</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        rounded-md
-                        focus:outline-none 
-                        focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} 
-                    bind:value={fallecidobuscar}
-                    onchange={filterUpdate}
-                >
-                    {#each fallecidos as r}
-                        <option value={r.id}>{r.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div >
-            <button class={`w-full btn btn-primary rounded-full flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo animal</span>
-            </button>
-        </div>
-        <div>
-            
-            <Exportar
-                titulo = {"Animales"}
-                filtros = {[]}
-                confiltros = {false}
-                data = {animalesrows}
-                {prepararData}
-            />
-        </div>
-    </div>-->
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr >
-                    <th class="text-base p-3"  >Animal</th>
-                    <th class="text-base p-3"  >Sexo</th>
-                    <th class="text-base p-3"  >Categoria</th>
-                    <th class="text-base p-3"  >Estado</th>
-                    <th class="text-base p-3"  >Lote</th>
-                    <th class="text-base p-3"  >Rodeo</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Animal</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Sexo</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Categoria</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Estado</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Lote</th>
+                    <th class="text-base p-3 border-b dark:border-gray-600"  >Rodeo</th>
                     <!--<th class="text-base"  >Acciones</th>-->
                     
                 </tr>
@@ -755,7 +604,7 @@
             <tbody>
                 {#each animalesrows as a}
                 <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`/animales/${a.id}`)}>
-                    <td class="text-base p-3 border-b">
+                    <td class="text-base p-3 ">
                         <div class="flex gap-1">
                             {`${a.caravana}`}
                             {#if !a.active}
@@ -770,16 +619,16 @@
                             {/if}
                         </div>
                     </td>
-                    <td class="text-base p-3 border-b"> {a.sexo}</td>
-                    <td class="text-base p-3 border-b"> {a.categoria}</td>
-                    <td class="text-base p-3 border-b"> {
+                    <td class="text-base p-3 "> {a.sexo}</td>
+                    <td class="text-base p-3 "> {a.categoria}</td>
+                    <td class="text-base p-3 "> {
                         a.prenada==2?
                         "Preñada":
                         a.prenada==1?
                         "Dudosa":
                         "Vacia"
                     }</td>
-                    <td class="text-base p-3 border-b">
+                    <td class="text-base p-3 ">
                         {
                             a.expand?
                             a.expand.lote?
@@ -789,7 +638,7 @@
 
                         }
                     </td>
-                    <td class="text-base p-3 border-b">
+                    <td class="text-base p-3 ">
                         {
                             a.expand?
                             a.expand.rodeo?
@@ -798,29 +647,7 @@
                             :""
                         }
                     </td>
-                    <!--<td class="flex gap-2">
-                        
-                        
-                        <div class="tooltip" data-tip="Ver">
-                            <button aria-label="Ver"  onclick={()=>getDetail(a.id)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                  </svg>
-                            </button>
-                        </div>
-                        <div class="tooltip" data-tip="Historia">
-                            <button aria-label="Historia"  onclick={()=>goto(`/animales/${a.id}`)}>
-                            
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                          
-                    </td>
-                    -->
+                    
 
                 </tr>
                 {/each}

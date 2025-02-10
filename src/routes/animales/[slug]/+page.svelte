@@ -13,6 +13,7 @@
     import Pariciones from "$lib/components/animal/Pariciones.svelte";
     import Tactos from "$lib/components/animal/Tactos.svelte";
     import Historial from "$lib/components/animal/Historial.svelte";
+    import {guardarHistorial} from "$lib/historial/lib"
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
     import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
@@ -59,13 +60,15 @@
 
         tactos = recordtactos
     }
-    async function darBaja(fechafallecimiento){
+    async function darBaja(fechafallecimiento,motivo){
         try{
             const data = {
                 active: false,
-                fechafallecimiento: fechafallecimiento +  " 03:00:00"
-            };
+                fechafallecimiento: fechafallecimiento +  " 03:00:00",
+                motivobaja:motivo
 
+            };
+            await guardarHistorial(pb,slug)
             const record = await pb.collection('animales').update(slug, data);  
             Swal.fire("Éxito dar de baja","Se pudo dar de baja al animal","success")
             goto("/animales")  
@@ -190,7 +193,7 @@
         <Acciones 
             caravana = {caravana}
             fechafallecimiento  = {fechafall}
-            bajar={async (fechafallecimiento)=>await darBaja(fechafallecimiento)}
+            bajar={async (fechafallecimiento,motivo)=>await darBaja(fechafallecimiento,motivo)}
             eliminar={eliminar}
             transferir={(newcab)=>transferir(newcab)}
         />

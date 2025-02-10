@@ -609,24 +609,24 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha</th>
-                    <th class="text-base mx-1 px-1">Animal</th>
-                    <th class="text-base mx-1 px-1">Categoria</th>
-                    <th class="text-base mx-1 px-1">Tipo</th>
+                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Animal</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Categoria</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Tipo</th>
                     <!--<th class="text-base mx-1 px-1">Acciones</th>-->
                 </tr>
             </thead>
             <tbody>
                 {#each tratamientosrow as t}
                     <tr onclick={()=>openEditModal(t.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{new Date(t.fecha).toLocaleDateString()}</td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 ">{new Date(t.fecha).toLocaleDateString()}</td>
+                        <td class="text-base mx-1 px-1 ">
                             {`${t.expand.animal.caravana}`}
                         </td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base mx-1 px-1 ">
                             {`${t.expand.animal.categoria}`}
                         </td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base mx-1 px-1 ">
                             {`${t.expand.tipo.nombre}`}
                         </td>
                         <!--<td class="flex gap-2 text-base mx-1 px-1">
@@ -836,6 +836,7 @@
                     <button class="btn btn-success text-white" onclick={editar} >Editar</button>
                     <button class="btn btn-error text-white" onclick={()=>eliminar(idtratamiento)}>Eliminar</button>
                   {/if}
+                  <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
                   
                 </form>
             </div>

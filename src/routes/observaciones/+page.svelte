@@ -342,52 +342,7 @@
             </div>
         </div>
     </div>
-    <!--<div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-                Fecha desde
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechadesde} onchange={filterUpdate}
-            />
-        </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-                Fecha Hasta
-            </label>
-            <input id ="fechadesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `}  
-                bind:value={fechahasta} onchange={filterUpdate}
-            />
-        </div>
-        <div>
-            Categoria
-        </div>
-    </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div>
-            <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nueva observación</span>
-            </button>
-        </div>
-        <div>
-        
-            <Exportar
-                titulo ={"Observaciones"}
-                filtros = {[]}
-                confiltros = {false}
-                data = {observacionesrow}
-                {prepararData}
-            />
-        </div>
-    </div>-->
+    
     
     <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
             <div class="w-full lg:w-1/2">
@@ -482,45 +437,29 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base border-b"  >Fecha</th>
-                    <th class="text-base border-b"  >Animal</th>
-                    <th class="text-base border-b"  >Categoria</th>
-                    <th class="text-base border-b"  >Observacion</th>
+                    <th class="text-base border-b dark:border-gray-600"  >Fecha</th>
+                    <th class="text-base border-b dark:border-gray-600"  >Animal</th>
+                    <th class="text-base border-b dark:border-gray-600"  >Categoria</th>
+                    <th class="text-base border-b dark:border-gray-600"  >Observacion</th>
                     
                 </tr>
             </thead>
             <tbody>
                 {#each observacionesrow as o}
                 <tr onclick={()=>openModalEditar(o.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
-                    <td class="text-base border-b">
+                    <td class="text-base ">
                         {`${new Date(o.fecha).toLocaleDateString()}`}
                     </td>
-                    <td class="text-base border-b">
+                    <td class="text-base ">
                         {`${o.expand.animal.caravana}`}
                     </td>
-                    <td class="text-base border-b">
+                    <td class="text-base ">
                         {`${o.categoria}`}
                     </td>
-                    <td class="text-base border-b">
+                    <td class="text-base ">
                         {`${o.observacion}`}
                     </td>
-                    <!--<td class="flex gap-2">
-                        <div class="tooltip" data-tip="Editar">
-                            <button aria-label="Editar" onclick={()=>openModalEditar(o.id)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="tooltip" data-tip="Eliminar">
-                            <button aria-label="Eliminar" onclick={()=>eliminar(o.id)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                </svg>                              
-                            </button>
-                        </div>
-                    </td>
-                    -->
+                   
                 </tr>
                 {/each}
             </tbody>
@@ -705,7 +644,7 @@
                       <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
                       <button class="btn btn-error text-white" onclick={()=>eliminar(idobservacion)}>Eliminar</button>
                     {/if}
-                    
+                    <button class="btn btn-neutral " onclick={cerrar}>Cerrar</button>
                     
                   </form>
             </div>

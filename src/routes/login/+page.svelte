@@ -103,7 +103,7 @@
     <div class="flex items-center justify-center">
         <div 
             class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 max-w-md w-full"
-            in:fly="{{ y: 50, duration: 500, easing: quintOut }}"
+            in:fly="{{ y: 50, duration: 200, easing: quintOut }}"
             out:fade
         >
         

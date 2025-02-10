@@ -5,18 +5,20 @@
     import Swal from "sweetalert2";
     import CardCabana from "./CardCabana.svelte";
     import CardBase from "../CardBase.svelte";
+    import motivos from '$lib/stores/motivos';
     import { onMount } from "svelte";
     
 
-    let {caravana,bajar,eliminar,transferir,fechafallecimiento} = $props()
+    let {caravana,bajar,eliminar,transferir,fechafallecimiento=$bindable("")} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let nombredel = $state("")
     let nombretrans = $state("")
-    //let fechafallecimiento = $state("")
     let buscar = $state("")
     let cabanas = $state([])
     let cabanasrow = $state([])
+    let motivo = $state("fallecimiento")
+    
     let id = $state("")
     
     function darBaja(){
@@ -30,7 +32,7 @@
                 cancelButtonText: 'No'
             }).then(result=>{
                 if(result.value){
-                    bajar(fechafallecimiento)
+                    bajar(fechafallecimiento,motivo)
                 }
             })
         }
@@ -151,6 +153,30 @@
                             `} 
                             bind:value={fechafallecimiento}
                         />
+                    </div>
+                    <div class="mt-2 col-span-1">
+                        <label for = "motivo" class="label">
+                            <span class="label-text text-base">Motivo</span>
+                        </label>
+                    </div>
+                    <div class="mt-2 col-span-3">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={motivo}
+                            
+                        >
+                            
+                            {#each motivos as m}
+                                <option value={m.id}>{m.nombre}</option>    
+                            {/each}
+                        </select>
                     </div>
                     
                 </div>
