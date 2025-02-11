@@ -42,6 +42,7 @@
         {nombre: "Vaca", total: 0, pesoProm: 0},
         {nombre: "Vaquillona", total: 0, pesoProm: 0},
         {nombre: "Ternero", total: 0, pesoProm: 0},
+        {nombre: "Ternera", total: 0, pesoProm: 0},
         {nombre: "Novillo", total: 0, pesoProm: 0},
         {nombre: "Torito", total: 0, pesoProm: 0},
         {nombre: "Toro", total: 0, pesoProm: 0}
@@ -165,6 +166,7 @@
         let pesoVaca = 0
         let pesoVaquillona = 0
         let pesoTernero = 0
+        let pesoTernera = 0
         let pesoNovillo = 0
         let pesoTorito = 0
         let pesoToro = 0
@@ -182,16 +184,20 @@
                 categoriasrows[2].total += 1
                 pesoTernero += animales[i].peso
             }
-            if (animales[i].categoria == "novillo"){
+            if (animales[i].categoria == "ternera"){
                 categoriasrows[3].total += 1
+                pesoTernera += animales[i].peso
+            }
+            if (animales[i].categoria == "novillo"){
+                categoriasrows[4].total += 1
                 pesoNovillo += animales[i].peso
             }
             if (animales[i].categoria == "torito"){
-                categoriasrows[4].total += 1
+                categoriasrows[5].total += 1
                 pesoTorito += animales[i].peso
             }
             if (animales[i].categoria == "toro"){
-                categoriasrows[5].total += 1
+                categoriasrows[6].total += 1
                 pesoToro += animales[i].peso
             }
         }
@@ -199,9 +205,10 @@
         categoriasrows[0].pesoProm = Number((pesoVaca / categoriasrows[0].total).toFixed(2))
         categoriasrows[1].pesoProm = Number((pesoVaquillona / categoriasrows[1].total).toFixed(2))
         categoriasrows[2].pesoProm = Number((pesoTernero / categoriasrows[2].total).toFixed(2))
-        categoriasrows[3].pesoProm = Number((pesoNovillo / categoriasrows[3].total).toFixed(2))
-        categoriasrows[4].pesoProm = Number((pesoTorito / categoriasrows[4].total).toFixed(2))
-        categoriasrows[5].pesoProm = Number((pesoToro / categoriasrows[5].total).toFixed(2))
+        categoriasrows[3].pesoProm = Number((pesoTernera / categoriasrows[3].total).toFixed(2))
+        categoriasrows[4].pesoProm = Number((pesoNovillo / categoriasrows[4].total).toFixed(2))
+        categoriasrows[5].pesoProm = Number((pesoTorito / categoriasrows[5].total).toFixed(2))
+        categoriasrows[6].pesoProm = Number((pesoToro / categoriasrows[6].total).toFixed(2))
 
         createChart()
     }
@@ -223,6 +230,7 @@
                 {nombre: "Vaca", total: 0, pesoProm: 0},
                 {nombre: "Vaquillona", total: 0, pesoProm: 0},
                 {nombre: "Ternero", total: 0, pesoProm: 0},
+                {nombre: "Ternera", total: 0, pesoProm: 0},
                 {nombre: "Novillo", total: 0, pesoProm: 0},
                 {nombre: "Torito", total: 0, pesoProm: 0},
                 {nombre: "Toro", total: 0, pesoProm: 0}
@@ -231,6 +239,7 @@
             let pesoVaca = 0
             let pesoVaquillona = 0
             let pesoTernero = 0
+            let pesoTernera = 0
             let pesoNovillo = 0
             let pesoTorito = 0
             let pesoToro = 0
@@ -248,16 +257,20 @@
                     lotes[i].categoriaslotes[2].total += 1
                     pesoTernero += animales[j].peso
                 }
-                if (animales[j].categoria == "novillo" && animales[j].lote == lotes[i].id){
+                if (animales[j].categoria == "ternera" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[3].total += 1
+                    pesoTernera += animales[j].peso
+                }
+                if (animales[j].categoria == "novillo" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[4].total += 1
                     pesoNovillo += animales[j].peso
                 }
                 if (animales[j].categoria == "torito" && animales[j].lote == lotes[i].id){
-                    lotes[i].categoriaslotes[4].total += 1
+                    lotes[i].categoriaslotes[5].total += 1
                     pesoTorito += animales[j].peso
                 }
                 if (animales[j].categoria == "toro" && animales[j].lote == lotes[i].id){
-                    lotes[i].categoriaslotes[5].total += 1
+                    lotes[i].categoriaslotes[6].total += 1
                     pesoToro += animales[j].peso
                 }
             }
@@ -279,23 +292,29 @@
             } else {
                 lotes[i].categoriaslotes[2].pesoProm = Number((pesoTernero / lotes[i].categoriaslotes[2].total).toFixed(2))
             }
+
+            if (pesoTernera == 0) {
+                lotes[i].categoriaslotes[3].pesoProm = 0                
+            } else {
+                lotes[i].categoriaslotes[3].pesoProm = Number((pesoTernera / lotes[i].categoriaslotes[3].total).toFixed(2))
+            }
             
             if (pesoNovillo == 0) {
-                lotes[i].categoriaslotes[3].pesoProm = 0  
+                lotes[i].categoriaslotes[4].pesoProm = 0  
             } else {
-                lotes[i].categoriaslotes[3].pesoProm = Number((pesoNovillo / lotes[i].categoriaslotes[3].total).toFixed(2))
+                lotes[i].categoriaslotes[4].pesoProm = Number((pesoNovillo / lotes[i].categoriaslotes[4].total).toFixed(2))
             }
             
             if (pesoTorito == 0) {
-                lotes[i].categoriaslotes[4].pesoProm = 0                
+                lotes[i].categoriaslotes[5].pesoProm = 0                
             } else {
-                lotes[i].categoriaslotes[4].pesoProm = Number((pesoTorito / lotes[i].categoriaslotes[4].total).toFixed(2))
+                lotes[i].categoriaslotes[5].pesoProm = Number((pesoTorito / lotes[i].categoriaslotes[5].total).toFixed(2))
             }
             
             if (pesoToro == 0) {
-                lotes[i].categoriaslotes[5].pesoProm = 0  
+                lotes[i].categoriaslotes[6].pesoProm = 0  
             } else {
-                lotes[i].categoriaslotes[5].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[5].total).toFixed(2))
+                lotes[i].categoriaslotes[6].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[6].total).toFixed(2))
             }
 
             lotes[i].chart = createChartPersonalizadoLotes(i)
@@ -319,6 +338,7 @@
             let pesoVaca = 0
             let pesoVaquillona = 0
             let pesoTernero = 0
+            let pesoTernera = 0
             let pesoNovillo = 0
             let pesoTorito = 0
             let pesoToro = 0
@@ -327,6 +347,7 @@
                 {nombre: "Vaca", total: 0, pesoProm: 0},
                 {nombre: "Vaquillona", total: 0, pesoProm: 0},
                 {nombre: "Ternero", total: 0, pesoProm: 0},
+                {nombre: "Ternera", total: 0, pesoProm: 0},
                 {nombre: "Novillo", total: 0, pesoProm: 0},
                 {nombre: "Torito", total: 0, pesoProm: 0},
                 {nombre: "Toro", total: 0, pesoProm: 0}
@@ -345,16 +366,20 @@
                     rodeos[i].categoriasrodeos[2].total += 1
                     pesoTernero += animales[j].peso
                 }
-                if (animales[j].categoria == "novillo" && animales[j].rodeo == rodeos[i].id){
+                if (animales[j].categoria == "ternera" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[3].total += 1
+                    pesoTernera += animales[j].peso
+                }
+                if (animales[j].categoria == "novillo" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[4].total += 1
                     pesoNovillo += animales[j].peso
                 }
                 if (animales[j].categoria == "torito" && animales[j].rodeo == rodeos[i].id){
-                    rodeos[i].categoriasrodeos[4].total += 1
+                    rodeos[i].categoriasrodeos[5].total += 1
                     pesoTorito += animales[j].peso
                 }
                 if (animales[j].categoria == "toro" && animales[j].rodeo == rodeos[i].id){
-                    rodeos[i].categoriasrodeos[5].total += 1
+                    rodeos[i].categoriasrodeos[6].total += 1
                     pesoToro += animales[j].peso
                 }
             }
@@ -377,22 +402,28 @@
                 rodeos[i].categoriasrodeos[2].pesoProm = Number((pesoTernero / rodeos[i].categoriasrodeos[2].total).toFixed(2))
             }
             
-            if (pesoNovillo == 0) {
-                rodeos[i].categoriasrodeos[3].pesoProm = 0  
+            if (pesoTernera == 0) {
+                rodeos[i].categoriasrodeos[3].pesoProm = 0                
             } else {
-                rodeos[i].categoriasrodeos[3].pesoProm = Number((pesoNovillo / rodeos[i].categoriasrodeos[3].total).toFixed(2))
+                rodeos[i].categoriasrodeos[3].pesoProm = Number((pesoTernera / rodeos[i].categoriasrodeos[3].total).toFixed(2))
+            }
+
+            if (pesoNovillo == 0) {
+                rodeos[i].categoriasrodeos[4].pesoProm = 0  
+            } else {
+                rodeos[i].categoriasrodeos[4].pesoProm = Number((pesoNovillo / rodeos[i].categoriasrodeos[4].total).toFixed(2))
             }
             
             if (pesoTorito == 0) {
-                rodeos[i].categoriasrodeos[4].pesoProm = 0                
+                rodeos[i].categoriasrodeos[5].pesoProm = 0                
             } else {
-                rodeos[i].categoriasrodeos[4].pesoProm = Number((pesoTorito / rodeos[i].categoriasrodeos[4].total).toFixed(2))
+                rodeos[i].categoriasrodeos[5].pesoProm = Number((pesoTorito / rodeos[i].categoriasrodeos[5].total).toFixed(2))
             }
             
             if (pesoToro == 0) {
-                rodeos[i].categoriasrodeos[5].pesoProm = 0  
+                rodeos[i].categoriasrodeos[6].pesoProm = 0  
             } else {
-                rodeos[i].categoriasrodeos[5].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[5].total).toFixed(2))
+                rodeos[i].categoriasrodeos[6].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[6].total).toFixed(2))
             }
 
             createChartPersonalizadoRodeos(i)

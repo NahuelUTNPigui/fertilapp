@@ -174,8 +174,8 @@
             <h1 class="text-2xl">Rodeo</h1>  
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
-            <button class={`btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo</span>
+            <button class={` btn btn-primary rounded-lg ${estilos.btntext} px-2 mx-1`} data-theme="forest" onclick={()=>openNewModal()}>
+                <span  class="text-xl">Nuevo</span> 
             </button>
         </div>
     </div>
