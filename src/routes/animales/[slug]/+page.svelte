@@ -40,6 +40,7 @@
     let categoria = $state("")
     let pariciones = $state([])
     let fechafall = $state("")
+    let motivobaja = $state("")
     let nacimientoobj = $state({})
     let tactos = $state([])
     let prenada = $state(0)
@@ -140,7 +141,7 @@
                 prenada = recorda.prenada
                 if(recorda.fechafallecimiento != ""){
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
-                    
+                    motivobaja = recorda.motivobaja
                 }
                 
                 //await getPariciones(slug)
@@ -193,6 +194,7 @@
         <Acciones 
             caravana = {caravana}
             fechafallecimiento  = {fechafall}
+            motivo = {motivobaja}
             bajar={async (fechafallecimiento,motivo)=>await darBaja(fechafallecimiento,motivo)}
             eliminar={eliminar}
             transferir={(newcab)=>transferir(newcab)}

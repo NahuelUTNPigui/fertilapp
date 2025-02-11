@@ -323,7 +323,7 @@
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
             <button
-                onclick={()=>goto("/tactos/cab")}
+                onclick={()=>goto("/inseminaciones")}
                 class={`
                     bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
                     ${estilos.btnsecondary}
@@ -526,14 +526,14 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
-        <h3 class="text-lg font-bold">Tactos múltiples</h3>
+        <h3 class="text-lg font-bold">Inseminaciones múltiples</h3>
         <div class="grid grid-cols-2 gap-1">
             <div>
-                <label for = "fechatacto" class="label">
+                <label for = "fechainseminacion" class="label">
                     <span class="label-text text-base">Fecha </span>
                 </label>
                 <label class="input-group ">
-                    <input id ="fechatacto" type="date" max={HOY}  
+                    <input id ="fechainseminacion" type="date" max={HOY}  
                         class={`
                             input input-bordered w-full
                             border border-gray-300 rounded-md
@@ -547,17 +547,17 @@
                     />
                     {#if malfecha}
                         <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tacto</span>                    
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha de inseminacion</span>                    
                         </div>
                     {/if}
                 </label>
             </div>
             <div>
-                <label for = "fechatacto" class="label">
+                <label for = "fechains" class="label">
                     <span class="label-text text-base">Fecha </span>
                 </label>
                 <label class="input-group ">
-                    <input id ="fechatacto" type="date" max={HOY}  
+                    <input id ="fechains" type="date" max={HOY}  
                         class={`
                             input input-bordered w-full
                             border border-gray-300 rounded-md

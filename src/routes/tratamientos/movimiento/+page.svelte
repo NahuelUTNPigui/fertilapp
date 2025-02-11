@@ -172,7 +172,7 @@
     }
     function openNewModal(){
         if(ninguno){
-            Swal.fire("Error tacto","No hay animales seleccionados","error")
+            Swal.fire("Error tratamiento","No hay animales seleccionados","error")
             return
         }
         selectanimales = []
@@ -187,7 +187,7 @@
     }
     async function guardarTratamiento(){
         if(fecha == "" || tipotratamientoselect == ""){
-            Swal.fire("Error tactos","Debe seleccionar una fecha","error")
+            Swal.fire("Error tratamientos","Debe seleccionar una fecha","error")
             return 
         }
         let errores = false
@@ -477,7 +477,7 @@
                     <span class="label-text text-base">Fecha </span>
                 </label>
                 <label class="input-group ">
-                    <input id ="fechatacto" type="date" max={HOY}  
+                    <input id ="fechtrata" type="date" max={HOY}  
                         class={`
                             input input-bordered w-full
                             border border-gray-300 rounded-md
@@ -505,7 +505,7 @@
                     />
                     {#if malfecha}
                         <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tacto</span>                    
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tratamiento</span>                    
                         </div>
                     {/if}
                 </label>
@@ -589,7 +589,7 @@
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
-                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={guardarTratamiento} >Crear Tactos</button>
+                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={guardarTratamiento} >Crear tratamientos</button>
                 <button class="btn btn-error text-white" >Cancelar</button>
             </form>
         </div>

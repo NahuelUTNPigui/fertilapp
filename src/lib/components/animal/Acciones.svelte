@@ -9,7 +9,7 @@
     import { onMount } from "svelte";
     
 
-    let {caravana,bajar,eliminar,transferir,fechafallecimiento=$bindable("")} = $props()
+    let {caravana,bajar,eliminar,transferir,fechafallecimiento=$bindable(""),motivo = $bindable("fallecimiento")} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let nombredel = $state("")
@@ -17,7 +17,7 @@
     let buscar = $state("")
     let cabanas = $state([])
     let cabanasrow = $state([])
-    let motivo = $state("fallecimiento")
+    
     
     let id = $state("")
     

@@ -11,6 +11,7 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import {createPer} from "$lib/stores/permisos.svelte"
     import { getPermisosList } from '$lib/permisosutil/lib';
+    import motivos from '$lib/stores/motivos';
     import MultiSelect from "$lib/components/MultiSelect.svelte";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -50,12 +51,16 @@
     let nuevorodeo = $state("")
     let tipotratamiento = $state("")
     let fecha = $state("")
+    let fechabaja = $state("")
+    let motivo = $state("")
     //validar
     let malcategoria = $state("")
     let mallote = $state("")
     let malrodeo = $state("")
     let maltipo = $state("")
     let malfecha = $state("")
+    let malfechabaja = $state("")
+    let malmotivo = $state("")
     let habilitarboton = $state(false)
 
     //Seleecionar
@@ -63,6 +68,7 @@
     let selectlote = $state(false)
     let selectrodeo = $state(false)
     let selecttratamiento = $state(false)
+    let selectbaja = $state(false)
 
     function clickFilter(){
         isOpenFilter = !isOpenFilter
@@ -294,13 +300,16 @@
         nuevorodeo = ""
         fecha = ""
         tipotratamiento = ""
+        fechabaja = ""
+        motivo = ""
         habilitarboton = false
         if(seccion == "CATEGORIA"){
             selectcategoria= true
             selectlote= false
             selectrodeo= false
             selecttratamiento = false
-            textoboton = "Mover"
+            selectbaja = false
+            textoboton = "Mover de categoria"
             
         }
         if(seccion == "RODEO"){
@@ -308,7 +317,8 @@
             selectlote= false
             selectrodeo= true
             selecttratamiento = false
-            textoboton = "Mover"
+            selectbaja = false
+            textoboton = "Mover de rodeo"
             
         }
         if(seccion == "LOTE"){
@@ -316,7 +326,8 @@
             selectlote= true
             selectrodeo= false
             selecttratamiento = false
-            textoboton = "Mover"
+            selectbaja = false
+            textoboton = "Mover de lote"
             
         }
         if(seccion == "TRATAMIENTO"){
@@ -324,8 +335,18 @@
             selectlote= false
             selectrodeo= false
             selecttratamiento = true
+            selectbaja = false
             textoboton = "Crear tratamientos"
             
+        }
+        if(seccion == "BAJA"){
+            selectcategoria= false
+            selectlote= false
+            selectrodeo= false
+            selecttratamiento = false
+            selectbaja = true
+
+            textoboton = "Dar baja"
         }
 
     }
@@ -354,6 +375,10 @@
                 habilitarboton = false
                 
             }
+        }
+        if(selectbaja){
+            if(fechabaja == "" || motivo == "")
+            habilitarboton = false
         }
     }
     function oninput(campo){
@@ -401,7 +426,26 @@
                 }
             }
         }
+        if(selectbaja){
+            if(campo == "FECHABAJA"){
+                if(fechabaja == ""){
+                    malfechabaja = true
+                }
+                else{
+                    malfechabaja = false
+                }
+            }
+            if(campo == "MOTIVO"){
+                if(motivo == ""){
+                    malmotivo = true
+                }
+                else{
+                    malmotivo = false
+                }
+            }
+        }
     }
+    
     onMount(async ()=>{
         await getAnimales()
         await getRodeos()
@@ -746,6 +790,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="collapse hidden">
+                    <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("BAJA")}/>
                 </div>
             </div>
             <div class="modal-action justify-start ">
