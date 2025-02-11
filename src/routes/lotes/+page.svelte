@@ -183,7 +183,7 @@
             <h1 class="text-2xl">Lote</h1>
         </div>
         <div>
-            <button class={`btn btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+            <button class={` btn btn-primary rounded-lg ${estilos.btntext} px-2 mx-1`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">Nuevo</span>
             </button>
         </div>
