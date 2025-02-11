@@ -23,6 +23,9 @@
     let fechahasta = $state("")
     let pesajes = $state([])
     let pesajesrows = $state([])
+    let filas = $state([])
+    let columnas = $state([])
+    let tablapesaje = $state({})
     //pesaje
     let idpesaje = $state("")
     let caravana = $state("")
@@ -42,6 +45,9 @@
         
     }
     function filterUpdate(){
+        filas = []
+        columnas = []
+        tablapesaje = {}
         pesajesrows = pesajes
         if(!isEmpty(buscarcaravana)){
             pesajesrows = pesajesrows.filter(p=>p.expand.animal.caravana.toLocaleLowerCase().includes(buscarcaravana.toLocaleLowerCase()))
@@ -52,6 +58,7 @@
         if(!isEmpty(fechahasta)){
             pesajesrows = pesajesrows.filter(p=>p.fecha<=fechahasta)
         }
+        procesarPesajes()
     }
     async function eliminar(){
         
@@ -85,6 +92,60 @@
             PESO_NUEVO:item.pesonuevo
         }
     }
+    function exportarPesaje(){
+        
+
+    }
+    function procesarPesajes(){
+        let setanimales = new Set()
+        let setfechas = new Set()
+        tablapesaje = {}
+        for(let i = 0;i<pesajesrows.length;i++){
+            let p = pesajesrows[i]
+            let caravana = p.expand.animal.caravana
+            let fecha = p.fecha
+            if(tablapesaje[fecha]){
+                //Puede ocurrir que tenga 2 pesajes en el mismo dia?
+                //En teoria si pero debe ser unerror, guardo el último
+                if(tablapesaje[fecha][caravana]){
+                    tablapesaje[fecha][caravana] = {
+                        pesonuevo:p.pesonuevo,
+                        pesoanterior:p.pesoanterior,
+                        id:p.id
+                    }
+                }
+                else{
+                    tablapesaje[fecha][caravana] = {
+                        pesonuevo:p.pesonuevo,
+                        pesoanterior:p.pesoanterior,
+                        id:p.id
+                    }
+                }
+            }
+            else{
+                tablapesaje[fecha]={}
+                tablapesaje[fecha][caravana] = {
+                    pesonuevo:p.pesonuevo,
+                    pesoanterior:p.pesoanterior,
+                    id:p.id
+                }
+                console.log(tablapesaje)
+            }
+            //Así recorro los animales
+            setanimales.add(caravana)
+            //Así recorro las fecha
+            setfechas.add(fecha)
+        }
+        filas = Array.from(setanimales)
+        columnas = Array.from(setfechas)
+        columnas.sort((a,b)=>new Date(a)<new Date(b)?-1:1)
+        console.log("filas")
+        console.log(filas)
+        console.log("columnas")
+        console.log(columnas)
+        console.log("tabla")
+        console.log(tablapesaje)
+    }
     onMount(async ()=>{
         await getPesajes()
         filterUpdate()
@@ -104,6 +165,21 @@
                     data = {pesajesrows}
                     {prepararData}
                 />
+            </div>
+            <div>
+                <button
+                    onclick={exportarPesaje}
+                    class={`
+                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                        ${estilos.btnsecondary}
+                        rounded-full
+                        px-4 pt-2 pb-3
+                    `} 
+                    aria-label="Exportar"
+                >
+                    <span  class="text-xl font-semibold ">Exportar 2</span>
+                    
+                </button>
             </div>
             <div>
                 <a class={`
@@ -184,24 +260,61 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 ">Fecha</th>
-                    <th class="text-base mx-1 px-1">Caravana</th>
-                    <th class="text-base mx-1 px-1">Peso anterior</th>
-                    <th class="text-base mx-1 px-1">Peso nuevo</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Animal</th>
+                    {#each columnas as c}
+                        <th class="text-base mx-1 px-1 border-b dark:border-gray-600">{new Date(c).toLocaleDateString()}</th>
+                    {/each}
+                </tr>
+            </thead>
+            <tbody>
+                {#each filas as f}
+                <tr>
+                    
+                        <td class="text-base mx-1 px-1">
+                            {f}
+                        </td>
+                        {#each columnas as c}
+                            <td class="text-base mx-1 px-1">
+                                {
+                                    tablapesaje[c]?
+                                        tablapesaje[c][f]?
+                                            tablapesaje[c][f].pesonuevo
+                                        :
+                                        "-"
+                                    :
+                                    "-"
+
+                                }
+                            </td>
+                        {/each}
+                    
+                </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
+    <div class="hidden w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+        <table class="table table-lg w-full" >
+            <thead>
+                <tr>
+                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Caravana</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso anterior</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso nuevo</th>
                     
                 </tr>
             </thead>
             <tbody>
                 {#each pesajesrows as p}
                     <tr onclick={()=>openDetalle(p.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{new Date(p.fecha).toLocaleDateString()}</td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(p.fecha).toLocaleDateString()}</td>
+                        <td class="text-base mx-1 px-1">
                             {p.expand.animal.caravana}
                         </td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base mx-1 px-1">
                             {p.pesoanterior}
                         </td>
-                        <td class="text-base mx-1 px-1 border-b">
+                        <td class="text-base mx-1 px-1">
                             {p.pesonuevo}
                         </td>
                     </tr>

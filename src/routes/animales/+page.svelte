@@ -42,6 +42,8 @@
     let buscar = $state("")
     let rodeobuscar = $state("")
     let rodeoseleccion = $state([])
+    let loteseleccion = $state([])
+    let categoriaseleccion = $state([])
     let sexobuscar = $state("")
     let lotebuscar = $state("")
     let estadobuscar = $state("")
@@ -202,8 +204,16 @@
                     nacimiento : recordparicion
                 }
             }
+            let datapesaje = {
+                animal:recorda.id,
+                fecha:fechanacimiento +" 03:00:00",
+                pesoanterior:0,
+                pesonuevo:peso
+            }
+            await pb.collection('pesaje').create(datapesaje)
             animales.push(recorda)
             animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+
             madres = animales.filter(a=>a.sexo=="H")
             padres = animales.filter(a=>a.sexo=="M")
             filterUpdate()
@@ -232,20 +242,21 @@
             animalesrows = animalesrows.filter(a=>a.sexo == sexobuscar)
             totalAnimalesEncontrados = animalesrows.length
         }
-        if(rodeobuscar != ""){
-            animalesrows = animalesrows.filter(a=>a.rodeo == rodeobuscar)
+        
+        if(rodeoseleccion.length != 0){
+            animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
             totalAnimalesEncontrados = animalesrows.length
         }
-        if(lotebuscar != ""){
-            animalesrows = animalesrows.filter(a=>a.lote == lotebuscar)
+        if(loteseleccion.length != 0){
+            animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
             totalAnimalesEncontrados = animalesrows.length
         }
         if(estadobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.prenada == estadobuscar)
             totalAnimalesEncontrados = animalesrows.length
         }
-        if(categoriabuscar !=""){
-            animalesrows = animalesrows.filter(a=>a.categoria == categoriabuscar)
+        if(categoriaseleccion.length != 0){
+            animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
             totalAnimalesEncontrados = animalesrows.length
         }
         if(activosbuscar == "activos"){
@@ -430,11 +441,12 @@
         {#if isOpenFilter}
                 <div transition:slide>
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
-                        <div>
+                        <div class="mt-2">
                             <MultiSelect
                                 opciones={rodeos}
-                                valores={rodeoseleccion}
-                                etiqueta="Elegir rodeo"
+                                bind:valores={rodeoseleccion}
+                                etiqueta="Rodeos"
+                                filterUpdate = {filterUpdate}
                             />
                         </div>
                         <div>
@@ -462,7 +474,7 @@
                                   </select>
                             </label>
                         </div>
-                        <div>
+                        <div class="hidden">
                             <label for = "rodeos" class="label">
                                 <span class="label-text text-base">Rodeo</span>
                             </label>
@@ -486,7 +498,15 @@
                                   </select>
                             </label>
                         </div>
-                        <div>
+                        <div class="mt-2">
+                            <MultiSelect
+                                opciones={lotes}
+                                bind:valores={loteseleccion}
+                                etiqueta="Lotes"
+                                filterUpdate = {filterUpdate}
+                            />
+                        </div>
+                        <div class="hidden">
                             <label for = "lote" class="label">
                                 <span class="label-text text-base">Lote</span>
                             </label>
@@ -510,7 +530,15 @@
                                   </select>
                             </label>
                         </div>
-                        <div>
+                        <div class="mt-2">
+                            <MultiSelect
+                                opciones={categorias}
+                                bind:valores={categoriaseleccion}
+                                etiqueta="Categorias"
+                                filterUpdate = {filterUpdate}
+                            />
+                        </div>
+                        <div class="hidden">
                             <label for = "categoria" class="label">
                                 <span class="label-text text-base">Categoria</span>
                             </label>
