@@ -11,6 +11,7 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import {createPer} from "$lib/stores/permisos.svelte"
     import { getPermisosList } from '$lib/permisosutil/lib';
+    import MultiSelect from "$lib/components/MultiSelect.svelte";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -27,7 +28,9 @@
     //Filtros
     let buscar = $state("")
     let lote = $state("")
+    let loteseleccion = $state([])
     let rodeo = $state("")
+    let rodeoseleccion = $state([])
     let categoria = $state("")
     let sexo = $state("")
 
@@ -64,7 +67,7 @@
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
-    function filterUpdate(){
+    function limpiar(){
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
             lista.push(key)
@@ -75,6 +78,9 @@
         algunos = false
         todos = false
         ninguno = true
+    }
+    function filterUpdate(){
+        
         animalesrows = animales
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -82,11 +88,19 @@
         if(sexo != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexo)
         }
-        if(rodeo != ""){
-            animalesrows = animalesrows.filter(a=>a.rodeo == rodeo)
+        //if(rodeo != ""){
+        //    animalesrows = animalesrows.filter(a=>a.rodeo == rodeo)
+        //}
+        //if(lote != ""){
+        //    animalesrows = animalesrows.filter(a=>a.lote == lote)
+        //}
+        if(rodeoseleccion.length != 0){
+            animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
+            
         }
-        if(lote != ""){
-            animalesrows = animalesrows.filter(a=>a.lote == lote)
+        if(loteseleccion.length != 0){
+            animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
+            
         }
         if(categoria != ""){
             animalesrows = animalesrows.filter(a=>a.categoria == categoria)
@@ -110,7 +124,7 @@
                 algunos = true
                 ninguno =  false
             }
-            let a = animalesrows.filter(an=>an.id==id)[0]
+            let a = animales.filter(an=>an.id==id)[0]
             selecthashmap[id] = {
                 ...a
             }
@@ -457,56 +471,25 @@
                         </select>
                     </label>
                 </div>
-                <div>
-                    <label for = "rodeos" class="label">
-                        <span class="label-text text-base">Rodeos</span>
-                    </label>
-                    <label class="input-group ">
-                        <select 
-                            class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `} 
-                            bind:value={rodeo}
-                            onchange={filterUpdate}
-                        >
-                                <option value="">Todos</option>
-                                {#each rodeos as r}
-                                    <option value={r.id}>{r.nombre}</option>    
-                                {/each}
-                        </select>
-                    </label>
+                <div class="mt-2">
+                    <MultiSelect
+                        opciones={rodeos}
+                        bind:valores={rodeoseleccion}
+                        etiqueta="Rodeos"
+                        filterUpdate = {filterUpdate}
+                    />
+                </div>
+                
+                <div class="mt-2">
+                    <MultiSelect
+                        opciones={lotes}
+                        bind:valores={loteseleccion}
+                        etiqueta="Lotes"
+                        filterUpdate = {filterUpdate}
+                    />
                 </div>
                 <div>
-                    <label for = "rodeos" class="label">
-                        <span class="label-text text-base">Lotes</span>
-                    </label>
-                    <label class="input-group ">
-                        <select 
-                            class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `} 
-                            bind:value={lote}
-                            onchange={filterUpdate}
-                        >
-                                <option value="">Todos</option>
-                                {#each lotes as r}
-                                    <option value={r.id}>{r.nombre}</option>    
-                                {/each}
-                        </select>
-                    </label>
-                </div>
-                <div>
-                    <label for = "rodeos" class="label">
+                    <label for = "categorias" class="label">
                         <span class="label-text text-base">Categorias</span>
                     </label>
                     <label class="input-group ">
@@ -529,6 +512,14 @@
                         </select>
                     </label>
                 </div>
+                <div>
+                    <button
+                        class="btn btn-neutral"
+                        onclick={limpiar}
+                    >
+                        Limpiar
+                    </button>
+                </div>
                 
             
             </div>
@@ -538,11 +529,12 @@
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
-                    <th class="px-1 p-0 m-0">
+                    <th class="px-1 p-0 m-0 border-b dark:border-gray-600">
                         <button    
                             aria-label="Todos"
                             onclick={clickTodos}
                             class={`
+                                
                                 text-base bg-transparent rounded-lg
                                 px-3 py-3 text-base
                                 ${estilos.secundario}
@@ -566,17 +558,17 @@
                           
                         </button>
                     </th>
-                    <th class="text-base mx-1 px-1 ">Caravana</th>
-                    <th class="text-base mx-1 px-1">Categoria</th>
-                    <th class="text-base mx-1 px-1">Rodeo</th>
-                    <th class="text-base mx-1 px-1">Lote</th>
-                    <th class="text-base mx-1 px-1">Sexo</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Caravana</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Categoria</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Rodeo</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Lote</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Sexo</th>
                 </tr>
             </thead>
             <tbody>
                 {#each animalesrows as a}
                     <tr>
-                        <td class="px-1 p-0 m-0 border-b">
+                        <td class="px-1 p-0 m-0 ">
                             <button
                                 aria-label="fila"
                                 onclick={()=>clickAnimal(a.id)}
@@ -597,11 +589,11 @@
                                 {/if}
                             </button>
                         </td>
-                        <td class="text-base mx-1 px-0 border-b">{a.caravana}</td>
-                        <td class="text-base mx-1 px-0 border-b">{a.categoria}</td>
-                        <td class="text-base mx-1 px-0 border-b">{a.expand?.rodeo?.nombre||''}</td>
-                        <td class="text-base mx-1 px-0 border-b">{a.expand?.lote?.nombre||''}</td>
-                        <td class="text-base mx-1 px-0 border-b">{a.sexo}</td>
+                        <td class="text-base mx-1 px-0 ">{a.caravana}</td>
+                        <td class="text-base mx-1 px-0 ">{a.categoria}</td>
+                        <td class="text-base mx-1 px-0 ">{a.expand?.rodeo?.nombre||''}</td>
+                        <td class="text-base mx-1 px-0 ">{a.expand?.lote?.nombre||''}</td>
+                        <td class="text-base mx-1 px-0 ">{a.sexo}</td>
                     </tr>
                 {/each}
             </tbody>

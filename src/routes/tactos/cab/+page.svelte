@@ -18,6 +18,8 @@
     import { getPermisosList } from "$lib/permisosutil/lib";
     import permisos from "$lib/stores/permisos";
     import { goto } from "$app/navigation";
+    import MultiSelect from "$lib/components/MultiSelect.svelte";
+
     let caber = createCaber()
     let cab = caber.cab
     let per = createPer()
@@ -488,7 +490,7 @@
                                 onchange={filterUpdate}
                             >
                                     <option value="">Todos</option>
-                                    {#each categorias as s}
+                                    {#each categorias.filter(cat=>cat.sexo=="H") as s}
                                         <option value={s.id}>{s.nombre}</option>
                                     {/each}
                               </select>

@@ -17,6 +17,7 @@
     import {createPer} from "$lib/stores/permisos.svelte"
     import { getPermisosList } from '$lib/permisosutil/lib';
     import RadioButton from '$lib/components/RadioButton.svelte';
+    import { getEstadoNombre } from '$lib/components/estadosutils/lib';
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     let ruta = import.meta.env.VITE_RUTA
 
@@ -649,13 +650,9 @@
                     </td>
                     <td class="text-base p-3 "> {a.sexo}</td>
                     <td class="text-base p-3 "> {a.categoria}</td>
-                    <td class="text-base p-3 "> {
-                        a.prenada==2?
-                        "Preñada":
-                        a.prenada==1?
-                        "Dudosa":
-                        "Vacia"
-                    }</td>
+                    <td class="text-base p-3 "> 
+                        {getEstadoNombre(a.prenada)}
+                    </td>
                     <td class="text-base p-3 ">
                         {
                             a.expand?

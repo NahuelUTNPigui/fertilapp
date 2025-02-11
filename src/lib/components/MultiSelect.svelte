@@ -43,14 +43,10 @@
         {:else}
             <div class="flex content-normal gap-2">
                 {#each valores as v}
-                    <!--<span
-                        
-                        class="inline-flex items-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100   rounded-md"
-                    >
-                        
-                    </span>-->
+                    
                     <span 
                         class="
+                        truncate
                         inline-flex items-center rounded-md 
                         px-2 py-1 text-base font-medium ring-1 ring-inset
                         bg-green-50 dark:bg-green-700

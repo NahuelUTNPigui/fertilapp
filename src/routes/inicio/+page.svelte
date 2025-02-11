@@ -12,6 +12,7 @@
     import tipostacto from '$lib/stores/tipostacto';
     import tiposanimal from '$lib/stores/tiposanimal';
     import {guardarHistorial} from "$lib/historial/lib"
+    import RadioButton from '$lib/components/RadioButton.svelte';
     import {isEmpty} from "$lib/stringutil/lib"
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
@@ -185,16 +186,16 @@
                animal:animaltacto,
                categoria:categoriatacto,
                prenada:prenadatacto,
-               tipo:tipostacto,
+               tipo:tipotacto,
                nombreveterinario:"",
                cab:cab.id,
                active:true
             }
             const record = await pb.collection('tactos').create(data);
-            await pb.collection('animales').update(animal,{
-                prenada
+            await pb.collection('animales').update(animaltacto,{
+                prenada:prenadatacto
             })
-            await guardarHistorial(pb,animal)
+            await guardarHistorial(pb,animaltacto)
             Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
         }
         catch(err){
@@ -269,10 +270,14 @@
             active:true,
             padre:padreins,
             pajuela:pajuelains,
-            categoria:categoriains
+            categoria:categoriains,
         }
         try{
             const record = await pb.collection('inseminacion').create(data);
+            await pb.collection('animales').update(idanimalins,{
+                prenada:3
+            })
+            await guardarHistorial(pb,idanimalins)
             Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
         }
         catch(err){
@@ -508,7 +513,7 @@
                 malcategoriatrat = true
             }
             else{
-                malcategoria = false
+                malcategoriatrat = false
             }
         }
         else if(campo == "TIPO"){
@@ -731,11 +736,13 @@
                     {/each}
                   </select>
             </label>
-            <div class="form-group">
-                <label for = "prenada" class="label">
-                    <span class="label-text text-base">Preñada</span>
+            <div class="form-group mt-2">
+                <label for = "prenada" class="label ">
+                    <span class="label-text text-base">Estado</span>
                 </label>
-                <label class="input-group ">
+                <RadioButton bind:option={prenadatacto} deshabilitado={false}/>
+                
+                <label class="input-group hidden">
                     <select 
                         class={`
                             select select-bordered w-full

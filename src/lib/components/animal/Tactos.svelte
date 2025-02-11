@@ -65,7 +65,14 @@
         nuevoTactoAnimal.close()
     }
     function getTipoNombre(tipo){
-        return tipostacto.filter(t=>t.id==tipo)[0].nombre
+        let tp = tipostacto.filter(t=>t.id==tipo)[0]
+        if(tp){
+            return tp.nombre
+        }
+        else{
+            return ""
+        }
+        
     }
     function getCategoriaNombre(cat){
         let tp = tiposanimal.filter(c=>c.id==cat)[0]
