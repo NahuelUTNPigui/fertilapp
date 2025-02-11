@@ -8,6 +8,7 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import {isEmpty} from "$lib/stringutil/lib"
     import estilos from '$lib/stores/estilos';
+    import * as XLSX from "xlsx"
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -93,7 +94,38 @@
         }
     }
     function exportarPesaje(){
-        
+        let csvdata = filas.map(f=>{
+            let filaexcel = {
+                ANIMAL:f
+            }
+            for(let i = 0;i<columnas.length;i++){
+                
+                let col = columnas[i]
+                let fecha = new Date(col).toLocaleDateString()
+                if(tablapesaje[col][f]){
+                    filaexcel[fecha] = tablapesaje[col][f].pesonuevo  
+                }
+                else{
+                    filaexcel[fecha] = "-"
+                }
+                
+            }
+            return filaexcel
+        })
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([])
+        ws['A1']={t:'s',v:"Pesajes",s:{}}
+        const range = XLSX.utils.decode_range('A1:K1');
+        ws['!merges'] = [{ s: { r: range.s.r, c: range.s.c }, e: { r: range.e.r, c: range.e.c } }];
+        XLSX.utils.sheet_add_json(ws, csvdata, { origin: 'A2' });
+        XLSX.utils.book_append_sheet(wb, ws, "Pesajes");
+        let confiltros = false
+        let filtros = []
+        if(confiltros){
+            const wsFilter = XLSX.utils.aoa_to_sheet(filtros)
+            XLSX.utils.book_append_sheet(wb, wsFilter, 'Filtros aplicados');
+        }
+        XLSX.writeFile(wb, `${"Pesajes".replace(/\//g, "-")}.xlsx`, { cellStyles: true });
 
     }
     function procesarPesajes(){
@@ -129,7 +161,6 @@
                     pesoanterior:p.pesoanterior,
                     id:p.id
                 }
-                console.log(tablapesaje)
             }
             //Así recorro los animales
             setanimales.add(caravana)
@@ -139,12 +170,7 @@
         filas = Array.from(setanimales)
         columnas = Array.from(setfechas)
         columnas.sort((a,b)=>new Date(a)<new Date(b)?-1:1)
-        console.log("filas")
-        console.log(filas)
-        console.log("columnas")
-        console.log(columnas)
-        console.log("tabla")
-        console.log(tablapesaje)
+        
     }
     onMount(async ()=>{
         await getPesajes()
@@ -157,15 +183,7 @@
             <h1 class="text-2xl">Historia pesajes</h1>  
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
-            <div>
-                <Exportar
-                    titulo ={"Pesajes"}
-                    filtros = {[]}
-                    confiltros = {false}
-                    data = {pesajesrows}
-                    {prepararData}
-                />
-            </div>
+            
             <div>
                 <button
                     onclick={exportarPesaje}
@@ -177,7 +195,7 @@
                     `} 
                     aria-label="Exportar"
                 >
-                    <span  class="text-xl font-semibold ">Exportar 2</span>
+                    <span  class="text-xl font-semibold ">Exportar</span>
                     
                 </button>
             </div>
@@ -274,18 +292,15 @@
                             {f}
                         </td>
                         {#each columnas as c}
-                            <td class="text-base mx-1 px-1">
-                                {
-                                    tablapesaje[c]?
-                                        tablapesaje[c][f]?
-                                            tablapesaje[c][f].pesonuevo
-                                        :
-                                        "-"
-                                    :
-                                    "-"
-
-                                }
-                            </td>
+                            {#if tablapesaje[c][f]}
+                                <td onclick={()=>openDetalle(tablapesaje[c][f].id)} class="cursor-pointer text-base mx-1 px-1 hover:bg-gray-200 dark:hover:bg-gray-900">
+                                    {tablapesaje[c][f].pesonuevo}
+                                </td>
+                            {:else}
+                                <td class="text-base mx-1 px-1">
+                                    {"-"}
+                                </td>
+                            {/if}
                         {/each}
                     
                 </tr>
