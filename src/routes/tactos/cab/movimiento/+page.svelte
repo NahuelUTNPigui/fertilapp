@@ -59,7 +59,7 @@
             selectanimales[i].tipotacto = tipotactoselect
         }
     }
-    function filterUpdate(){
+    function limpiar(){
         selectanimales = []
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
@@ -71,6 +71,9 @@
         algunos = false
         todos = false
         ninguno = true
+    }
+    function filterUpdate(){
+        
         animalesrows = animales
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -106,7 +109,7 @@
                 algunos = true
                 ninguno =  false
             }
-            let a = animalesrows.filter(an=>an.id==id)[0]
+            let a = animales.filter(an=>an.id==id)[0]
             selecthashmap[id] = {
                 ...a
             }
@@ -363,6 +366,15 @@
                         </select>
                     </label>
                 </div>
+                <div class="mt-2">
+                    <button
+                    class=" btn btn-neutral"
+                    onclick={limpiar}
+                >
+                    Limpiar
+                </button>
+                </div>
+                
             </div>
         {/if}
     </div>

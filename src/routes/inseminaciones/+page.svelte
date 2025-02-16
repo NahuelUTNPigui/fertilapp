@@ -12,6 +12,7 @@
     import tiposanimal from '$lib/stores/tiposanimal';
     import permisos from "$lib/stores/permisos";
     import estilos from '$lib/stores/estilos';
+    import { guardarHistorial } from '$lib/historial/lib';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -168,7 +169,8 @@
 
     async function guardar(){
         try{
-            let caravana = madres.filter(a=>a.id==idanimal)[0].caravana
+            let m = madres.filter(a=>a.id==idanimal)[0]
+            let caravana = m.caravana
             let data = {
                 cab:cab.id,
                 animal: idanimal,
@@ -181,6 +183,8 @@
             }
             
             const record = await pb.collection('inseminacion').create(data);
+            await guardarHistorial(pb,madre.id)
+            await pb.collection('animales').update(m.id,{prenada:3})
             let item = record
             item.expand ={animal:{caravana}}
             

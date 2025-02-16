@@ -73,8 +73,7 @@
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
-
-    function filterUpdate(){
+    function limpiar(){
         //Cuando filtro debo reiniciar la seleccion?
         selectanimales = []
         let lista = []
@@ -87,6 +86,9 @@
         algunos = false
         todos = false
         ninguno = true
+    }
+    function filterUpdate(){
+        
         animalesrows = madres
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -434,6 +436,12 @@
                     </select>
                 </label>
             </div>
+            <button
+                class="btn btn-neutral"
+                onclick={limpiar}
+            >
+                Limpiar
+            </button>
         </div>
         {/if}
     </div>

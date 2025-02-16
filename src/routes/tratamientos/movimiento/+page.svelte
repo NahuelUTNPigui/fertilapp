@@ -12,7 +12,7 @@
     import sexos from "$lib/stores/sexos";
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
-    
+    import MultiSelect from "$lib/components/MultiSelect.svelte";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -30,6 +30,8 @@
     let buscar = $state("")
     let lote = $state("")
     let rodeo = $state("")
+    let loteseleccion = $state([])
+    let rodeoseleccion = $state([])
     let categoria = $state("")
     let sexo = $state("H")
 
@@ -57,8 +59,7 @@
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
-
-    function filterUpdate(){
+    function limpiar(){
         selectanimales = []
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
@@ -70,6 +71,9 @@
         algunos = false
         todos = false
         ninguno = true
+    }
+    function filterUpdate(){
+        
         animalesrows = animales
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -105,7 +109,7 @@
                 algunos = true
                 ninguno =  false
             }
-            let a = animalesrows.filter(an=>an.id==id)[0]
+            let a = animales.filter(an=>an.id==id)[0]
             selecthashmap[id] = {
                 ...a
             }
@@ -378,6 +382,9 @@
                     </select>
                 </label>
             </div>
+            <button class="btn btn-neutral" onclick={limpiar}>
+                Limpiar
+            </button>
             
         
         </div>
