@@ -148,14 +148,14 @@
                 </div>
                 
             </div>
-            <!--<div class="mt-6 text-center">
-                <a href="#" 
+            <div class="mt-6 text-center">
+                <a href="/recover" 
                     class="text-sm text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition"
                 >
                     ¿Olvidaste la contraseña?
                 </a>
             </div>
-            -->
+            
             <div class="mt-8 border-t border-gray-200 pt-6 text-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     ¿No tienes una cuenta?

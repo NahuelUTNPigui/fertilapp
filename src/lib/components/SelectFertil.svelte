@@ -123,8 +123,7 @@
         </div>
     {/if}
     {#if valor.length != 0}
-    <span class="text-sm mt-1 ">Elegiste a {nombre}</span>
-        
+        <span class="text-sm mt-1 ">Elegiste a {nombre}</span>
     {/if}
 
     

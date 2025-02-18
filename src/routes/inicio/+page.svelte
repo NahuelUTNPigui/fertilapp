@@ -14,8 +14,12 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import RadioButton from '$lib/components/RadioButton.svelte';
     import {isEmpty} from "$lib/stringutil/lib"
+    import PredictSelect from '$lib/components/PredictSelect.svelte';
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
+
+    
+
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -26,17 +30,21 @@
         id:""
     })
     let caber = createCaber()
-    let modoedicion = false
     let animales = $state([])
     let madres = $state([])
     let padres = $state([])
+    let listaanimales = $state([])
+    let listamadres = $state([])
+    let listapadres = $state([])
     let tipotratamientos = $state([])
+    let cargadoanimales = $state(false)
     //Datos cabaña
     let classbutton = "w-full flex items-center justify-center space-x-4 bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 dark:bg-green-700 dark:hover:bg-green-600"
     //Tacto
     let fechatacto = $state("")
     let observaciontacto = $state("")
     let animaltacto = $state("")
+    let cadenatacto = $state("")
     //Tipo animal
     let categoriatacto = $state("vaca")
     let prenadatacto = $state(0)
@@ -50,13 +58,22 @@
     //Nacimiento    
     let caravananac = $state("")
     let sexonac = $state("")
-    let padrenac = $state("")
-    let madrenac = $state("")
     let pesonac = $state("")
-    let nombremadrenac = $state("")
-    let nombrepadrenac = $state("")
     let fechanac = $state("")
     let observacionnac = $state("")
+    //Madre
+    let etiquetamadre = "Madre"
+    let madrenac = $state("")
+    let nombremadrenac = $state("")
+    
+    
+    //
+    //Padre
+    let padrenac = $state("")
+    let nombrepadrenac = $state("")
+    //let lista = $state([])
+    
+    //
     //Validacion
     let malmadrenac = $state(false)
     let malpadrenac = $state(false)
@@ -66,6 +83,7 @@
     let botonhabilitadonac = $state(false)
     //Tratamiento
     let animaltrat = $state("")
+    let cadenatrat = $state("")
     let categoriatrat = $state("")
     let fechatrat = $state("")
     let tipotrat = $state("")
@@ -79,6 +97,7 @@
     let padreins = $state("")
     let pajuelains = $state("")
     let idanimalins = $state("")
+    let cadenains = $state("")
     let categoriains = $state("")
     let fechainseminacion = $state("")
     let fechapartoins = $state("")
@@ -90,6 +109,7 @@
     let botonhabilitadoins = $state(false)
     //Observacion
     let animalobs = $state("")
+    let cadenaobs = $state("")
     let categoriaobs = $state("")
     let fechaobs = $state("")
     let observacionobs = $state("")
@@ -105,8 +125,20 @@
         })
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+        
+        
+        cargadoanimales = true
         madres = animales.filter(a=>a.sexo=="H"||"F")
+        listamadres = madres.map(item=>{
+            return {id:item.id,nombre:item.caravana}
+        })
         padres = animales.filter(a=>a.sexo=="M")
+        listapadres = padres.map(item=>{
+            return {id:item.id,nombre:item.caravana}
+        })
+        listaanimales = animales.map(item=>{
+            return {id:item.id,nombre:item.caravana}
+        })
     }
     async function getTiposTratamientos(){
         const records = await pb.collection('tipotratamientos').getFullList({
@@ -120,6 +152,7 @@
         fechatacto = ""
         observaciontacto =  ""
         animaltacto = ""
+        cadenatacto = ""
         categoriatacto = "vaca"
         prenadatacto = 0
         tipotacto = "tacto"
@@ -150,6 +183,7 @@
         
         fechatrat = ""
         animaltrat = ""
+        cadenatrat = ""
         tipotrat = ""
         categoriatrat = ""
         nuevoModalTratamiento.showModal()
@@ -164,6 +198,7 @@
         fechainseminacion = ""
         padreins = ""
         idanimalins = ""
+        cadenains = ""
         categoriains = ""
         pajuelains = ""
         nuevoModalInseminacion.showModal()
@@ -173,6 +208,7 @@
         observacionobs = ""
         categoriaobs = ""
         fechaobs = ""
+        cadenaobs = ""
         botonhabilitadoobs = false
         malanimalobs = false
         malfechaobs = false
@@ -214,9 +250,6 @@
                 observacion:observacionnac,
                 cab:cab.id
             }
-            
-            
-            
             const recordparicion = await pb.collection('nacimientos').create(dataparicion);
             let data = {
                 caravana:caravananac,
@@ -431,8 +464,6 @@
         }
     }
     function oninputNacimiento(inputName){
-        
-        
         if(inputName == "CARAVANA"){
             if(caravananac == ""){
                 malcaravananac = true
@@ -584,7 +615,6 @@
         }
     }
     onMount(async ()=>{
-        
         cab = caber.cab
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.model.id
@@ -592,13 +622,10 @@
             await getAnimales()
             await getTiposTratamientos()
         }
-        
-        
     })
  
 </script>
 <Navbarr>
-    
     {#if cab.exist}
         <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -691,12 +718,11 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
-        
-        <h3 class="text-lg font-bold">Nuevo tacto</h3>  
-        
+        <h3 class="text-lg font-bold">Nuevo tacto</h3>
         <div class="form-control">
+            <div>
             <label for = "animal" class="label">
-                <span class="label-text text-base">Animal</span>
+                <span class={estilos.labelForm}>Animal</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -716,8 +742,9 @@
                     {/each}
                   </select>
             </label>
+            </div>
             <label for = "tipo" class="label">
-                <span class="label-text text-base">Categoria</span>
+                <span class={estilos.labelForm}>Categoria</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -738,7 +765,7 @@
             </label>
             <div class="form-group mt-2">
                 <label for = "prenada" class="label ">
-                    <span class="label-text text-base">Estado</span>
+                    <span class={estilos.labelForm}>Estado</span>
                 </label>
                 <RadioButton bind:option={prenadatacto} deshabilitado={false}/>
                 
@@ -758,7 +785,7 @@
                 </label>
             </div>
             <label for = "fecha" class="label">
-                <span class="label-text text-base">Fecha </span>
+                <span class={estilos.labelForm}>Fecha </span>
             </label>
             <label class="input-group ">
                 <input id ="fecha" type="date" max={HOY}  
@@ -781,7 +808,7 @@
                 {/if}
             </label>
             <label for = "tipo" class="label">
-                <span class="label-text text-base">Tacto/Ecografia</span>
+                <span class={estilos.labelForm}>Tacto/Ecografia</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -821,7 +848,7 @@
             </div>
             <label class="form-control">
                 <div class="label">
-                    <span class="label-text">Observacion</span>                    
+                    <span class={estilos.labelForm}>Observacion</span>                    
                 </div>
                 <input 
                     id ="observacion" 
@@ -847,7 +874,6 @@
             </form>
         </div>
     </div>
-
 </dialog>
 <dialog id="nuevoModalNacimiento" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
     <div class="
@@ -863,7 +889,7 @@
         
         <div class="form-control">
             <label for = "nombre" class="label">
-                <span class="label-text text-base">Caravana</span>
+                <span class={estilos.labelForm}>Caravana</span>
             </label>
             <label class="input-group">
                 <input id ="nombre" type="text"  
@@ -887,7 +913,7 @@
             </label>
             
             <label for = "sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
+                <span class={estilos.labelForm}>Sexo</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -915,7 +941,7 @@
             </label>
 
             <label for = "peso" class="label">
-                <span class="label-text text-base">Peso (KG)</span>
+                <span class={estilos.labelForm}>Peso (KG)</span>
             </label>
             <label class="input-group">
                 <input id ="peso" type="number"  
@@ -930,7 +956,7 @@
                 />
             </label>
             <label for = "fechanacimiento" class="label">
-                <span class="label-text text-base">Fecha nacimiento</span>
+                <span class={estilos.labelForm}>Fecha nacimiento</span>
             </label>
             <label class="input-group ">
                 <input id ="fechanacimiento" type="date" max={HOY}  
@@ -951,8 +977,9 @@
                     </div>
                 {/if}
             </label>
+            <div class="hidden">
             <label for = "nombremadre" class="label">
-                <span class="label-text text-base">Caravana madre</span>
+                <span class="label-text text-base ">Caravana madre</span>
             </label>
             <label class="input-group">
                 <input 
@@ -998,8 +1025,15 @@
                     {/each}
                   </select>
             </label>
+            </div>
+            {#if cargadoanimales}
+                <PredictSelect bind:valor={madrenac} etiqueta = {"Madre"} bind:cadena={nombremadrenac} lista = {listamadres}>
+                    
+                </PredictSelect>
+            {/if}
+            <div class="hidden">
             <label for = "nombrepadre" class="label">
-                <span class="label-text text-base">Caravana padre</span>
+                <span class="label-text text-base font-semibold">Caravana padre</span>
             </label>
             <label class="input-group">
                 <input 
@@ -1025,7 +1059,7 @@
                 {/if}
             </label>
             <label for = "padre" class="label">
-                <span class="label-text text-base">Padre</span>
+                <span class="label-text text-base font-semibold">Padre</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -1044,9 +1078,15 @@
                     {/each}
                   </select>
             </label>
+            </div>
+            {#if cargadoanimales}
+                <PredictSelect bind:valor={padrenac} etiqueta = {"Padre"} bind:cadena={nombrepadrenac} lista = {listapadres}>
+                    
+                </PredictSelect>
+            {/if}
             <label class="form-control">
                 <div class="label">
-                    <span class="label-text">Observacion</span>                    
+                    <span class={estilos.labelForm}>Observacion</span>                    
                 </div>
                 <input 
                     id ="observacion" 
@@ -1087,7 +1127,7 @@
         
         <div class="form-control">
             <label for = "madre" class="label">
-                <span class="label-text text-base">Animal</span>
+                <span class={estilos.labelForm}>Animal</span>
             </label>
             <label class="input-group ">
                 <select 
@@ -1249,6 +1289,7 @@
                     {/each}
                   </select>
             </label>
+            <div class="hidden">
             <label for = "nombrepadre" class="label">
                 <span class="label-text text-base">Pajuela</span>
             </label>
@@ -1295,6 +1336,10 @@
                     {/each}
                   </select>
             </label>
+            </div>
+            {#if cargadoanimales}
+                <PredictSelect bind:valor={padreins} etiqueta = {"Padre"} bind:cadena={pajuelains} lista = {listapadres}/>
+            {/if}
             <label for = "fechainseminacion" class="label">
                 <span class="label-text text-base">Fecha de inseminacion</span>
             </label>

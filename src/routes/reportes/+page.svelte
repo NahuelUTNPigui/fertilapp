@@ -530,7 +530,7 @@
 
     async function getAnimalesTotalRodeos(id){
         const results = await pb.collection('animales').getList(1, 10, {
-            filter: `active = true && delete = false && rodeo='${id}'`,
+            filter: `active = true && delete = false && rodeo='${id}' `,
         });
         return results.totalItems
     }
@@ -543,22 +543,22 @@
     }
     async function getTotales() {
         let recordtactos = await pb.collection('tactos').getList(1,1,{
-            filter:"active=True"
+            filter:`active=True && cab='${cab.id}'`
         })
         let recordnacimientos = await pb.collection('nacimientos').getList(1,1,{
-            
+            filter:`cab='${cab.id}'`
         })
         let recordtratamientos = await pb.collection('tratamientos').getList(1,1,{
-            filter:"active=True"
+            filter:`active=True && cab='${cab.id}'`
         })
         let recordinseminaciones = await pb.collection('inseminacion').getList(1,1,{
-            filter:"active=True"
+            filter:`active=True && cab='${cab.id}'`
         })
         let recordobservaciones = await pb.collection('observaciones').getList(1,1,{
-            filter:"active=True"
+            filter:`active=True && cab='${cab.id}'`
         })
         let recordpesajes = await pb.collection('pesaje').getList(1,1,{
-            
+            filter:`cab='${cab.id}'`
         })
         totaleventos.tactos = recordtactos.totalItems
         totaleventos.inseminaciones = recordinseminaciones.totalItems

@@ -105,7 +105,7 @@
     }
 </script>
 <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">{titulo}</h1>
-<div class="grid grid-cols-3 lg:grid-cols-4 gap-1">
+<div class="grid grid-cols-3 lg:grid-cols-4 gap-2">
     <div>
         <button class={estilos.mediumsolidgreen}
         onclick={openNewModalColaborador}
