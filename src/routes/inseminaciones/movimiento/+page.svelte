@@ -41,6 +41,8 @@
     let animalesrows = $state([])
     let madres = $state([])
     let padres = $state([])
+    let listapadres = $state([])
+    let cargadoanimales = $state(false)
     //Filtros
     let buscar = $state("")
     let lote = $state("")
@@ -65,6 +67,7 @@
     let fechaparto = $state("")
     let pajuela = $state("")
     let padre = $state("")
+    let cadenapadre = $state("")
     //validacion
     let malfecha = $state(false)
     let malpadre = $state(false)
@@ -188,6 +191,13 @@
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
         madres = animales.filter(a=>a.sexo == "H")
         padres = animales.filter(a=>a.sexo == "M")
+        cargadoanimales = true
+        listapadres = padres.map(item=>{
+            return {
+                id:item.id,
+                nombre:item.caravana
+            }
+        })
         animalesrows = madres
     }
     function openNewModal(){
@@ -314,8 +324,7 @@
 
 </script>
 <Navbarr>
-    <!--<PredictSelect bind:valor={valor} lista={lista} etiqueta = {etiqueta}></PredictSelect>
-    <span>{valor}</span>-->
+    
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
             <h1 class="text-2xl">Inseminaciones</h1>
@@ -580,7 +589,10 @@
                     />
                 </label>
             </div>
-            <div>
+            {#if cargadoanimales}
+                <PredictSelect bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres} size="w-1/2"/>
+            {/if}
+            <div class="hidden">
                 <label for = "nombrepadre" class="label">
                     <span class="label-text text-base">Pajuela</span>
                 </label>
@@ -607,8 +619,7 @@
                         </div>
                     {/if}
                 </label>
-            </div>
-            <div>
+            
                 <label for = "padre" class="label">
                     <span class="label-text text-base">Padre</span>
                 </label>

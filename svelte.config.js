@@ -45,7 +45,9 @@ const config = {
 				"/establecimientos",
 				"/establecimientos/nuevo",
 				"/inseminaciones/movimiento",
-				"/tratamientos/movimiento"]
+				"/tratamientos/movimiento",
+				"/recover",
+				"/recover/token"]
 		}
 	}
 };

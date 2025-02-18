@@ -1,7 +1,7 @@
 <script>
     import estilos from "$lib/stores/estilos";
 
-    let {lista,etiqueta,valor=$bindable(""),cadena=$bindable("")} = $props()
+    let {lista,etiqueta,valor=$bindable(""),cadena=$bindable(""),size="w-4/5"} = $props()
     let listarow = $state(lista)
     let isOpen = $state(false)
     let nombre = $state("")
@@ -51,7 +51,7 @@
 
     />
     {#if isOpen}
-        <div class="w-4/5 mt-0 absolute z-10 max-h-40 overflow-auto ">
+        <div class={`mt-0 absolute z-10 max-h-40 overflow-auto ${size}`}>
             {#if listarow.length == 0}
                 
                 <div 

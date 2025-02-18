@@ -11,6 +11,7 @@
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = $state("")
+    let tokencolab = $state("")
     let username = $state("")
     let usermail = $state("")
     let viejacontra = $state("")
@@ -121,6 +122,7 @@
         usermail = pb_json.model.email
         username = pb_json.model.username
         let light = !darker.dark
+        tokencolab = pb_json.model.codigo
         cab = caber.cab
     })
 </script>
@@ -219,6 +221,17 @@
             </button> 
             
         </div>
+        <h2 class="mt-3 text-xl font-semibold">Colaboracion</h2>
+        <label for="codigo " 
+            class={`mt-2 block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            Codigo de colaboracion:
+        </label>
+        <label for="codigo" 
+            class={`mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            {tokencolab}
+        </label>
     </CardBase>
     
 </Navbarr>

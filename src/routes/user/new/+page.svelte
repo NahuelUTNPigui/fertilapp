@@ -25,6 +25,18 @@
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
+    function randomString(len, an) {
+        an = an && an.toLowerCase();
+        var str = "",
+            i = 0,
+            min = an == "a" ? 10 : 0,
+            max = an == "n" ? 10 : 62;
+        for (; i++ < len;) {
+            var r = Math.random() * (max - min) + min << 0;
+            str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+        }
+        return str;
+    }
     async function guardar(){
         if(isEmpty(usuarioemail)){
             Swal.fire('Error guardar', 'Nombre usuario vacio', 'error');
@@ -38,6 +50,7 @@
             Swal.fire('Error guardar', 'Confirmar contraseña no puede estar vacio', 'error');
             return
         }
+        
         try{
             const data = {
                 "username": usuarioemail.split("@")[0],
@@ -46,7 +59,8 @@
                 "password": contra,
                 "passwordConfirm": confirmcontra,
                 "name": usuarioemail,
-                "active": true
+                "active": true,
+                "codigo":randomString(10,"n")
             };
             const record = await pb.collection('users').create(data);
 

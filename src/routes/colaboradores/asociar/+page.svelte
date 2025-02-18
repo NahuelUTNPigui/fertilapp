@@ -12,6 +12,7 @@
     const pb = new PocketBase(ruta);
     let caber = createCaber()
     let cab = caber.cab
+    let tokencolab = $state("")
     let usuarios = $state([])
     let colabs = $state([])
     let usuario = $state({
@@ -125,20 +126,51 @@
     function volver(){
         goto("/establecimiento")
     }
+    async function asociar() {
+        const resultList = await pb.collection('users').getFirstListItem(1, 1, {
+            filter: `codigo == '${tokencolab}'`,
+        });        
+        if(resultList.length == 0){
+            Swal.fire("Error colaborador","No existe un usuario con ese codigo","error")
+        }
+        
+
+    }
     onMount(async ()=>{
+        
         await getUsuarios()
         await getColabs()
     })
 </script>
 <Navbarr>
-    <div class="mx-9 mt-1">
+    <div class="mx-1 mt-1">
         <div>
             <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={volver}>
                 Volver         
             </button>
         </div>
     </div>
-    <div class="bg-transparent p-2">
+    <div class="bg-opacity-30  p-8 rounded-2xl shadow-2xl backdrop-blur-md w-full  ">
+        <div class="mb-6">
+            <h1 class="text-xl font-smibold">Escribe el codigo de colaboración</h1>
+            <input 
+                id ="token" 
+                type="text"  
+                class={`
+                    input 
+                    input-bordered 
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                    w-full lg:w-1/3
+                    ${estilos.bgdark2}
+                `}
+                bind:value={tokencolab}
+            />
+            <button class="mt-1 btn btn-success text-white text-xl w-full lg:w-1/3" onclick={asociar} >Asociar</button>
+
+        </div>
+    </div>
+    <div class="bg-transparent p-2 hidden">
         <div class="flex items-center justify-center">
             <div 
                 class={`
@@ -214,7 +246,7 @@
             </div>
         </div>
     </div>
-    <div role="tablist" class="tabs tabs-lifted">
+    <div role="tablist" class="tabs tabs-lifted hidden">
         <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Usuarios" />
         <div role="tabpanel" class="tab-content bg-transparent border-base-300 rounded-box p-6">
             <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">

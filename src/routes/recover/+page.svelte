@@ -21,12 +21,12 @@
         const pb = new PocketBase(ruta);
         try{
             await pb.collection('users').requestPasswordReset(usuariomail);
-            Swal.fire("Correo enviado","Se envió un correo con el token y la nueva contraseña","success")
+            Swal.fire("Correo enviado","Se envió un correo con las instrucciones","success")
 
         }
         catch(err){
             console.error(err)
-            Swal.fire("Correo denegado","No se pudo enviar con el token y la nueva contraseña","success")
+            Swal.fire("Correo denegado","No se pudo enviar el correo con las instrucciones","error")
         }
     }
     function keyEvent(e){
