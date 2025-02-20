@@ -206,7 +206,7 @@
             {/if}
         </div>
         
-        <h2 class="class text-xl font-semibold">Contraseña y autenticación</h2>
+        <h2 class="text-xl font-semibold">Contraseña y autenticación</h2>
         
         <div class="mt-2 flex justify-start">
             <button

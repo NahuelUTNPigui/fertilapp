@@ -97,15 +97,16 @@
             
         }
     }
-    async function transferir(newcab){
-        
+    async function transferir(codigo){
+        const resultcab = await pb.collection('cabs').getList(1, 1, {
+            filter: `active = true && codigo = '${codigo}'`,
+        });
         try{
-            const data = {
-                
-                cab: newcab,
-                rodeo: "",
-            };
-
+            
+            let data = {
+                cab:resultcab.items[0].id,
+            }
+            
             const record = await pb.collection('animales').update(slug, data);
 
             goto("/animales")
@@ -197,7 +198,7 @@
             motivo = {motivobaja}
             bajar={async (fechafallecimiento,motivo)=>await darBaja(fechafallecimiento,motivo)}
             eliminar={eliminar}
-            transferir={(newcab)=>transferir(newcab)}
+            transferir={(codigo)=>transferir(codigo)}
         />
     </CardAnimal>
 </Navbarr>

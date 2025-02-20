@@ -54,6 +54,7 @@
                     }
                     catch(err){
                         try{
+                            //Revisa si sos colaborador 
                             const recordcab = await pb.collection('estxcolabs').getFirstListItem(`colab.user='${authData.record.id}'`, {
                                 expand: 'colab,cab,colab.user',
                             })

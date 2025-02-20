@@ -27,12 +27,14 @@
     let nombre = $state("")
     let direccion = $state("")
     let contacto = $state("")
+    let codigo = $state("")
     async function getCabaña(){
         try{
             const record = await pb.collection('cabs').getFirstListItem(`id='${cab.id}' && active=true`, {});
             nombre = record.nombre
             direccion = record.direccion
             contacto = record.contacto
+            codigo = record.codigo
             caber.setCab(record.nombre,record.id)
         }
         catch(err){
@@ -41,6 +43,7 @@
             nombre = ""
             direccion = ""
             contacto = ""
+            codigo = ""
             goto("/")
         }
         
@@ -248,6 +251,18 @@
                         />
                     {/if}
                     
+                </div>
+                <div>
+                    <label for="codigo" 
+                        class="block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                        Codigo de transferencia
+                    </label>
+                    <label for="codigo" 
+                            class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                        >
+                            {codigo}
+                        </label>
                 </div>
             </div>
             <div class="mt-8 flex justify-end">

@@ -41,7 +41,7 @@
                 Todos
             </span>
         {:else}
-            <div class="flex content-normal gap-2">
+            <div class="flex content-normal gap-2 overflow-x-hidden">
                 {#each valores as v}
                     
                     <span 

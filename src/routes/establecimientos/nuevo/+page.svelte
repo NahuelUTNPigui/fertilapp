@@ -10,6 +10,7 @@
     import { createDarker } from "$lib/stores/dark.svelte";
     import { page } from '$app/stores';  
     import { createCaber } from "$lib/stores/cab.svelte";
+    import {randomString} from "$lib/stringutil/lib"
     import Swal from 'sweetalert2';
     let pageurl = $page.url.pathname  
     let ruta = import.meta.env.VITE_RUTA
@@ -73,7 +74,8 @@
             direccion:direccionest,
             user: usuarioid,
             active: true,
-            contacto:contactoest
+            contacto:contactoest,
+            codigo:randomString(10,'n')
         };
 
         try{

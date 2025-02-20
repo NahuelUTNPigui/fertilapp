@@ -20,11 +20,20 @@
     let caber = createCaber()
     let cab = $state({})
     //Guardar establecimiento 
+    function irEstablecimientoColab(id){
+        let per = createPer()
+        let est = establecimientoscolab.filter(e=>e.id == id)[0]
+        console.log(est.expand.cab)
+        caber.setCab(est.expand.cab.nombre,est.expand.cab.id)
+        per.setPer("0,1,2,3,4,5",usuarioid)
+        goto("/")
+    }
     function irEstablecimiento(id){
         
         let per = createPer()
         
         let est = establecimientos.filter(e=>e.id == id)[0]
+        
         caber.setCab(est.nombre,est.id)
         per.setPer("0,1,2,3,4,5",usuarioid)
         goto("/")
@@ -93,7 +102,7 @@
 
         })
         establecimientoscolab = restxcolab
-        console.log(establecimientoscolab)
+        
         establecimientos = records
         
         for(let i = 0;i<establecimientos.length;i++){
@@ -202,7 +211,7 @@
                     <span class="text-xl font-medium text-end">{totalescolab[i]}</span>
                 </div>
                 <div class="p-2">
-                    <button onclick={()=>irEstablecimiento(e.expand.cab.id)} class={`mt-3  hover:text-gray-500 dark:hover:text-gray-600 inline-flex items-center `}>Ir establecimiento
+                    <button onclick={()=>irEstablecimientoColab(e.id)} class={`mt-3  hover:text-gray-500 dark:hover:text-gray-600 inline-flex items-center `}>Ir establecimiento
                         <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                             stroke-width="2" class="w-4 h-4 ml-2" viewBox="0 0 24 24">
                             <path d="M5 12h14M12 5l7 7-7 7"></path>

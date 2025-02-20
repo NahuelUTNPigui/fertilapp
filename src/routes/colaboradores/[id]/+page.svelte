@@ -59,9 +59,8 @@
         }
         
     }
-    async function desasociar() {
 
-        
+    async function desasociar() {    
         Swal.fire({
             title: 'Desasociar colaborador',
             text: '¿Seguro que deseas desasociar el colaborador?',
@@ -71,8 +70,18 @@
             cancelButtonText: 'No'
         }).then(async result=>{
             if(result.value){
-                await pb.collection("estxcolabs").delete(id)
-                goto("/establecimiento")
+                try{
+                    let recordper = await pb.collection('permisos').getFirstListItem(`estxcolab='${id}'`)
+                    await pb.collection("permisos").delete(recordper.id)
+                    await pb.collection("estxcolabs").delete(id)
+                    goto("/establecimiento")
+                }
+                catch(err){
+                    console.error(err)
+                }
+
+                
+                
             }
         })
     }

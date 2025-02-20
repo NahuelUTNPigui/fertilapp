@@ -53,6 +53,7 @@
     let fecha = $state("")
     let fechabaja = $state("")
     let motivo = $state("")
+    let codigo = $state("")
     //validar
     let malcategoria = $state("")
     let mallote = $state("")
@@ -61,6 +62,7 @@
     let malfecha = $state("")
     let malfechabaja = $state("")
     let malmotivo = $state("")
+    let malcodigo = $state("")
     let habilitarboton = $state(false)
 
     //Seleecionar
@@ -69,6 +71,7 @@
     let selectrodeo = $state(false)
     let selecttratamiento = $state(false)
     let selectbaja = $state(false)
+    let selecttransfer = $state(false)
 
     function clickFilter(){
         isOpenFilter = !isOpenFilter
@@ -94,12 +97,6 @@
         if(sexo != ""){
             animalesrows = animalesrows.filter(a=>a.sexo == sexo)
         }
-        //if(rodeo != ""){
-        //    animalesrows = animalesrows.filter(a=>a.rodeo == rodeo)
-        //}
-        //if(lote != ""){
-        //    animalesrows = animalesrows.filter(a=>a.lote == lote)
-        //}
         if(rodeoseleccion.length != 0){
             animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
             
@@ -223,6 +220,7 @@
             nuevacategoria = ""
             return
         }
+
         try{
             let data = {}
             let nombrelote = ""
@@ -245,13 +243,26 @@
                 data.active = true
                 data.cab = cab.id
             }
+            if(selectbaja){
+                data.active = false
+                data.motivobaja = motivo
+                data.fechafallecimiento = fechabaja + " 03:00:00" 
+            }
+            if(selecttransfer){
+                const resultList = await pb.collection('cabs').getList(1, 1, {
+                    filter: `active = true && codigo = '${codigo}'`,
+                });
+                if(resultList.items.length == 0){
+                    malcodigo = true
+                    return
+                }
+                data.cab = resultList.items[0].id
+            }
             for(let i = 0;i<lista.length;i++){
                 
                 if(!selecttratamiento){
                     await guardarHistorial(pb,lista[i].id)
                     await pb.collection('animales').update(lista[i].id, data);
-                    
-                    
                 }
                 else{
                     let a = lista[i]
@@ -275,11 +286,16 @@
             selectlote = false
             selectrodeo = false
             selecttratamiento = false
+            selectbaja = false
+            selecttransfer
             nuevacategoria = ""
             nuevolote = ""
             nuevorodeo = ""
             fecha = ""
             tipotratamiento = ""
+            fechabaja = ""
+            motivo = ""
+            codigo = ""
             habilitarboton = false
             Swal.fire("Éxito movimiento","Movimiento exitoso","success")
             await getAnimales()
@@ -302,6 +318,7 @@
         tipotratamiento = ""
         fechabaja = ""
         motivo = ""
+        codigo = ""
         habilitarboton = false
         if(seccion == "CATEGORIA"){
             selectcategoria= true
@@ -309,6 +326,7 @@
             selectrodeo= false
             selecttratamiento = false
             selectbaja = false
+            selecttransfer = false
             textoboton = "Mover de categoria"
             
         }
@@ -318,6 +336,7 @@
             selectrodeo= true
             selecttratamiento = false
             selectbaja = false
+            selecttransfer = false
             textoboton = "Mover de rodeo"
             
         }
@@ -327,6 +346,7 @@
             selectrodeo= false
             selecttratamiento = false
             selectbaja = false
+            selecttransfer = false
             textoboton = "Mover de lote"
             
         }
@@ -336,6 +356,7 @@
             selectrodeo= false
             selecttratamiento = true
             selectbaja = false
+            selecttransfer = false
             textoboton = "Crear tratamientos"
             
         }
@@ -345,8 +366,16 @@
             selectrodeo= false
             selecttratamiento = false
             selectbaja = true
-
+            selecttransfer = false
             textoboton = "Dar baja"
+        }
+        if(seccion == "TRANSFER"){
+            selectcategoria= false
+            selectlote= false
+            selectrodeo= false
+            selecttratamiento = false
+            selectbaja = false
+            selecttransfer = true
         }
 
     }
@@ -377,8 +406,15 @@
             }
         }
         if(selectbaja){
-            if(fechabaja == "" || motivo == "")
-            habilitarboton = false
+            if(fechabaja == "" || motivo == ""){
+                habilitarboton = false
+            }
+            
+        }
+        if(selecttransfer){
+            if(codigo == ""){
+                habilitarboton = false
+            }
         }
     }
     function oninput(campo){
@@ -791,8 +827,67 @@
                         </div>
                     </div>
                 </div>
-                <div class="collapse hidden">
+                <div class="collapse">
                     <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("BAJA")}/>
+                    <div class="collapse-title text-xl font-medium">Dar de baja</div>
+                    <div class="collapse-content">
+                        <div class="grid grid-cols-2 gap-1">
+                            <div>
+                                <label for = "fecha" class="label">
+                                    <span class="label-text text-base">Motivo</span>
+                                </label>
+                                <input id ="caravana" type="text"  
+                                    class={`input input-bordered w-full ${estilos.bgdark2}`}
+                                    bind:value={motivo}
+                                    oninput={()=>oninput("MOTIVO")}
+                                />
+                            </div>
+                            <div>
+                                <label for = "fecha" class="label">
+                                    <span class="label-text text-base">Fecha</span>
+                                </label>
+                                <label class="input-group ">
+                                    <input id ="fecha" type="date" max={HOY}  
+                                        class={`
+                                            input input-bordered w-full
+                                            border border-gray-300 rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2} 
+                                        `}
+                                        bind:value={fechabaja}
+                                        onchange={()=>oninput("FECHABAJA")}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        
+                    </div>  
+                </div>
+                <div class="collapse">
+                    <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("TRANSFER")}/>
+                    <div class="collapse-title text-xl font-medium">Transferir</div>
+                    <div class="collapse-content">
+                        <div class="grid grid-cols-1 gap-1">
+                            <div>
+                                <label for = "codigo" class="label">
+                                    <span class="label-text text-base">Código</span>
+                                </label>
+                                <input id ="codigo" type="text"  
+                                    class={`input input-bordered w-full ${estilos.bgdark2}`}
+                                    bind:value={codigo}
+                                    oninput={()=>oninput("CODIGO")}
+                                />
+                                {#if malcodigo}
+                                    <div class="label">
+                                        <span class="label-text-alt text-red-500">No existe un establecimiento con ese codigo</span>                    
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                        
+                    </div>  
                 </div>
             </div>
             <div class="modal-action justify-start ">
