@@ -14,9 +14,6 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import { isEmpty } from "$lib/stringutil/lib";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
-    
-
-    //fin test
 
     let ruta = import.meta.env.VITE_RUTA
 
@@ -205,6 +202,8 @@
                 padre:"",
                 pajuela:""})
         }
+        pajuela = ""
+        fechainseminacion = ""
         inseminacionMasiva.showModal()
     }
     function getEstadoName(est) {
@@ -231,6 +230,10 @@
             }
             try{
                 const record = await pb.collection('inseminacion').create(data);
+                await guardarHistorial(pb,inseminacion.id)
+                await pb.collection('animales').update(inseminacion.id, {prenada:2});
+                await getAnimales()
+                
             }catch(err){
                 console.error(err)
             }
@@ -278,9 +281,11 @@
         botonhabilitado = true
         if(isEmpty(fechainseminacion)){
             botonhabilitado = false
+            console.log("mal feca")
         }
         if(isEmpty(pajuela)){
             botonhabilitado = false
+            console.log("mal pajuela")
             
         }
     }
@@ -290,6 +295,7 @@
             selectanimales[i].pajuela = p.caravana
             selectanimales[i].padre = id
         }
+        pajuela  = p.caravana
         onInput("PAJUELA")
     }
     function onwrite(){

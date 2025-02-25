@@ -48,7 +48,10 @@ const config = {
 				"/tratamientos/movimiento",
 				"/recover",
 				"/recover/token",
-				"/user/nivel"
+				"/user/nivel",
+				"/servicios",
+				"/servicios/movimiento"
+
 			]
 		}
 	}
