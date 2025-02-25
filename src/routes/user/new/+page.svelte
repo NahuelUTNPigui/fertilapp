@@ -14,7 +14,10 @@
     let usuarioemail=''
     let contra = ''
     let confirmcontra = ''
-    
+    let nombre = ''
+    let apellido = ''
+    let malnombre = false
+    let malapellido = false
     let malusuarioname = false
     let malcontra = false
     let malconfirmcontra = false
@@ -28,6 +31,14 @@
     }
     function validarBoton(){
         botonhabilitado = true
+        if(isEmpty(nombre)){
+            botonhabilitado = false
+            return
+        }
+        if(isEmpty(apellido)){
+            botonhabilitado = false
+            return
+        }
         if(isEmpty(usuarioemail)){
             botonhabilitado = false
             return
@@ -43,6 +54,22 @@
     }
     function onInput(campo){
         validarBoton()
+        if (campo=="NOMBRE"){
+            if(isEmpty(nombre)){
+                malnombre = true
+            }
+            else{
+                malnombre = false
+            }
+        }
+        if (campo=="APE"){
+            if(isEmpty(apellido)){
+                malapellido = true
+            }
+            else{
+                malapellido = false
+            }
+        }
         if(campo == "EMAIL"){
             if(isEmpty(usuarioemail)){
                 malusuarioname = true
@@ -89,12 +116,14 @@
         }
         try{
             const data = {
-                "username": usuarioemail.split("@")[0],
+                "username": nombre+"."+apellido,
                 "email": usuarioemail,
                 "emailVisibility": true,
                 "password": contra,
                 "passwordConfirm": confirmcontra,
                 "name": usuarioemail,
+                "nombre":nombre,
+                "apellido":apellido,
                 "active": true,
                 "codigo":randomString(10,"n")
             };
@@ -145,6 +174,46 @@
         >
             <h1 class="text-3xl font-bold text-green-700 dark:text-green-400 mb-6 text-center">Crear usuario</h1>
             <div class="space-y-6">
+                <div>
+                    <label for="nombr" 
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                        Nombre
+                    </label>
+                    <input 
+                        type="nombre" 
+                        id="nombre" 
+                        bind:value={nombre} 
+                        oninput={()=>onInput("NOMBRE")}
+                        required 
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                    />
+                    {#if malnombre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre que usará, lo puede cambiar mas adelante</span>                    
+                        </div>
+                    {/if}
+                </div>
+                <div>
+                    <label for="apellido" 
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                        Apellido
+                    </label>
+                    <input 
+                        type="apellido" 
+                        id="apellido" 
+                        bind:value={apellido} 
+                        oninput={()=>onInput("APE")}
+                        required 
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                    />
+                    {#if malapellido}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el apellido que usará, luego lo podrá cambiar</span>                    
+                        </div>
+                    {/if}
+                </div>
                 <div>
                     <label for="nombreusuario" 
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"

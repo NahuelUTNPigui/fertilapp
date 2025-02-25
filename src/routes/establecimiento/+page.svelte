@@ -39,6 +39,9 @@
     let telefono = $state("")
     let mail = $state("")
     let titular = $state("")
+    //Desasociar
+    let asociado = $state(false)
+    let idestxcolab = $state("")
     async function getCabaña(){
         try{
             const record = await pb.collection('cabs').getFirstListItem(`id='${cab.id}' && active=true`, {});
@@ -172,6 +175,33 @@
             Swal.fire("Error modificar","No se pudo modificar la cabaña con éxito","error")
         }
     }
+    async function desasociar() {
+        
+        await pb.collection('estxcolabs').delete(idestxcolab);
+        try{
+            const record = await pb.collection('cabs').getFirstListItem(`user='${usuarioid}' && active=true`, {});
+            caber.setCab(record.nombre,record.id)
+            per.setPer("0,1,2,3,4,5",usuarioid)
+        }
+        catch(err){
+            try{
+                //Revisa si sos colaborador 
+                const recordcab = await pb.collection('estxcolabs').getFirstListItem(`colab.user='${usuarioid}'`, {
+                    expand: 'colab,cab,colab.user',
+                })
+                const recordper = await pb.collection("permisos").getFirstListItem(`estxcolab='${recordcab.id}'`)
+                per.setPer(recordper.permisos,usuarioid)
+                caber.setCab(recordcab.expand.cab.nombre,recordcab.expand.cab.id)
+                
+            }
+            catch(err){
+                caber.setDefault()
+                per.setDefault()
+            }
+            
+        }
+        goto('/')
+    }
     function mostrarcolab(data){
         console.log("padre: "+data)
     }
@@ -205,6 +235,25 @@
         if(cab.exist){
            await getCabaña()
            await getColabs()
+           const recordcolab = await pb.collection('colaboradores').getList(1,1,{
+            filter:`user = '${usuarioid}'`
+           })
+           if(recordcolab.items.length > 0){
+            const recordestxcolab = await pb.collection('estxcolabs').getList(1, 1, {
+                filter: `colab = '${recordcolab.items[0].id}' && cab = '${cab.id}'`,
+            });
+            if(recordestxcolab.items.length > 0){
+                asociado = true
+                idestxcolab = recordestxcolab.items[0].id
+            }
+            else{
+                asociado = false
+            }
+           }
+           else{
+            asociado = false
+           }
+           
         }
     })
  
@@ -516,7 +565,7 @@
                 {/if}
                 
             </div>
-            <Colaboradores {mostrarcolab} {guardarColab}/>
+            <Colaboradores {mostrarcolab} {guardarColab} {desasociar} {asociado}/>
             <ListaColabs {colabs}/>
         </CardBase>
     {:else}

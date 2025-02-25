@@ -3,8 +3,10 @@
     import estilos from "$lib/stores/estilos";
     import {isEmpty} from "$lib/stringutil/lib"
     import { randomString } from "$lib/stringutil/lib";
+    import { PenBox } from "lucide-svelte";
+    import Swal from "sweetalert2";
     
-    let {colabs = $bindable(),mostrarcolab,guardarColab,asos} = $props()
+    let {colabs = $bindable(),mostrarcolab,guardarColab,desasociar,asociado} = $props()
     let titulo = $state("Colaboradores")
     
     //Nuevo colaborador
@@ -107,6 +109,20 @@
     function openNewModalColaborador(){
         modalNuevoColaborador.show()
     }
+    async function confirmDesasociar() {
+        Swal.fire({
+            title: 'Desasociar',
+            text: `¿Seguro que desasociarte del establecimiento?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si',
+            cancelButtonText: 'No'
+        }).then(async result=>{
+            if(result.value){
+                await desasociar()
+            }
+        })
+    }
 </script>
 <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">{titulo}</h1>
 <div class="grid grid-cols-3 lg:grid-cols-4 gap-2">
@@ -122,6 +138,15 @@
             Asociar
         </button>
     </div>
+    {#if asociado}
+        <div>
+            <button class={estilos.mediumsolidred}
+            onclick={confirmDesasociar}
+            >
+                Desasociar
+            </button>
+        </div>
+    {/if}
 </div>
 <dialog id="modalNuevoColaborador" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
     <div 

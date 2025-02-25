@@ -14,6 +14,8 @@
     let tokencolab = $state("")
     let username = $state("")
     let usermail = $state("")
+    let nombre = $state("")
+    let apellido = $state("")
     let viejacontra = $state("")
     let malviejacontra = $state("")
     let contra = $state("")
@@ -33,7 +35,9 @@
 
     async function editarUsuario(){
         const data = {
-            username
+            username,
+            nombre,
+            apellido
         };
         try{
             const record = await pb.collection("users").update(usuarioid, data);
@@ -121,6 +125,8 @@
         usuarioid = pb_json.model.id
         usermail = pb_json.model.email
         username = pb_json.model.username
+        nombre = pb_json.model.nombre
+        apellido = pb_json.model.apellido
         let light = !darker.dark
         tokencolab = pb_json.model.codigo
         cab = caber.cab
@@ -144,19 +150,67 @@
                 {:else}
                     <input 
                         type="text" 
-                        id="nombre"
-                        disabled={!modoedicion}
+                        id="usernombre"
+                        
                         bind:value={username} 
                         required 
                         class={`
                             w-full px-3 py-2 border rounded-md shadow-sm
                             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
                             transition duration-150 ease-in-out
-                            ${
-                            modoedicion
-                                ? 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                                : 'bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                            }
+                            border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                        `}
+                    />
+                {/if}
+                <label for="nombre" 
+                    class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                >
+                    Nombre:
+                </label>
+                {#if !modoedicion}
+                    <label for="nombre" 
+                        class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                    >
+                        {nombre}
+                    </label>
+                {:else}
+                <input 
+                        type="text" 
+                        id="nombre"
+                        
+                        bind:value={nombre} 
+                        required 
+                        class={`
+                            w-full px-3 py-2 border rounded-md shadow-sm
+                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                            transition duration-150 ease-in-out
+                            border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100
+                        `}
+                    />
+                {/if}
+                <label for="nombre" 
+                    class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                >
+                    Apellido:
+                </label>
+                {#if !modoedicion}
+                    <label for="nombre" 
+                        class={`block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+                    >
+                        {apellido}
+                    </label>
+                {:else}
+                <input 
+                        type="text" 
+                        id="apellido"
+                        
+                        bind:value={apellido} 
+                        required 
+                        class={`
+                            w-full px-3 py-2 border rounded-md shadow-sm
+                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                            transition duration-150 ease-in-out
+                            border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-gray-900 dark:text-gray-100
                         `}
                     />
                 {/if}
