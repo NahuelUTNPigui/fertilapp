@@ -120,7 +120,7 @@
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}'`,
+            filter:`active=true && cab='${cab.id}' && delete = false`,
             expand:"nacimiento"
         })
         animales = recordsa
@@ -128,7 +128,7 @@
         
         
         cargadoanimales = true
-        madres = animales.filter(a=>a.sexo=="H"||"F")
+        madres = animales.filter(a=>a.sexo=="H"||a.sexo=="F")
         listamadres = madres.map(item=>{
             return {id:item.id,nombre:item.caravana}
         })

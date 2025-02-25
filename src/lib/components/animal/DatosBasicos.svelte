@@ -13,6 +13,7 @@
     import RadioButton from "$lib/components/RadioButton.svelte";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
+    import { guardarHistorial } from "$lib/historial/lib";
     let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada,modohistoria=$bindable()} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -52,6 +53,7 @@
     let fecha = $state("")
     let madres = $state([])
     let padres = $state([])
+    let tipomadre = $state("")
     
     let observacion = $state("") 
     let rodeos = $state([])
@@ -89,7 +91,7 @@
     //Animales
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}'`,
+            filter:`active=true && cab='${cab.id}' `,
             expand:"nacimiento"
         })
         madres = recordsa.filter(a=>a.sexo == "H" && a.delete==false)
@@ -207,6 +209,16 @@
             }
             const record = await pb.collection('animales').update(id, datanimal);
             await pb.collection("historialanimales").create(datahistorial)
+            await guardarHistorial(pb,madre)
+            let datamadre = {
+                prenada : 0
+            }
+            if(tipomadre == "vaquillona"){
+                datamadre.categoria = "vaca"
+                
+            }
+            
+            await pb.collection('animales').update(madre, datamadre);
             Swal.fire("Éxito guardar","Se pudo guardar el nacimiento","success")
             connacimiento = true
             nacimiento = recordparicion
@@ -251,6 +263,9 @@
     function getNombreMadre(){
         let m = madres.filter(item=>item.id == madre)[0]
         nombremadre = m.caravana
+        console.log(m)
+        tipomadre = m.categoria
+        console.log(tipomadre)
     }
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]

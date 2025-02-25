@@ -6,7 +6,10 @@
     let isOpen = $state(false)
     let nombre = $state("")
     function cambioCadena(){
-        onwrite(cadena)
+        if(onwrite){
+            onwrite(cadena)
+        }
+        
         if(cadena.length == 0){
             listarow = lista
             valor = ""
@@ -16,7 +19,10 @@
             listarow = lista.filter(e=>e.nombre.toLowerCase().includes(cadena.toLowerCase()))
             if(listarow.length == 1){
                 valor = listarow[0].id
-                onelegir(valor)
+                if(onelegir){
+                    onelegir(valor)
+                }
+                
                 nombre = listarow[0].nombre
             }
             if(listarow.length == 0){
@@ -26,7 +32,10 @@
     }
     function clickOption(id){
         valor = id
-        onelegir(valor)
+        if(onelegir){
+            onelegir(valor)
+        }
+        
         isOpen = !isOpen
         cadena = listarow.filter(l=>l.id==id)[0].nombre
         nombre = cadena

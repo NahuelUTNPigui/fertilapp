@@ -64,7 +64,7 @@
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}'`,
+            filter:`active=true && cab='${cab.id}' && delete = false`,
             expand:"nacimiento"
         })
         madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
@@ -80,8 +80,6 @@
                 id:item.id,nombre:item.caravana
             }
         })
-        console.log(listamadres)
-        console.log(listapadres)
     }
     async function getNacimientos(){
         const recordsn = await pb.collection("nacimientosall").getFullList({
@@ -96,6 +94,7 @@
         try{
             
             let m = madres.filter(ma=>ma.id==madre)[0]
+            let tipomadre = m.categoria
             let dataparicion = {
                 madre,
                 padre,
@@ -117,13 +116,17 @@
                 nacimiento:recordparicion.id
             }
             let recorda = await pb.collection('animales').create(data); 
+            let datamadre = {
+                prenada:0
+            }
             if(m.categoria == "vaquillona"){
+                datamadre.categoria = "vaca"
                 let datamadre = {
                     categoria:"vaca"
                 }
-                await guardarHistorial(pb,madre)
-                await pb.collection('animales').update(madre,datamadre)
             }
+            await guardarHistorial(pb,madre)
+                await pb.collection('animales').update(madre,datamadre)
             Swal.fire("Éxito guardar","Se pudo guardar la paricion con exito","success")
             let item = {
                 caravana,
@@ -314,6 +317,18 @@
         filterUpdate()
         await getAnimales()
     })
+    function onwriteMadre(){
+        
+    }
+    function onwritePadre(){
+        onchange("PADRE")
+    }
+    function onelegirMadre(){
+        onchange("MADRE")
+    }
+    function onelegirPadre(){
+        onchange("PADRE")
+    }
     function cerrarModal(){
         idnacimiento = ""
         caravana = ""
@@ -744,8 +759,8 @@
                 
                 </div>
                 {#if cargadoanimales}
-                    <PredictSelect bind:valor={madre} etiqueta = {"Madre"} bind:cadena={nombremadre} lista = {listamadres}/>
-                    <PredictSelect bind:valor={padre} etiqueta = {"Padre"} bind:cadena={nombrepadre} lista = {listapadres}/>
+                    <PredictSelect bind:valor={madre} etiqueta = {"Madre"} bind:cadena={nombremadre} lista = {listamadres} onelegir={onelegirMadre} onwrite={onwriteMadre}/>
+                    <PredictSelect bind:valor={padre} etiqueta = {"Padre"} bind:cadena={nombrepadre} lista = {listapadres} onelegir={onelegirPadre} onwrite={onwritePadre}/>
                 {/if}
                 
                 
