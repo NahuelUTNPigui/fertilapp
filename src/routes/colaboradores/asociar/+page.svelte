@@ -8,6 +8,7 @@
     import permisos from '$lib/stores/permisos';
     import estilos from '$lib/stores/estilos';
     import CardBase from '$lib/components/CardBase.svelte';
+    import tiponoti from '$lib/stores/tiponoti';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let caber = createCaber()
@@ -24,18 +25,36 @@
         });        
         if(resultList.items.length == 0){
             Swal.fire("Error colaborador","No existe un usuario con ese codigo","error")
-
+            return
         }
+    
+
+        let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        
+        let origenusuarioid =  pb_json.model.id
         let userid = resultList.items[0].id
         let nombre = resultList.items[0].nombre
         let apellido = resultList.items[0].apellido
+        if(userid == origenusuarioid){
+            Swal.fire("Error colaborador","No puedes asociarte al establecimiento","error")
+            return
+        }
         const resultcolab = await pb.collection('colaboradores').getList(1,1,{
             filter:`user = '${userid}'`,
             skipTotal:true
         })
         
-        let existecolab = resultcolab.items.length == 0
+        let colabid = resultcolab.items[0].id
+        let existecolab = resultcolab.items.length > 0
         if(existecolab){
+            //verificar si ya esta asociado
+            const recordasoci = await pb.collection('estxcolabs').getList(1,1,{
+                filter:`cab = '${cab.id}' && colab = '${colabid}'`
+            })
+            if(recordasoci.items.length>0){
+                Swal.fire("Error asociar","El usuario ya esta asociado","error")
+                return
+            }
             try{    
                 let colabid = resultcolab.items[0].id
                 //Creo la asociación
@@ -56,7 +75,9 @@
             catch(err){
                 console.error(err)
                 Swal.fire("Error asociar","No se pudo asociar el usuario","error")
+                
                 tokencolab = ""
+                return
             }
 
 
@@ -91,8 +112,24 @@
                 console.error(err)
                 Swal.fire("Error asociar","No se pudo asociar el usuario","error")
                 tokencolab = ""
+                return
 
             }
+        }
+        //Creo las notificaciones
+        try{
+            let data = {
+                texto:"Se te asoció al establecimiento "+ cab.nombre,
+                titulo:"Asociado a "+ cab.nombre,
+                tipo:tiponoti[0].id,
+                origen:origenusuarioid,
+                destino:userid,
+                leido:false
+            }
+            const record = await pb.collection('notificaciones').create(data);
+        }
+        catch(err){
+            console.error(err)
         }
     }
     onMount(async ()=>{

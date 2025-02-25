@@ -11,6 +11,7 @@
     import { page } from '$app/stores';  
     import { createCaber } from "$lib/stores/cab.svelte";
     import {randomString} from "$lib/stringutil/lib"
+    import { codigoSinRepetirEstablecimiento } from "$lib/pbutils/lib";
     import Swal from 'sweetalert2';
     let pageurl = $page.url.pathname  
     let ruta = import.meta.env.VITE_RUTA
@@ -69,13 +70,14 @@
         goto("/establecimientos")
     }
     async function guardarEstablecimiento(){
+        let codigo = await codigoSinRepetirEstablecimiento(pb)
         const data = {
             nombre:nombreest,
             direccion:direccionest,
             user: usuarioid,
             active: true,
             contacto:contactoest,
-            codigo:randomString(10,'n')
+            codigo
         };
 
         try{

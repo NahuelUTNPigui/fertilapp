@@ -14,7 +14,8 @@
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let darker = createDarker()
-    
+    let leido = $state(true)
+    let notificaciones = $state([])
     let cab = $state({
         exist:false,
         nombre:"",
@@ -24,6 +25,7 @@
     let textColorClass = '';
     
     let nombreusuario = $state('')
+    let usuarioid = $state('')
     let roler = createRoler()
     
     let rol = roler.rol==""?"":roler.rol=="vet"?"Veterinario":"Establecimiento"
@@ -33,7 +35,7 @@
       let caber = createCaber()
       nombreestablecimiento = caber.cab.nombre
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-      let usuarioid = pb_json.model.id
+      usuarioid = pb_json.model.id
       nombreusuario = pb_json.model.username
       let hab = $enabled
       if(hab==="no"){
@@ -41,6 +43,7 @@
       }
       let light = !darker.dark
       cab = caber.cab      
+      await getNotis()
     })
     
     function salir(){
@@ -60,7 +63,31 @@
     let checked = $state('');
     function handleClick() {
         (checked == 'checked') ? checked = '': checked = 'checked';
+    }
+    async function getNotis() {
+      const records = await pb.collection('notificaciones').getFullList({
+          sort: '-created',
+          filter: `destino = '${usuarioid}' && leido = False`
+      });
+      
+      notificaciones = records
+      if(notificaciones.length>0){
+        leido = false
+      }
+      
+    }
+    async function leerNotis() {
+      leido = true
+      for(let i = 0;i<notificaciones.length;i++){
+        try{
+          let data = {leido:true}
+          await pb.collection('notificaciones').update(notificaciones[i].id, data);
 
+        }
+        catch(err){
+          console.error(err)
+        }
+      }
     }
     let bgnav = "bg-green-500"
     let classtext=`text-lg px-2 font-extrabold`
@@ -88,7 +115,29 @@
                 >{nombreestablecimiento}</a>
               </div>
               <div class="flex mr-1 pr-1 lg:mr-5 lg:pr-5">
-                <span class={classtextnavbar}>{nombreusuario}</span>
+                <details class="dropdown dropdown-end">
+                  <summary class={`btn m-0 p-0 bg-transparent hover:bg-transparent ${classtextnavbar} border-none`} onclick={leerNotis}>
+
+                    <div class="indicator">
+                      {#if !leido}
+                        <span class="indicator-item badge dark:badge-error badge-error badge-xs"></span>
+                      {/if}
+                      
+                      <span class={` px-2`} >{nombreusuario}</span>
+                      
+                    </div>
+                  </summary>
+                  
+                  <ul class={`menu dropdown-content w-52 rounded-box z-[1] shadow ${classtextnavbar} ${bgnav}`}>
+                    {#if notificaciones.length == 0}
+                      <li><span>Sin notificaciones</span></li>  
+                    {:else}
+                      {#each notificaciones as n}
+                        <li><span>{n.titulo}</span></li>  
+                      {/each}
+                    {/if}
+                  </ul>
+                </details>
                 
                 <details class="dropdown dropdown-end">
                   <summary class={`btn btn-square btn-ghost ${classtextnavbar}`}>
@@ -412,4 +461,3 @@
         </ul>
       </div>
 </div>
-  

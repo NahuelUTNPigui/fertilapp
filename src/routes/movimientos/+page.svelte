@@ -13,6 +13,7 @@
     import { getPermisosList } from '$lib/permisosutil/lib';
     import motivos from '$lib/stores/motivos';
     import MultiSelect from "$lib/components/MultiSelect.svelte";
+    import tiponoti from "$lib/stores/tiponoti";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -257,6 +258,23 @@
                     return
                 }
                 data.cab = resultList.items[0].id
+                try{
+                    let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+            
+                    let origenusuarioid =  pb_json.model.id
+                    let data = {
+                        texto:`Se transfirieron ${lista.length} animales`,
+                        titulo:`Transferencia de ${lista.length} animales`,
+                        tipo:tiponoti[1].id,
+                        origen:origenusuarioid,
+                        destino:resultList.items[0].user,
+                        leido:false
+                    }
+                    const record = await pb.collection('notificaciones').create(data);
+                }
+                catch(err){
+                    console.error(err)
+                }
             }
             for(let i = 0;i<lista.length;i++){
                 

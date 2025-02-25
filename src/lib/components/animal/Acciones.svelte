@@ -7,6 +7,7 @@
     import CardBase from "../CardBase.svelte";
     import motivos from '$lib/stores/motivos';
     import { onMount } from "svelte";
+    import tiponoti from '$lib/stores/tiponoti';
     
 
     let {caravana,bajar,eliminar,transferir,fechafallecimiento=$bindable(""),motivo = $bindable("fallecimiento")} = $props()
@@ -65,7 +66,7 @@
         }
         
     }
-    async function transfer(name){
+    async function transfer(){
         const resultList = await pb.collection('cabs').getList(1, 1, {
             filter: `active = true && codigo = '${codigo}'`,
         });
@@ -77,7 +78,7 @@
         
         Swal.fire({
             title: 'Transferir animal',
-            text: `¿Seguro que deseas transferir el animal a ${name}?`,
+            text: `¿Seguro que deseas transferir el animal a ${caravana}?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si',
@@ -298,7 +299,7 @@
         <div 
             class="form-control bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-fullmax-w-xl"
         >
-            <h2 class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">Código de trasnferencia</h2>
+            <h2 class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">Código de transferencia</h2>
             <input 
                 id ="token" 
                 type="text"  

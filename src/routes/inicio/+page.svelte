@@ -851,7 +851,7 @@
                     <span class={estilos.labelForm}>Observacion</span>                    
                 </div>
                 <input 
-                    id ="observacion" 
+                    id ="observaciontacto" 
                     type="text"  
                     class={`
                         input 
@@ -1032,12 +1032,12 @@
                 </PredictSelect>
             {/if}
             <div class="hidden">
-            <label for = "nombrepadre" class="label">
+            <label for = "nombrepadre2" class="label">
                 <span class="label-text text-base font-semibold">Caravana padre</span>
             </label>
             <label class="input-group">
                 <input 
-                    id ="nombrepadre" 
+                    id ="nombrepadrenac" 
                     type="text"  
                     class={`
                         input 
@@ -1089,7 +1089,7 @@
                     <span class={estilos.labelForm}>Observacion</span>                    
                 </div>
                 <input 
-                    id ="observacion" 
+                    id ="observacionnac" 
                     type="text"  
                     class={`
                         input 
@@ -1290,12 +1290,12 @@
                   </select>
             </label>
             <div class="hidden">
-            <label for = "nombrepadre" class="label">
+            <label for = "nombrepadreins" class="label">
                 <span class="label-text text-base">Pajuela</span>
             </label>
             <label class="input-group">
                 <input 
-                    id ="nombrepadre" 
+                    id ="nombrepadreins" 
                     type="text"  
                     class={`
                         input 
@@ -1481,7 +1481,7 @@
                 <span class="label-text">Observacion</span>                    
             </div>
             <input 
-                id ="observacion" 
+                id ="observacionobs" 
                 type="text"  
                 class={`
                     input 

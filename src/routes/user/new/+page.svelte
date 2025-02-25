@@ -7,7 +7,7 @@
     import PocketBase from 'pocketbase'
     import { fade, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
-    
+    import { randomString } from '$lib/stringutil/lib';
 
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -18,6 +18,7 @@
     let malusuarioname = false
     let malcontra = false
     let malconfirmcontra = false
+    let botonhabilitado = false
 
 
 
@@ -25,19 +26,50 @@
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
-    function randomString(len, an) {
-        an = an && an.toLowerCase();
-        var str = "",
-            i = 0,
-            min = an == "a" ? 10 : 0,
-            max = an == "n" ? 10 : 62;
-        for (; i++ < len;) {
-            var r = Math.random() * (max - min) + min << 0;
-            str += String.fromCharCode(r += r > 9 ? r < 36 ? 55 : 61 : 48);
+    function validarBoton(){
+        botonhabilitado = true
+        if(isEmpty(usuarioemail)){
+            botonhabilitado = false
+            return
         }
-        return str;
+        if (isEmpty(contra) || contra.length < 10){
+            botonhabilitado = false
+            return
+        }
+        if (contra != confirmcontra){
+            botonhabilitado = false
+            return
+        }
+    }
+    function onInput(campo){
+        validarBoton()
+        if(campo == "EMAIL"){
+            if(isEmpty(usuarioemail)){
+                malusuarioname = true
+            }
+            else{
+                malusuarioname = false
+            }
+        }
+        else if(campo == "CONTRA"){
+            if(isEmpty(contra) || contra.length < 10){
+                malcontra = true
+            }
+            else{
+                malcontra = false
+            }
+        }
+        else if(campo == "CONF"){
+            if(contra != confirmcontra){
+                malconfirmcontra = true
+            }
+            else{
+                malconfirmcontra = false
+            }
+        }
     }
     async function guardar(){
+        
         if(isEmpty(usuarioemail)){
             Swal.fire('Error guardar', 'Nombre usuario vacio', 'error');
             return
@@ -50,7 +82,11 @@
             Swal.fire('Error guardar', 'Confirmar contraseña no puede estar vacio', 'error');
             return
         }
-        
+        let coincide = await existeCorreo(usuarioemail)
+        if(coincide){
+            Swal.fire('Error guardar', 'Ya existe un usuario con ese correo', 'error');
+            return
+        }
         try{
             const data = {
                 "username": usuarioemail.split("@")[0],
@@ -63,7 +99,7 @@
                 "codigo":randomString(10,"n")
             };
             const record = await pb.collection('users').create(data);
-
+            Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario.Ingrese a la aplicación', 'success');
             goto("/")
         }catch(e){
             console.log(e)
@@ -81,45 +117,21 @@
             }
         }
     }
+    async function existeCorreo() {
+        
+        const record = await pb.collection('users').getList(1,1,
+        {
+            filter:`email = '${usuarioemail}' && active = true`
+        });
+        
+        if(record.totalItems != 0){
+            return true
+        }
+        else{
+            return false
+        }
+    }
 </script>
-<!--<div class="flex justify-end m-10">
-    <Oscuro></Oscuro>
-</div>
-<div class="grid justify-items-center mt-20 w-full">
-    <h1 class="text-4xl ">Fertil</h1>
-    <br>
-    <h2 class="text-2xl ">Nuevo usuario</h2>
-    <div class="card bg-base-100 w-96 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">Crear usuario</h2>
-            <div class="form-control">
-                <label for = "nombre" class="label">
-                    <span class="label-text text-lg">Email</span>
-                </label>
-                <label class="input-group">
-                <input id ="nombre" type="text"  class="input input-bordered" bind:value={usuarioemail}/>
-                </label>
-                <label for = "nombre" class="label">
-                    <span class="label-text text-lg">Contraseña</span>
-                </label>
-                <label class="input-group">
-                <input id ="pass" type="password"  class="input input-bordered" bind:value={contra}/>
-                </label>
-                <label for = "nombre" class="label">
-                    <span class="label-text text-lg">Confirmar Contraseña</span>
-                </label>
-                <label class="input-group">
-                <input id ="pass" type="password"  class="input input-bordered" bind:value={confirmcontra}/>
-                </label>
-            </div>
-            <div class="card-actions justify-start mt-10">
-                <button class="btn btn-primary" onclick={guardar}>Crear usuario</button>
-                <button class="btn btn-primary" onclick={volver}>Volver</button>
-            </div>
-        </div>
-    </div>
-</div>
--->
 <svelte:window on:keydown={keyEvent}></svelte:window>   
 <div class="min-h-screen bg-gradient-to-br from-green-400 to-green-700  dark:from-gray-900 dark:to-gray-800 p-4">
     <div class="flex justify-end m-10">
@@ -143,9 +155,15 @@
                         type="nombreusuario" 
                         id="nombreusuario" 
                         bind:value={usuarioemail} 
+                        oninput={()=>onInput("EMAIL")}
                         required 
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                     />
+                    {#if malusuarioname}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el correo que usará</span>                    
+                        </div>
+                    {/if}
                 </div>
                 <div>
                     <label for="password" 
@@ -157,9 +175,15 @@
                         type="password" 
                         id="password" 
                         bind:value={contra} 
-                        required 
+                        oninput={()=>onInput("CONTRA")}
+                        
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                     />
+                    {#if malcontra}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir una contraseña de al menos 10 caracteres</span>                    
+                        </div>
+                    {/if}
                 </div>
                 <div>
                     <label for="passwordconf" 
@@ -171,14 +195,20 @@
                         type="password" 
                         id="passwordconf" 
                         bind:value={confirmcontra} 
-                        required 
+                        oninput={()=>onInput("CONF")}
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                     />
+                    {#if malconfirmcontra}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Deben coincidir las contraseñas</span>                    
+                        </div>
+                    {/if}
                 </div>
                 <div>
                     <button 
                         onclick={guardar}
                         class="w-full bg-green-600 text-white rounded-md py-2 px-4 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition" 
+                        disabled='{!botonhabilitado}'
                     >
                       Crear cuenta
                     </button>

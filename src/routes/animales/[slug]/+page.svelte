@@ -21,6 +21,7 @@
     import Observaciones from "$lib/components/animal/Observaciones.svelte";
     import Pesajes from "$lib/components/animal/Pesajes.svelte";
     import HistoriaClinica from "$lib/components/animal/HistoriaClinica.svelte";
+    import tiponoti from "$lib/stores/tiponoti";
     
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
@@ -100,7 +101,10 @@
     async function transferir(codigo){
         const resultcab = await pb.collection('cabs').getList(1, 1, {
             filter: `active = true && codigo = '${codigo}'`,
+            
         });
+        
+
         try{
             
             let data = {
@@ -109,10 +113,23 @@
             
             const record = await pb.collection('animales').update(slug, data);
 
+            let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        
+            let origenusuarioid =  pb_json.model.id
+            let datatrans = {
+                texto:"Se transfirió a "+caravana,
+                titulo:"Transferencia de 1 animal",
+                tipo:tiponoti[1].id,
+                origen:origenusuarioid,
+                destino:resultcab.items[0].user,
+                leido:false
+            }
+            await pb.collection('notificaciones').create(datatrans);
+            
             goto("/animales")
             Swal.fire("Éxito transferencia","Se pudo transferir al animal","success")
         }catch(err){
-            
+            console.error(err)
             Swal.fire("Error transferencia","No se pudo transferir al animal","error")
         }
         

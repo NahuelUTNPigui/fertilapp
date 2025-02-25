@@ -2,6 +2,8 @@
     import { goto } from "$app/navigation";
     import estilos from "$lib/stores/estilos";
     import {isEmpty} from "$lib/stringutil/lib"
+    import { randomString } from "$lib/stringutil/lib";
+    
     let {colabs = $bindable(),mostrarcolab,guardarColab,asos} = $props()
     let titulo = $state("Colaboradores")
     
@@ -20,12 +22,14 @@
     let malconfirmcontra = $state(false)
     let botonhabilitadocolab = $state(false)
     async function guardarColaborador(){
+        
         let data = {
             nombre,
             apellido,
             contra,
             telefono,
-            email
+            email,
+            
         }
         await guardarColab(data)
     }
@@ -201,23 +205,26 @@
                     </div>
                 {/if}
             </label>
-            <label for = "tel" class="label">
-                <span class="label-text text-base">Teléfono</span>
-            </label>
-            <label class="input-group">
-                <input id ="tel" type="text"  
-                    class={`
-                        input input-bordered 
-                        w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}   
-                    `}
-                    bind:value={telefono}
-                />
-            </label>
+            <div class="hidden">
+                <label for = "tel" class="label">
+                    <span class="label-text text-base">Teléfono</span>
+                </label>
+                <label class="input-group">
+                    <input id ="tel" type="text"  
+                        class={`
+                            input input-bordered 
+                            w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}   
+                        `}
+                        bind:value={telefono}
+                    />
+                </label>
+            </div>
+            
             <label for = "pass" class="label">
                 <span class="label-text text-base">Contraseña</span>
             </label>
