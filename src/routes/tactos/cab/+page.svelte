@@ -382,7 +382,11 @@
         </div>
         <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
-                <button class={` btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <button 
+                    class={` btn btn-primary rounded-lg ${estilos.btntext}`} 
+                    data-theme="forest" 
+                    onclick={()=>goto("/tactos/cab/movimiento")}
+                >
                     <span  class="text-xl">Nuevo</span>
                 </button>
             </div>
@@ -395,7 +399,7 @@
                     {prepararData}
                 />
             </div>
-            <div class="">
+            <div class="hidden">
                 <button
                     onclick={()=>goto("/tactos/cab/movimiento")}
                     class={`

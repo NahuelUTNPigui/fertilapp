@@ -4,6 +4,11 @@ export function isEmpty(str){
 export function capitalize(s) {
  return (s && String(s[0]).toUpperCase() + String(s).slice(1)) || ""
 }
+export function addDays(date, days) {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 export function randomString(len, an) {
     an = an && an.toLowerCase();
     var str = "",

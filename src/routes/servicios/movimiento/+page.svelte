@@ -12,7 +12,7 @@
     import sexos from "$lib/stores/sexos";
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
-    import tipostacto from '$lib/stores/tipostacto';
+    import { isEmpty } from "$lib/stringutil/lib";
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -20,17 +20,23 @@
     const today = new Date();
     const DESDE = new Date(today.getFullYear(), today.getMonth() - 1, 1);    
     const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
     let caber = createCaber()
     let cab = caber.cab
     //Datos animales
     let animales = $state([])
     let animalesrows = $state([])
+    let madres = $state([])
+    let padres = $state([])
+    let listapadres = $state([])
+    let cargadoanimales = $state(false)
     //Filtros
     let buscar = $state("")
     let lote = $state("")
     let rodeo = $state("")
     let categoria = $state("")
     let sexo = $state("H")
+    let estado = $state("")
 
     let lotes = $state([])
     let rodeos = $state([])
@@ -43,23 +49,24 @@
     let algunos = $state(false)
     let ninguno = $state(true)
 
-    //movimiento
-    let tipotactoselect = $state("")
-    let fecha = $state("")
+    //Datos servicios
+    let padresserv = $state("")
+    let pajuelasserv = $state("")
+    //Seria la fecha del parto
+    let fechaparto = $state("")
+    let fechadesdeserv = $state("")
+    let fechahastaserv = $state("")
+    let madre = $state("")
+    let observacion = $state("")
     //validacion
     let malfecha = $state(false)
+    let malpadre = $state(false)
     let botonhabilitado = $state(false)
-    
-
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
-    function onchangeTipoTacto(){
-        for(let i = 0;i<selectanimales.length;i++ ){
-            selectanimales[i].tipotacto = tipotactoselect
-        }
-    }
     function limpiar(){
+        //Cuando filtro debo reiniciar la seleccion?
         selectanimales = []
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
@@ -74,28 +81,11 @@
     }
     function filterUpdate(){
         
-        animalesrows = animales
-        if(buscar != ""){
-            animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
-        }
-        if(sexo != ""){
-            animalesrows = animalesrows.filter(a=>a.sexo == sexo)
-        }
-        if(rodeo != ""){
-            animalesrows = animalesrows.filter(a=>a.rodeo == rodeo)
-        }
-        if(lote != ""){
-            animalesrows = animalesrows.filter(a=>a.lote == lote)
-        }
-        if(categoria != ""){
-            animalesrows = animalesrows.filter(a=>a.categoria == categoria)
-        }
-
+        animalesrows = madres
     }
     function ordenarNombre(lista){
         lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
     }
-
     function clickAnimal(id){
         if(selecthashmap[id]){
             if(todos){
@@ -109,9 +99,11 @@
                 algunos = true
                 ninguno =  false
             }
-            let a = animales.filter(an=>an.id==id)[0]
+            let a = animalesrows.filter(an=>an.id==id)[0]
             selecthashmap[id] = {
-                ...a
+                ...a,
+                pajuela :"",
+                padre:""
             }
         }
     }
@@ -128,7 +120,9 @@
             for(let i = 0;i<animalesrows.length;i++){
                 let a = animalesrows[i]
                 selecthashmap[animalesrows[i].id] = {
-                    ...a
+                    ...a,
+                    pajuela :"",
+                    padre:""
                 }
             }
         }
@@ -164,77 +158,32 @@
         
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
-        animalesrows = animales
+        madres = animales.filter(a=>a.sexo == "H")
+        padres = animales.filter(a=>a.sexo == "M")
+        cargadoanimales = true
+        listapadres = padres.map(item=>{
+            return {
+                id:item.id,
+                nombre:item.caravana
+            }
+        })
+        animalesrows = madres
     }
     function openNewModal(){
-        tipotactoselect = "tacto"
         if(ninguno){
-            Swal.fire("Error tacto","No hay animales seleccionados","error")
+            Swal.fire("Error servicio","No hay animales seleccionados","error")
             return
         }
-        selectanimales = []
-        for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({
-                ...value,
-                estadonuevo:0,
-                tipotacto:"tacto",
-                observacionnuevo:""})
-        }
-        tactoMasivo.showModal()
+        
     }
     function getEstadoName(est) {
         let estado = estados.filter(e=>e.id==est)[0]
         return estado.nombre
     }
-    async function crearTactos() {
-        if(fecha == ""){
-            Swal.fire("Error tactos","Debe seleccionar una fecha","error")
-            return 
-        }
-        let errores = false
-
-        for(let i = 0;i<selectanimales.length;i++){
-            let tactoanimal = selectanimales[i]
-            try{
-                let dataupdate = {
-                    prenada:tactoanimal.estadonuevo
-                }
-                let datatacto={
-                    fecha:fecha +" 03:00:00" ,
-                    observacion:tactoanimal.observacionnuevo,
-                    animal:tactoanimal.id,
-                    categoria:tactoanimal.categoria,
-                    prenada:tactoanimal.estadonuevo,
-                    tipo:tactoanimal.tipotacto,
-                    nombreveterinario:"",
-                    cab:cab.id,
-                    active:true
-                }
-                
-                await guardarHistorial(pb,selectanimales[i].id)
-                let r = await pb.collection('animales').update(selectanimales[i].id, dataupdate);
-                await pb.collection('tactos').create(datatacto);
-                
-            }
-            catch(err){
-                console.error(err)
-                errores = true
-            }
-        }
-        if(errores){
-            Swal.fire("Error tactos","Hubo algun error en algun tacto","error")
-        }
-        else{
-            Swal.fire("Éxito tactos","Se lograron registrar todos los tactos","success")
-        }
-        await getAnimales()
-        filterUpdate()
-        fecha = ""
-        botonhabilitado = false
-        malfecha = false
-        selecthashmap = {}
-        selectanimales = []
+    async function crerServicio(params) {
+        
+    }
+    function validarBoton(){
     }
     onMount(async ()=>{
         await getAnimales()
@@ -244,42 +193,25 @@
     })
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-2 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <button
+                <button
                     class="bg-transparent border-none flex"
                     aria-label="volver"
-                    onclick={()=>goto("/tactos/cab")}
+                    onclick={()=>goto("/servicios")}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-1">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
                     <h1 class="text-2xl">
-                        Tactos
+                        Servicios        
                     </h1>
-                
                 </button>
-            
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex  gap-1 justify-end">
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
-            <button
-                onclick={()=>goto("/tactos/cab")}
-                class={`
-                    hidden
-                    bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
-                    ${estilos.btnsecondary}
-                    rounded-full
-                    px-4 pt-2 pb-3
-                `} 
-                aria-label="volver"
-            >
-            <span  class="text-xl font-semibold ">Volver</span>
-                
-            </button>
-
         </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
@@ -303,11 +235,10 @@
                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
-            </div> 
+            </div>
         </button>
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
-                
                 <div>
                     <label for = "rodeos" class="label">
                         <span class="label-text text-base">Rodeos</span>
@@ -380,16 +311,15 @@
                         </select>
                     </label>
                 </div>
-                <div class="mt-3">
+                <div>
                     <br>
                     <button
-                        class=" btn btn-neutral"
+                        class="btn btn-neutral mt-3"
                         onclick={limpiar}
                     >
                         Limpiar
                     </button>
                 </div>
-                
             </div>
         {/if}
     </div>
@@ -471,143 +401,3 @@
         </table>
     </div>
 </Navbarr>
-<dialog id="tactoMasivo" class="modal modal-middle rounded-xl">
-    <div 
-        class="
-            modal-box w-11/12 max-w-6xl
-            bg-gradient-to-br from-white to-gray-100 
-            dark:from-gray-900 dark:to-gray-800
-            "
-    >
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-        </form>
-        <h3 class="text-lg font-bold">Tactos múltiples</h3>
-        <div class="grid grid-cols-2 gap-1">
-            <div>
-                <label for = "fechatacto" class="label">
-                    <span class="label-text text-base">Fecha </span>
-                </label>
-                <label class="input-group ">
-                    <input id ="fechatacto" type="date" max={HOY}  
-                        class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={fecha}
-                        onchange={
-                            ()=>{
-                                if(fecha == ""){
-                                    malfecha = true
-                                    botonhabilitado = false
-                                }
-                                else{
-                                    malfecha = false
-                                    botonhabilitado = true
-                                }
-                            }
-                        }
-                    />
-                    {#if malfecha}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha del tacto</span>                    
-                        </div>
-                    {/if}
-                </label>
-            </div>
-            <div>
-                <label for = "tipotacto" class="tracking-wide label">
-                    <span class="label-text text-base">Tipo</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={tipotactoselect}
-                        onchange={onchangeTipoTacto}
-                    >
-                            
-                            {#each tipostacto as s}
-                                <option value={s.id}>{s.nombre}</option>
-                            {/each}
-                      </select>
-                </label>
-            </div>
-        </div>
-        <div class="w-full grid grid-cols-1 justify-items-start " >
-            <div class="flex overflow-x-auto">
-                <table class="table table-lg w-full w-11/12" >
-                    <thead>
-                        <tr>
-                            <th class="text-base ">Caravana</th>
-                            <th class="text-base "><span>Estado</span><br> anterior</th>
-                            <th class="text-base ">Estado Nuevo</th>
-                            <th class="text-base ">Observación</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each selectanimales as a,i}
-                            <tr>
-                                <td class="text-base">{a.caravana}</td>
-                                <td class="text-base ">{getEstadoName(a.prenada)}</td>
-                                <td>
-                                    <label class="input-group ">
-                                        <select 
-                                            class={`
-                                                select select-bordered w-full
-                                                rounded-md
-                                                focus:outline-none focus:ring-2 
-                                                focus:ring-green-500 
-                                                focus:border-green-500
-                                                ${estilos.bgdark2}
-                                            `}
-                                            bind:value={selectanimales[i].estadonuevo}
-                                        >
-                                                
-                                            {#each estados as e}
-                                                <option value={e.id}>{e.nombre}</option>
-                                            {/each}
-                                        </select>
-                                    </label>
-                                </td>
-                                <td class="">
-                                    <input
-                                    bind:value={selectanimales[i].observacion}
-                                    class={`
-                                        h-12 border border-gray-300 
-                                        w-full
-                                        rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `}
-                                    />
-                                </td>
-                                
-                                
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="modal-action justify-start ">
-            <form method="dialog" >
-                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={crearTactos} >Crear Tactos</button>
-                <button class="btn btn-error text-white" >Cancelar</button>
-            </form>
-        </div>
-    </div>
-</dialog>

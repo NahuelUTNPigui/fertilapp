@@ -357,6 +357,23 @@
               </div>
             {/if}
           </li>
+          <li class={`hidden ${cab.exist?"":"disabled"} ${pageurl.includes("servicios")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+            {#if cab.exist}
+            <a class = {classtext} href="/servicios">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+              </svg>
+              <span class="px-3">Servicios</span>
+            </a>
+            {:else}
+              <div class={classtext}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                </svg>                
+                <span class="px-3">Servicios</span>
+              </div>
+            {/if}
+          </li>
           <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("observaciones")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
             {#if cab.exist}
             <a class = {classtext} href="/observaciones">

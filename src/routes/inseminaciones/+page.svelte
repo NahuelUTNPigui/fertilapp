@@ -389,8 +389,8 @@
         </div>
         <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
-                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                    <span  class="text-lg">Nueva</span>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto("/inseminaciones/movimiento")}>
+                    <span  class="text-lg">Nuevas</span>
                 </button>
             </div>
             <div>
@@ -402,7 +402,7 @@
                     {prepararData}
                 />
             </div>
-            <div class="">
+            <div class="hidden">
                 <button
                     onclick={()=>goto("/inseminaciones/movimiento")}
                     class={`
@@ -533,51 +533,6 @@
             </div>
         {/if}
     </div>
-    <!--<div class="w-full grid justify-items-left mx-1 lg:mx-10 mt-1">
-        <h1 class="text-2xl">Inseminaciones</h1>
-    </div>
-    <div class="grid grid-cols-2 lg:grid-cols-4 mx-1 lg:mx-10 mb-2 lg:mb-3" >
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-              Inseminacion desde
-            </label>
-            <input id ="fechainseminaciondesde" type="date"  
-                class={`
-                    input input-bordered
-                    ${estilos.bgdark2}
-                `} 
-                bind:value={fechainseminaciondesde} onchange={filterUpdate}
-            />
-        </div>
-        <div class="">
-            <label class="block uppercase tracking-wide text-xs font-bold mb-2" for="grid-first-name">
-                Inseminacion hasta
-            </label>
-            <input id ="fechainseminacionhasta" type="date"  
-                  class={`
-                      input input-bordered
-                      ${estilos.bgdark2}
-                  `} 
-                  bind:value={fechainseminacionhasta} onchange={filterUpdate}
-            />
-        </div>  
-    </div>
-    <div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div >
-            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nueva inseminación</span>
-            </button>
-        </div>
-        <div>
-            <Exportar
-                titulo={"Inseminaciones"}
-                filtros={[]}
-                confiltros={false}
-                data = {inseminacionesrow}
-                {prepararData}
-            />
-        </div>
-    </div>-->
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>

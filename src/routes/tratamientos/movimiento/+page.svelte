@@ -237,17 +237,31 @@
 
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-2 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Tratamientos </h1>
+            <button
+                    class="bg-transparent border-none flex"
+                    aria-label="volver"
+                    onclick={()=>goto("/tratamientos")}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    <h1 class="text-2xl">
+                        Tratamientos
+                    </h1>
+                </button>
+            
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex gap-1 justify-end">
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
             <button
+
                 onclick={()=>goto("/tratamientos")}
                 class={`
+                    hidden
                     bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
                     ${estilos.btnsecondary}
                     rounded-full

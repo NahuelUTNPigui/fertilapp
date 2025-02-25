@@ -422,13 +422,13 @@
     }
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-3 lg:grid-cols-4 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
             <h1 class="text-2xl">Tratamientos</h1>
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex col-span-3 gap-1 justify-start lg:justify-end">
             <div>
-                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto("/tratamientos/movimiento")}>
                     <span  class="text-xl">Nuevo</span>
                 </button>
             </div>
@@ -437,18 +437,18 @@
                     <span  class="text-xl">Tipos</span>
                 </button>
             </div>
-            
+            <div>
+                <Exportar
+                    titulo ={"Tratamientos"}
+                    filtros = {[]}
+                    confiltros = {false}
+                    data = {tratamientosrow}
+                    {prepararData}
+                />
+            </div>
         </div>
-        <div>
-            <Exportar
-                titulo ={"Tratamientos"}
-                filtros = {[]}
-                confiltros = {false}
-                data = {tratamientosrow}
-                {prepararData}
-            />
-        </div>
-        <div class="">
+        
+        <div class="hidden">
             <button
                 onclick={()=>goto("/tratamientos/movimiento")}
                 class={`

@@ -1,11 +1,12 @@
 <script>
     import estilos from "$lib/stores/estilos";
 
-    let {lista,etiqueta,valor=$bindable(""),cadena=$bindable(""),size="w-4/5"} = $props()
+    let {lista,etiqueta,valor=$bindable(""),cadena=$bindable(""),onelegir,onwrite,size="w-4/5"} = $props()
     let listarow = $state(lista)
     let isOpen = $state(false)
     let nombre = $state("")
     function cambioCadena(){
+        onwrite(cadena)
         if(cadena.length == 0){
             listarow = lista
             valor = ""
@@ -15,6 +16,7 @@
             listarow = lista.filter(e=>e.nombre.toLowerCase().includes(cadena.toLowerCase()))
             if(listarow.length == 1){
                 valor = listarow[0].id
+                onelegir(valor)
                 nombre = listarow[0].nombre
             }
             if(listarow.length == 0){
@@ -24,6 +26,7 @@
     }
     function clickOption(id){
         valor = id
+        onelegir(valor)
         isOpen = !isOpen
         cadena = listarow.filter(l=>l.id==id)[0].nombre
         nombre = cadena

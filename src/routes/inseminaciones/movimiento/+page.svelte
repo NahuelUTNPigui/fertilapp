@@ -15,15 +15,7 @@
     import { isEmpty } from "$lib/stringutil/lib";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
     
-    //lista testear
-    let valor = $state("")
-    let lista = [
-        {id:1,nombre:"a"},
-        {id:2,nombre:"b"},
-        {id:3,nombre:"d"},
-        {id:4,nombre:"c"},
-    ]
-    let etiqueta = $state("Test")
+
     //fin test
 
     let ruta = import.meta.env.VITE_RUTA
@@ -292,6 +284,22 @@
             
         }
     }
+    function onelegir(id){
+        let p = padres.filter(pa=>pa.id == id)[0]
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].pajuela = p.caravana
+            selectanimales[i].padre = id
+        }
+        onInput("PAJUELA")
+    }
+    function onwrite(){
+        
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].pajuela = pajuela
+            
+        }
+        onInput("PAJUELA")
+    }
     function onInput(campo){
         validarBoton()
         if(campo=="FECHA"){
@@ -325,17 +333,29 @@
 </script>
 <Navbarr>
     
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-2 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Inseminaciones</h1>
+                <button
+                    class="bg-transparent border-none flex"
+                    aria-label="volver"
+                    onclick={()=>goto("/inseminaciones")}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    </svg>
+                    <h1 class="text-2xl">
+                        Inseminaciones        
+                    </h1>
+                </button>
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex  gap-1 justify-end">
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
             <button
                 onclick={()=>goto("/inseminaciones")}
                 class={`
+                hidden
                     bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
                     ${estilos.btnsecondary}
                     rounded-full
@@ -445,12 +465,16 @@
                     </select>
                 </label>
             </div>
-            <button
-                class="btn btn-neutral"
-                onclick={limpiar}
-            >
-                Limpiar
-            </button>
+            <div>
+                <br>
+                <button
+                    class="btn btn-neutral mt-3"
+                    onclick={limpiar}
+                >
+                    Limpiar
+                </button>
+            </div>
+            
         </div>
         {/if}
     </div>
@@ -547,7 +571,7 @@
         <div class="grid grid-cols-2 gap-1">
             <div>
                 <label for = "fechainseminacion" class="label">
-                    <span class="label-text text-base">Fecha </span>
+                    <span class="label-text text-base">Fecha inseminacion </span>
                 </label>
                 <label class="input-group ">
                     <input id ="fechainseminacion" type="date" max={HOY}  
@@ -571,7 +595,7 @@
             </div>
             <div>
                 <label for = "fechains" class="label">
-                    <span class="label-text text-base">Fecha </span>
+                    <span class="label-text text-base">Fecha Parto</span>
                 </label>
                 <label class="input-group ">
                     <input id ="fechains" type="date" max={HOY}  
@@ -590,7 +614,7 @@
                 </label>
             </div>
             {#if cargadoanimales}
-                <PredictSelect bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres} size="w-1/2"/>
+                <PredictSelect {onwrite} {onelegir} bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres}  size="w-1/2"/>
             {/if}
             <div class="hidden">
                 <label for = "nombrepadre" class="label">

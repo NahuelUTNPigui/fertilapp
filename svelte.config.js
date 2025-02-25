@@ -47,7 +47,9 @@ const config = {
 				"/inseminaciones/movimiento",
 				"/tratamientos/movimiento",
 				"/recover",
-				"/recover/token"]
+				"/recover/token",
+				"/user/nivel"
+			]
 		}
 	}
 };
