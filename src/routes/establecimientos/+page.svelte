@@ -57,24 +57,27 @@
             confirmButtonText: 'Si',
             cancelButtonText: 'No'
         }).then(async result=>{
-            let data = {active :false}
-            try{
-                await pb.collection("cabs").update(id,data)
-                Swal.fire("Éxito","Se pudo eliminar el establecimiento","success")
+            if(result.value){
+                let data = {active :false}
+                try{
+                    await pb.collection("cabs").update(id,data)
+                    Swal.fire("Éxito","Se pudo eliminar el establecimiento","success")
+                }
+                catch(err){
+                    Swal.fire("Error eliminar","No se pudo eliminar el establecimiento","error")
+                }
+                const records = await pb.collection("cabs").getFullList({
+                    filter: `active = True && user = '${usuarioid}'` 
+                })
+                
+                establecimientos = records
+                totales = []
+                for(let i = 0;i<establecimientos.length;i++){
+                    totales.push(await getTotalAnimales(establecimientos[i].id))
+                } 
             }
-            catch(err){
-                Swal.fire("Error eliminar","No se pudo eliminar el establecimiento","error")
-            }
-            const records = await pb.collection("cabs").getFullList({
-                filter: `active = True && user = '${usuarioid}'` 
-            })
             
-            establecimientos = records
-            totales = []
-            for(let i = 0;i<establecimientos.length;i++){
-                totales.push(await getTotalAnimales(establecimientos[i].id))
-            }
-            })
+        })
         
         
     }

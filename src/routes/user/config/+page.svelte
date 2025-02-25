@@ -15,6 +15,7 @@
     let username = $state("")
     let usermail = $state("")
     let nombre = $state("")
+    let nivel = $state("")
     let apellido = $state("")
     let viejacontra = $state("")
     let malviejacontra = $state("")
@@ -127,6 +128,7 @@
         username = pb_json.model.username
         nombre = pb_json.model.nombre
         apellido = pb_json.model.apellido
+        nivel = pb_json.model.nivel
         let light = !darker.dark
         tokencolab = pb_json.model.codigo
         cab = caber.cab
@@ -286,6 +288,31 @@
         >
             {tokencolab}
         </label>
+        <h2 class="mt-3 text-xl font-semibold">Plan </h2>
+        <label for="codigo " 
+            class={`mt-2 block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            Nivel:
+        </label>
+        <label for="codigo" 
+            class={`mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            {nivel}
+        </label>
+        <div class="mt-2 flex justify-start">
+            <button
+                    onclick={()=>goto("/user/nivel")}
+                    class=" 
+                        btn px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md 
+                        text-white font-bold font-lg focus:outline-none 
+                        focus:ring-2 focus:ring-offset-2 focus:ring-green-500
+                    "
+                >
+                    Cambiar plan
+            </button> 
+            
+        </div>
+
     </CardBase>
     
 </Navbarr>
