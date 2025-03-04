@@ -1,7 +1,7 @@
 import { randomString } from "$lib/stringutil/lib";
 export async function codigoRepetido(pb,codigo){
     const resultList = await pb.collection('Codigos').getList(1, 1, {
-        filter: `id == '${codigo}'`,
+        filter: `id = '${codigo}'`,
         skipTotal :true
     });
     if(resultList.items.length == 0){
@@ -23,7 +23,7 @@ export async function codigoSinRepetir(pb) {
 //Establecimentos
 export async function codigoRepetidoEstablecimiento(pb,codigo){
     const resultList = await pb.collection('CodigosEstablecimiento').getList(1, 1, {
-        filter: `id == '${codigo}'`,
+        filter: `id = '${codigo}'`,
         skipTotal :true
     });
     if(resultList.items.length == 0){

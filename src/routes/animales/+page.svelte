@@ -19,6 +19,7 @@
     import RadioButton from '$lib/components/RadioButton.svelte';
     import { getEstadoNombre } from '$lib/components/estadosutils/lib';
     import MultiSelect from '$lib/components/MultiSelect.svelte';
+    import cuentas from '$lib/stores/cuentas';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -88,6 +89,21 @@
     }
     function isEmpty(str){
         return (!str || str.length === 0 );
+    }
+    async function verificarNivel() {
+        let user = await pb.collection("users").getOne(usuarioid)
+        
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+        
+        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
+        
+        if(animals.totalItems >= nivel.animales){
+            return false
+        }
+        else{
+            return true
+        }
+
     }
     async function getRodeos(){
         const records = await pb.collection('rodeos').getFullList({
@@ -166,6 +182,21 @@
     }
     //Se puede guardar un animal con su nacimiento
     async function guardar(){
+        let user = await pb.collection("users").getOne(usuarioid)
+        
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+        
+        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
+        let verificar = true
+        if(nivel.animales != -1 && animals.totalItems > nivel.animales){
+            verificar =  false
+        }
+        
+        if(!verificar){
+            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
+            return
+        }
+        return 
         try{
             let recordparicion = null
             if(conparicion){

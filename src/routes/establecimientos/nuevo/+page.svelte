@@ -12,6 +12,7 @@
     import { createCaber } from "$lib/stores/cab.svelte";
     import {randomString} from "$lib/stringutil/lib"
     import { codigoSinRepetirEstablecimiento } from "$lib/pbutils/lib";
+    import cuentas from '$lib/stores/cuentas';
     import Swal from 'sweetalert2';
     let pageurl = $page.url.pathname  
     let ruta = import.meta.env.VITE_RUTA
@@ -70,6 +71,16 @@
         goto("/establecimientos")
     }
     async function guardarEstablecimiento(){
+        let user = await pb.collection("users").getOne(usuarioid)
+        
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+        let cabs = await pb.collection('cabs').getList(1,1,{filter:`user='${usuarioid}' && active = true`})
+        
+        if(nivel.establecimientos != -1 && cabs.totalItems > nivel.establecimientos){
+          Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.establecimientos} establecimientos`,"error")
+          return
+        }
+        
         let codigo = await codigoSinRepetirEstablecimiento(pb)
         const data = {
             nombre:nombreest,
