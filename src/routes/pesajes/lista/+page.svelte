@@ -27,12 +27,14 @@
     let filas = $state([])
     let columnas = $state([])
     let tablapesaje = $state({})
+    let pesajesprocesados = $state([])
     //pesaje
     let idpesaje = $state("")
     let caravana = $state("")
     let fecha = $state("")
     let pesoanterior = $state("")
     let pesonuevo = $state("")
+    let ultimos = $state(5)
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
@@ -59,7 +61,8 @@
         if(!isEmpty(fechahasta)){
             pesajesrows = pesajesrows.filter(p=>p.fecha<=fechahasta)
         }
-        procesarPesajes()
+        //procesarPesajes()
+        procesarUltimosPesajes()
     }
     async function eliminar(){
         
@@ -94,22 +97,17 @@
         }
     }
     function exportarPesaje(){
-        let csvdata = filas.map(f=>{
+        
+        let lista = pesajesrows
+        let csvdata = lista.map(f=>{
+
             let filaexcel = {
-                ANIMAL:f
+                ANIMAL:f.expand.animal.caravana,
+                FECHA:new Date(f.fecha).toLocaleDateString(),
+                PESO_ANTERIO:f.pesoanterior,
+                PESO_NUEVO:f.pesonuevo
             }
-            for(let i = 0;i<columnas.length;i++){
-                
-                let col = columnas[i]
-                let fecha = new Date(col).toLocaleDateString()
-                if(tablapesaje[col][f]){
-                    filaexcel[fecha] = tablapesaje[col][f].pesonuevo  
-                }
-                else{
-                    filaexcel[fecha] = "-"
-                }
-                
-            }
+            
             return filaexcel
         })
         const wb = XLSX.utils.book_new();
@@ -126,6 +124,35 @@
             XLSX.utils.book_append_sheet(wb, wsFilter, 'Filtros aplicados');
         }
         XLSX.writeFile(wb, `${"Pesajes".replace(/\//g, "-")}.xlsx`, { cellStyles: true });
+
+    }
+    function procesarUltimosPesajes(){
+        pesajesprocesados = []
+        //tabla[animal] = { animal,pesajes:[{fecha,peso}]}
+        let tablapesajes = {}
+        for(let i = 0;i<pesajesrows.length;i++){
+            let p = pesajesrows[i]
+            let caravana = p.expand.animal.caravana
+            let fecha = p.fecha
+            let peso = p.pesonuevo
+            let id = p.id
+            if(tablapesajes[caravana]){
+                if(tablapesajes[caravana].pesajes.length < ultimos){
+                    tablapesajes[caravana].pesajes.push({fecha,peso,id})
+                }
+            }
+            else{
+                tablapesajes[caravana] = {
+                    animal:caravana,
+                    pesajes:[{fecha,peso,id}]
+                }
+            }
+        }
+        console.log(tablapesajes)
+        for (const [key, value] of Object.entries(tablapesajes)) {
+            pesajesprocesados.push(value)
+        }
+        console.log(pesajesprocesados)
 
     }
     function procesarPesajes(){
@@ -180,7 +207,7 @@
 <Navbarr>
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Historia pesajes</h1>  
+            <h1 class="text-2xl">Historia pesajes - Últimos {ultimos}</h1>  
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
             
@@ -274,7 +301,7 @@
             </div>
         {/if}
     </div>
-    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+    <div class="hidden w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
@@ -308,102 +335,112 @@
             </tbody>
         </table>
     </div>
-    <div class="hidden w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Caravana</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso anterior</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso nuevo</th>
-                    
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Animal</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">5</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">4</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">3</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">2</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">1</th>
                 </tr>
+                
             </thead>
             <tbody>
-                {#each pesajesrows as p}
-                    <tr onclick={()=>openDetalle(p.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
-                        <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{new Date(p.fecha).toLocaleDateString()}</td>
+                {#each pesajesprocesados as f}
+                    <tr>
                         <td class="text-base mx-1 px-1">
-                            {p.expand.animal.caravana}
+                            {f.animal}
                         </td>
-                        <td class="text-base mx-1 px-1">
-                            {p.pesoanterior}
-                        </td>
-                        <td class="text-base mx-1 px-1">
-                            {p.pesonuevo}
-                        </td>
+                        {#each Array(ultimos) as _,idx}
+                            {#if f.pesajes.length < ultimos - idx}
+                                <td>
+                                    {"-"}
+                                </td>
+                            {:else}
+                                <td onclick={()=>openDetalle(f.pesajes[ultimos - idx - 1].id)} class="cursor-pointer text-base mx-1 px-1 hover:bg-gray-200 dark:hover:bg-gray-900">
+                                    {new Date(f.pesajes[ultimos - idx - 1].fecha).toLocaleDateString()} , {f.pesajes[ultimos - idx - 1].peso}
+                                </td>
+                            {/if}
+                                
+                        {/each}
+                        
+                        
                     </tr>
                 {/each}
             </tbody>
         </table>
     </div>
-    <dialog id="detallePesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-        <div class="
-            modal-box w-11/12 max-w-xl
-            bg-gradient-to-br from-white to-gray-100 
-            dark:from-gray-900 dark:to-gray-800 
-            "
-        >
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-            </form>
-            <h3 class="text-lg font-bold">Ver pesaje</h3>  
-            <div class="form-control">
-                <div class="grid grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
-                    <div class="mb-1 lg:mb-0">
-                        <label for = "caravana" class="label">
-                            <span class="label-text text-base">Caravana</span>
-                        </label>
-                        <label for="caravana" 
-                            class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
-                        >
-                            {caravana}
-                        </label>
-                    </div>
-                    <div class="mb-1 lg:mb-0">
-                        <label for = "caravana" class="label">
-                            <span class="label-text text-base">Fecha</span>
-                        </label>
-                        <label for="caravana" 
-                            class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
-                        >
-                            {fecha}
-                        </label>
-                    </div>
-                    <div class="mb-1 lg:mb-0">
-                        <label for = "pesoanterior" class="label">
-                            <span class="label-text text-base">Peso anterior(KG)</span>
-                        </label>
-                        <label for="pesoanterior" 
-                            class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
-                        >
-                            {pesoanterior}
-                        </label>
-                    </div>
-                    <div class="mb-1 lg:mb-0">
-                        <label for = "pesonuevo" class="label">
-                            <span class="label-text text-base">Peso nuevo(KG)</span>
-                        </label>
-                        <label for="pesonuevo" 
-                            class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
-                        >
-                            {pesonuevo}
-                        </label>
-                    </div>
+    
+</Navbarr>
+<dialog id="detallePesaje" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div class="
+        modal-box w-11/12 max-w-xl
+        bg-gradient-to-br from-white to-gray-100 
+        dark:from-gray-900 dark:to-gray-800 
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Ver pesaje</h3>  
+        <div class="form-control">
+            <div class="grid grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
+                <div class="mb-1 lg:mb-0">
+                    <label for = "caravana" class="label">
+                        <span class="label-text text-base">Caravana</span>
+                    </label>
+                    <label for="caravana" 
+                        class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+                    >
+                        {caravana}
+                    </label>
+                </div>
+                <div class="mb-1 lg:mb-0">
+                    <label for = "caravana" class="label">
+                        <span class="label-text text-base">Fecha</span>
+                    </label>
+                    <label for="caravana" 
+                        class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+                    >
+                        {fecha}
+                    </label>
+                </div>
+                <div class="mb-1 lg:mb-0">
+                    <label for = "pesoanterior" class="label">
+                        <span class="label-text text-base">Peso anterior(KG)</span>
+                    </label>
+                    <label for="pesoanterior" 
+                        class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+                    >
+                        {pesoanterior}
+                    </label>
+                </div>
+                <div class="mb-1 lg:mb-0">
+                    <label for = "pesonuevo" class="label">
+                        <span class="label-text text-base">Peso nuevo(KG)</span>
+                    </label>
+                    <label for="pesonuevo" 
+                        class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+                    >
+                        {pesonuevo}
+                    </label>
                 </div>
             </div>
-            <div class="modal-action justify-start ">
-                
-                    <button class="btn btn-error text-white" onclick={eliminar}>Eliminar</button>
-                    <button class={`
-                        btn 
-                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
-                        ${estilos.btnsecondary}`} 
-                        onclick={()=>detallePesaje.close()}
-
-                    >Cerrar</button>
-                
-            </div>
         </div>
-    </dialog>
-</Navbarr>
+        <div class="modal-action justify-start ">
+            
+                <button class="btn btn-error text-white" onclick={eliminar}>Eliminar</button>
+                <button class={`
+                    btn 
+                    bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                    ${estilos.btnsecondary}`} 
+                    onclick={()=>detallePesaje.close()}
+
+                >Cerrar</button>
+            
+        </div>
+    </div>
+</dialog>

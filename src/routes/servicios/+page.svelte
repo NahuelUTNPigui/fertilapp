@@ -13,7 +13,8 @@
     import permisos from "$lib/stores/permisos";
     import estilos from '$lib/stores/estilos';
     import { guardarHistorial } from '$lib/historial/lib';
-    import { isEmpty,getWholeWordButLastLetter } from '$lib/stringutil/lib';
+    import { isEmpty,getWholeWordButLastLetter,addDays } from '$lib/stringutil/lib';
+    import MultipleToros from "$lib/components/MultipleToros.svelte";
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -26,6 +27,7 @@
     let cab = caber.cab
     let usuarioid = userer.userid
     let caravana = $state("")
+    let cargado = $state(false)
     // Datos para mostrar
     let servicios = $state([])
     let serviciosrow = $state([])
@@ -35,6 +37,7 @@
     
     //Datos servicios
     let idserv = $state("")
+    let padreslist = $state([])
     let padresserv = $state("")
     let pajuelasserv = $state("")
     //Seria la fecha del parto
@@ -60,9 +63,54 @@
     }
     function openEditModal(id){
         idserv = id
+        let ser = servicios.filter(s=>s.id == id)[0]
+        if(ser){
+            madre = ser.madre
+            fechadesdeserv = ser.fechadesde.split(" ")[0]
+            fechahastaserv = ser.fechahasta.split(" ")[0]
+            fechaparto = ser.fechaparto.split(" ")[0]
+            observacion = ser.observacion
+            padreslist = ser.padres.split(",")
+            nuevoModal.showModal()
+        }
     }
-    function editar(){
-
+    async function editar(){
+        try{
+            let dataser = {
+                fechadesde : fechadesdeserv + " 03:00:00",
+                fechaparto: fechaparto + " 03:00:00",
+                observacion: observacion,
+                madre:madre,
+                padres:padreslist.join()
+            }
+            if(fechahastaserv != ""){
+                dataser.fechahasta = fechahastaserv + " 03:00:00"
+            }
+            await pb.collection("servicios").update(idserv,dataser)
+            await getServicios()
+            filterUpdate()
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+    async function eliminar(id){
+        try{
+            await pb.collection("servicios").update(id,{active:false})
+            await getServicios()
+        }
+        catch(err){
+            console.error(err)
+        }
+    }
+    function cerrarModal(){
+        madre = ser.madre
+        fechadesdeserv = ""
+        fechahastaserv = ""
+        fechaparto = ""
+        observacion = ""
+        padreslist = ""
+        nuevoModal.close()
     }
     async function getServicios(){
         const records = await pb.collection('servicios').getFullList({
@@ -74,10 +122,11 @@
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}'`
+            filter:`active=true && cab='${cab.id}' && delete=False`
         })
         madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
         padres = recordsa.filter(a=>a.sexo == "M")
+        cargado = true
 
     }
     function validarBoton(){
@@ -265,3 +314,132 @@
         </table>
     </div>
 </Navbarr>
+<dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div class="
+        modal-box w-11/12 max-w-xl
+        bg-gradient-to-br from-white to-gray-100 
+        dark:from-gray-900 dark:to-gray-800
+    "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Ver servicio</h3>  
+        <div class="form-control">
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Madre</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={madre}
+                    
+                >
+                    
+                    {#each madres as a}
+                        <option value={a.id}>{a.caravana}</option>    
+                    {/each}
+                </select>
+            </label>
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Fecha desde</span>
+            </label>
+            <label class="input-group ">
+                <input id ="fecha" type="date" 
+                    class={`
+                        input input-bordered 
+                        w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={fechadesdeserv}
+                    s
+                />
+                
+            </label>
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Fecha hasta</span>
+            </label>
+            <label class="input-group ">
+                <input id ="fecha" type="date" 
+                    class={`
+                        input input-bordered 
+                        w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={fechahastaserv}
+                    
+                />
+                
+            </label>
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Fecha parto</span>
+            </label>
+            <label class="input-group ">
+                <input id ="fecha" type="date" 
+                    class={`
+                        input input-bordered 
+                        w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `} 
+                    bind:value={fechaparto}
+                />
+            </label>
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Padres</span>
+            </label>
+            <label class="input-group ">
+                {#if cargado}
+                    <MultipleToros toros={padres} bind:valor={padresserv} bind:listavalores={padreslist} />
+                    
+                {/if}
+            </label>
+            
+            <label class="form-control">
+                <div class="label">
+                    <span class="label-text">Observacion</span>                    
+                </div>
+                <input 
+                    id ="observacion" 
+                    type="text"  
+                    class={`
+                        input 
+                        input-bordered 
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                        w-full
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={observacion}
+                />
+            </label>
+            
+
+        </div>
+        <div class="modal-action justify-start ">
+            <form method="dialog" >
+                <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
+                <button class="btn btn-error text-white" onclick={()=>eliminar(idserv)}>Eliminar</button>
+                <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
+            </form>
+        </div>
+    </div>
+</dialog>

@@ -20,6 +20,9 @@
         if(!dentroLista(t)){
             listavalores.push(t.id)
         }
+        else{
+            quitar(t.id)
+        }
         
     }
     function dentroLista(t){

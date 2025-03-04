@@ -103,7 +103,7 @@
               <div class="flex-none">
                 <button
                   aria-label="menu" 
-                  class={`mx-1 px-1 btn btn-ghost ${classtextnavbar}`} onclick={handleClick}>
+                  class={`mx-1 px-0 btn btn-ghost ${classtextnavbar}`} onclick={handleClick}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                     <path fill-rule="evenodd" d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
                   </svg>
@@ -111,8 +111,8 @@
               </div>
               <div class="flex-1">
                 <a href="/inicio" 
-                class={`pl-0 pr-1 btn btn-ghost text-2xl ${classtextnavbar}`}
-                >{nombreestablecimiento}</a>
+                class={`ps-0 btn btn-ghost text-xl ${classtextnavbar}`}
+                >{nombreestablecimiento.length > 15? nombreestablecimiento.slice(0,15):nombreestablecimiento}</a>
               </div>
               <div class="flex mr-1 pr-1 lg:mr-5 lg:pr-5">
                 <details class="dropdown dropdown-end">

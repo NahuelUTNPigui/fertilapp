@@ -12,7 +12,7 @@
     import sexos from "$lib/stores/sexos";
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
-    import { isEmpty } from "$lib/stringutil/lib";
+    import { isEmpty,addDays } from "$lib/stringutil/lib";
     import MultipleToros from "$lib/components/MultipleToros.svelte";
     let ruta = import.meta.env.VITE_RUTA
 
@@ -213,6 +213,7 @@
             }
             else{
                 malfechadese = false
+                fechaparto = addDays(fechadesdeserv, 280).toISOString().split("T")[0]
             }
         }
     }
@@ -226,6 +227,7 @@
             try{
                 let dataser = {
                     fechadesde : fechadesdeserv + " 03:00:00",
+                    fechaparto: fechaparto + " 03:00:00",
                     observacion: servicio.observacion,
                     madre:servicio.id,
                     padres:padreslist.join(),
@@ -544,6 +546,27 @@
                         bind:value={fechahastaserv}
                     />
                 </label>
+            </div>
+            <div>
+                <label for = "fechaparto" class="label">
+                    <span class="label-text text-base">Fecha parto</span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechaparto" type="date"   
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fechaparto}
+                        
+                    />
+                    
+                </label>
+
             </div>
             <div class="lg:col-span-2">
                 <label for = "toros" class="label">

@@ -9,6 +9,7 @@
     import ImportarPesajes from '$lib/components/importar/ImportarPesajes.svelte';
     import ImportarRodeos from '$lib/components/importar/ImportarRodeos.svelte';
     import ImportarTactos from '$lib/components/importar/ImportarTactos.svelte';
+    import ImportarInseminaciones from '$lib/components/importar/ImportarInseminaciones.svelte';
     
 </script>
 <Navbarr>
@@ -29,6 +30,9 @@
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar observaciones">
         <ImportarObservaciones/>
+    </CardImportar>
+    <CardImportar cardsize="max-w-2xl" titulo="Importar inseminaciones">
+        <ImportarInseminaciones/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar pesajes">
         <ImportarPesajes/>

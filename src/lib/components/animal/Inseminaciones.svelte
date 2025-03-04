@@ -88,19 +88,7 @@
     })
 </script>
 <div class="w-full flex justify-items-start gap-2">
-    <div class="hidden">
-        <button
-            aria-label="Expandir"
-            onclick={()=>expandirInseminacion.showModal()}
-            class={`
-                ${estilos.basico} ${estilos.chico} ${estilos.primario}
-                ${inseminaciones.length == 0?estilos.deshabilitado:""}
-            `}
-            disabled = {inseminaciones.length == 0}
-        >
-            Expandir                
-        </button>
-    </div>
+    
     <div>
         <button
             aria-label="Nuevo"

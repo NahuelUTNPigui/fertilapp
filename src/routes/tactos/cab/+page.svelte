@@ -737,47 +737,7 @@
     
                     <RadioButton class="m-1 my-3" bind:option={prenada} deshabilitado={false}/>
                 </div>
-                <div class="form-group hidden">
-                    <label for = "prenada" class="label">
-                        <span class="label-text text-base">Preñada</span>
-                    </label>
-                    <label class="input-group ">
-                        <select 
-                            class={`
-                                select select-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `} bind:value={prenada}>
-                            {#each estados as e}
-                                <option value={e.id}>{e.nombre}</option>    
-                            {/each}
-                        </select>
-                    </label>
-                    <!--<div class="grid grid-cols-3">
-                        {#each  estados as e}
-                            <div>
-                                <button
-                                    aria-label={`estado ${e.nombre}` }
-                                    onclick={()=>selectOption(e.id)}
-                                    class={`
-                                        ${
-                                            e.id==prenada?
-                                            estilos.basicofill:
-                                            estilos.basico} 
-
-                                            ${estilos.medio} ${estilos.primario}
-                                    `}
-                                >
-                                        {e.nombre}
-                                </button>
-                                
-                            </div>
-                        {/each} 
-                    </div>
-                    -->
-                </div>
+                
                 <label for = "fecha" class="label">
                     <span class="label-text text-base">Fecha </span>
                 </label>
