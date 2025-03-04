@@ -233,12 +233,13 @@
                 active:true,
                 padre:inseminacion.padre,
                 pajuela:inseminacion.pajuela,
-                categoria:inseminacion.categoria
+                categoria:inseminacion.categoria,
+                
             }
             try{
                 const record = await pb.collection('inseminacion').create(data);
                 await guardarHistorial(pb,inseminacion.id)
-                await pb.collection('animales').update(inseminacion.id, {prenada:2});
+                await pb.collection('animales').update(inseminacion.id, {prenada:3});
                 await getAnimales()
                 
             }catch(err){
@@ -637,7 +638,7 @@
             {#if cargadoanimales}
                 <PredictSelect {onwrite} {onelegir} bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres}  size="w-1/2"/>
             {/if}
-            <div>
+            <div class="hidden">
                 <label for = "obs" class="label">
                     <span class="label-text text-base">Observacion </span>
                 </label>
@@ -667,7 +668,7 @@
                             <th class="text-base px-1">Caravana</th>
                             <th class="text-base px-1">Pajuela</th>
                             <th class="text-base px-1">Padre</th>
-                            <th class="text-base px-1">Observaciones</th>
+                            <th class="text-base px-1 hidden">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -711,7 +712,7 @@
                                         </select>
                                     </label>
                                 </td>
-                                <td class="px-1">
+                                <td class="px-1 hidden">
                                     <input
                                         bind:value={selectanimales[i].observacion}
                                         class={`

@@ -241,7 +241,8 @@
                 await pb.collection("servicios").create(dataser)
                 await guardarHistorial(pb,servicio.id)
                 await pb.collection("animales").update(servicio.id,{prenada:3})
-            }
+                await getAnimales()
+            }   
             catch(err){
                 console.error(err)
                 errores = true

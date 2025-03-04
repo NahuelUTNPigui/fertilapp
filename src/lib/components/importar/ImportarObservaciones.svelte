@@ -18,7 +18,7 @@
         let csvData = [{
             caravana:"AAA",
             categoria:"",
-            fecha:"AAAA/MM/DD",
+            fecha:"MM/DD/AAAA",
             observacion:""
         }].map(item=>({
             CARAVANA: item.caravana,

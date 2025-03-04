@@ -543,18 +543,21 @@
             </label>
         {/if}
     </div>
-    <div class="mb-1 lg:mb-0 col-span-2 lg:w-1/2">
-        <label for = "prenada" class="label">
-            <span class="label-text text-base">Estado</span>
-        </label>
-        {#if modoedicion}
-            
-            <RadioButton bind:option={prenada} deshabilitado={false}/>
-        {:else}
-            <RadioButton bind:option={prenada} deshabilitado={true}/>
-            
-        {/if}
-    </div>
+    {#if sexo == "H"}
+        <div class="mb-1 lg:mb-0 col-span-2 lg:w-1/2">
+            <label for = "prenada" class="label">
+                <span class="label-text text-base">Estado</span>
+            </label>
+            {#if modoedicion}
+                
+                <RadioButton bind:option={prenada} deshabilitado={false}/>
+            {:else}
+                <RadioButton bind:option={prenada} deshabilitado={true}/>
+                
+            {/if}
+        </div>
+    {/if}
+    
     {#if modoedicion}
         <div class="mb-1 lg:mb-0">
             <label for = "caravana" class="label">

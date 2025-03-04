@@ -19,7 +19,7 @@
         let csvData = [{
             caravana:"AAA",
             peso:"0",
-            fecha:"DD/MM/AAAA"
+            fecha:"MM/DD/AAAA"
         }].map(item=>({
             CARAVANA:item.caravana,
             PESO:item.peso,

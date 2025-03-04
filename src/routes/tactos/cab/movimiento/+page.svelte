@@ -159,7 +159,7 @@
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && delete=false && cab='${cab.id}'`,
+            filter:`active=true && delete=false && cab='${cab.id}' && sexo = 'H'`,
             expand:"rodeo,lote"
         })
         
@@ -180,7 +180,7 @@
                 ...value,
                 estadonuevo:0,
                 tipotacto:"tacto",
-                observacionnuevo:""})
+                observacion:""})
         }
         tactoMasivo.showModal()
     }
@@ -203,7 +203,7 @@
                 }
                 let datatacto={
                     fecha:fecha +" 03:00:00" ,
-                    observacion:tactoanimal.observacionnuevo,
+                    observacion:tactoanimal.observacion,
                     animal:tactoanimal.id,
                     categoria:tactoanimal.categoria,
                     prenada:tactoanimal.estadonuevo,
@@ -399,7 +399,7 @@
             </div>
         {/if}
     </div>
-    <div class="w-full grid justify-items-center mx-1  lg:w-3/4 overflow-x-auto">
+    <div class="w-full grid justify-items-center mx-1 lg:mx-10  lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full " >
             <thead>
                 <tr>

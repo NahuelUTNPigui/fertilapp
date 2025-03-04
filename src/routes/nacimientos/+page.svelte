@@ -93,13 +93,25 @@
     async function guardar(){
         try{
             
-            let m = madres.filter(ma=>ma.id==madre)[0]
+            let ms = madres.filter(ma=>ma.id==madre)
+            let m = {
+                id:"",
+                nombremadre:"",
+                rodeo:"",
+                lote:""
+            }
+            if(ms.length > 0){
+                m.id = ms[0].id
+                m.nombremadre = ms[0].caravana
+                m.lote = ms[0].lote
+                m.rodeo = ms[0].rodeo
+            }
             let tipomadre = m.categoria
             let dataparicion = {
-                madre,
+                madre:m.id,
                 padre,
                 fecha:fecha + " 03:00:00",
-                nombremadre,
+                nombremadre:m.nombremadre,
                 nombrepadre,
                 observacion,
                 cab:cab.id
@@ -113,10 +125,13 @@
                 sexo,
                 cab:cab.id,
                 peso,
+                lote:m.lote,
+                rodeo:m.rodeo,
                 nacimiento:recordparicion.id
             }
             let recorda = await pb.collection('animales').create(data); 
-            let datamadre = {
+            if(m.id != ""){
+                let datamadre = {
                 prenada:0
             }
             if(m.categoria == "vaquillona"){
@@ -126,23 +141,24 @@
                 }
             }
             await guardarHistorial(pb,madre)
-                await pb.collection('animales').update(madre,datamadre)
-            Swal.fire("Éxito guardar","Se pudo guardar la paricion con exito","success")
-            let item = {
-                caravana,
-                observacion,
-                cab,
-                nombremadre,
-                nombrepadre,
-                madre,
-                padre,
-                fecha:fecha +" 03:00:00",
-                animalid:recorda.id
-
+            await pb.collection('animales').update(madre,datamadre)
             }
-            nacimientos.push(item)
             
-            nacimientos.sort((n1,n2)=>new Date(n1.fecha)>new Date(n2.fecha)?-1:1)
+            Swal.fire("Éxito guardar","Se pudo guardar la paricion con exito","success")
+            //let item = {
+            //    caravana,
+            //    observacion,
+            //    cab,
+            //    nombremadre,
+            //    nombrepadre,
+            //    madre,
+            //    padre,
+            //    fecha:fecha +" 03:00:00",
+            //    animalid:recorda.id
+            //}
+            //nacimientos.push(item)
+            //nacimientos.sort((n1,n2)=>new Date(n1.fecha)>new Date(n2.fecha)?-1:1)
+            await getNacimientos()
             filterUpdate()
 
             
@@ -153,14 +169,27 @@
         }
     }
     async function editar(){
+        let ms = madres.filter(ma=>ma.id==madre)
+        let m = {
+            id:"",
+            nombremadre:"",
+            rodeo:"",
+            lote:""
+        }
+        if(ms.length > 0){
+            m.id = ms[0].id
+            m.nombremadre = ms[0].caravana
+            m.lote = ms[0].lote
+            m.rodeo = ms[0].rodeo
+        }
         let datanimal={
             fechanacimiento:fecha+" 03:00:00"
         }
         let dataparicion = {
-            madre,
+            madre:m.id,
             padre,
             fecha:fecha + " 03:00:00",
-            nombremadre,
+            nombremadre:m.nombremadre,
             nombrepadre,
             observacion,    
         }
@@ -168,21 +197,8 @@
             const recorda = await pb.collection('animales').update(idanimal, datanimal);
             const record = await pb.collection('nacimientos').update(idnacimiento, dataparicion);
             Swal.fire("Éxito editar","Se pudo editar la paricion con exito","success")
-            let item = {
-                caravana,
-                observacion,
-                cab,
-                nombremadre,
-                nombrepadre,
-                madre,
-                padre,
-                fecha:fecha +" 03:00:00",
-                animalid:recorda.id
-
-            }
-            nacimientos = nacimientos.filter(n=>n.id!=idnacimiento)
-            nacimientos.push(item)
-            nacimientos.sort((n1,n2)=>new Date(n1.fecha)>new Date(n2.fecha)?-1:1)
+            
+            await getNacimientos()
             filterUpdate()
             idnacimiento = ""
             caravana = ""
@@ -261,12 +277,14 @@
         nacimiento = nacimientos.filter(n=>n.id == id)[0]
         if(nacimiento.padre){
             padre = nacimiento.padre
+            nombrepadre = nacimiento.nombrepadre
         }
         else{
             padre = ""
         }
         if(nacimiento.madre ){
             madre = nacimiento.madre
+            nombremadre = nacimiento.nombremadre
         }
         else{
             madre = ""
@@ -358,18 +376,18 @@
             botonhabilitado = false
             
         }
-        if(isEmpty(nombremadre)){
-            botonhabilitado = false
-            
-        }
-        if(isEmpty(nombrepadre)){
-            botonhabilitado = false
-            
-        }
-        if(idnacimiento == "" && isEmpty(sexo)){
-            botonhabilitado = false
-            
-        }
+        //if(isEmpty(nombremadre)){
+        //    botonhabilitado = false
+        //    
+        //}
+        //if(isEmpty(nombrepadre)){
+        //    botonhabilitado = false
+        //    
+        //}
+        //if(idnacimiento == "" && isEmpty(sexo)){
+        //    botonhabilitado = false
+        //    
+        //}
         if(isEmpty(caravana)){
             botonhabilitado = false
             
@@ -393,31 +411,30 @@
                 malcaravana = false
             }
         }
-        if(nombreCampo=="MADRE"){
-            if(isEmpty(nombremadre)){
-                malmadre = true
-            }
-            else{
-                malmadre = false
-            }
-        }
-        if(nombreCampo=="PADRE"){
-            if(isEmpty(nombrepadre)){
-                malpadre=true
-            }
-            else{
-                malpadre = true
-            }
-        }
-
-        if(nombreCampo=="SEXO"){
-            if(isEmpty(sexo)){
-                malsexo = true
-            }
-            else{
-                malsexo = false
-            }
-        }
+        //if(nombreCampo=="MADRE"){
+        //    if(isEmpty(nombremadre)){
+        //        malmadre = true
+        //    }
+        //    else{
+        //        malmadre = false
+        //    }
+        //}
+        //if(nombreCampo=="PADRE"){
+        //    if(isEmpty(nombrepadre)){
+        //        malpadre=true
+        //    }
+        //    else{
+        //        malpadre = true
+        //    }
+        //}
+        //if(nombreCampo=="SEXO"){
+        //    if(isEmpty(sexo)){
+        //        malsexo = true
+        //    }
+        //    else{
+        //        malsexo = false
+        //    }
+        //}
     }
     function prepararData(item){
         return {
@@ -430,11 +447,11 @@
     }
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-2 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
             <h1 class="text-2xl">Nacimientos</h1>  
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex col-span-2 gap-1 justify-start">
             <div >
                 <button class={`btn flex btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                     <span  class="text-xl">Nuevo</span>

@@ -25,7 +25,7 @@
             sexo:"H/M",
             rodeo:"",
             lote:"",
-            fechanacimiento:"DD/MM/AAAA",
+            fechanacimiento:"MM/DD/AAAA",
             nombremadre:"",
             nombrepadre:"",
             observaciones:""

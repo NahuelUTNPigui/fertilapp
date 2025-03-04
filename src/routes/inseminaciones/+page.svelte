@@ -249,8 +249,13 @@
                 try{
                     let data = {active:false}
                     const record = await pb.collection('inseminacion').update(idins, data);
-                    inseminaciones = inseminaciones.filter(i=>i.id!=idins)
-                    inseminacionesrow = inseminaciones
+                    let ins = inseminaciones.filter(i=>i.id == idins)[0]
+                    let an = madres.filter(m=>m.id == ins.animal)[0]
+                    if(an.prenada == 3){
+                        await pb.collection("animales").update(an.id,{prenada:0})
+                    }
+                    await getInseminaciones()
+                    filterUpdate()
                     Swal.fire("Éxito eliminar","Se pudo eliminar la inseminación con exito","success")
                 }
                 catch(err){

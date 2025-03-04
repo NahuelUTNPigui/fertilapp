@@ -19,6 +19,7 @@
     import permisos from "$lib/stores/permisos";
     import { goto } from "$app/navigation";
     import MultiSelect from "$lib/components/MultiSelect.svelte";
+    
 
     let caber = createCaber()
     let cab = caber.cab
@@ -66,6 +67,12 @@
     let malvet = $state("")
     let botonhabilitado=$state(false)
     let botonhabilitadoAnimal=$state(false)
+    function getNombreEstado(e){
+        
+        let ess = estados.filter(est=>est.id==e)[0]
+        
+        return ess.nombre
+    }
     //Funciones
     function clickFilter(){
         isOpenFilter = !isOpenFilter
@@ -588,11 +595,7 @@
                             {`${capitalizeFirstLetter(t.expand.animal.categoria)}`}
                         </td>
                         <td class="text-base p-3 "> {
-                            t.prenada==2?
-                            "Preñada":
-                            t.prenada==1?
-                            "Dudosa":
-                            "Vacia"
+                            getNombreEstado(t.prenada)
                         }</td>
                         <td class="text-base ">
                             {`${t.tipo=="eco"?"Ecografía":"Tacto"}`}

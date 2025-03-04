@@ -30,10 +30,16 @@
     
     let rol = roler.rol==""?"":roler.rol=="vet"?"Veterinario":"Establecimiento"
     let nombreestablecimiento = $state("")
+    
     //let rol = "cab"
     onMount(async ()=>{
       let caber = createCaber()
       nombreestablecimiento = caber.cab.nombre
+      if (window.innerWidth <= 600) { // Pantallas pequeñas
+        nombreestablecimiento= nombreestablecimiento.slice(0,15)
+        
+      }
+      
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
       usuarioid = pb_json.model.id
       nombreusuario = pb_json.model.username
@@ -111,8 +117,10 @@
               </div>
               <div class="flex-1">
                 <a href="/inicio" 
-                class={`ps-0 btn btn-ghost text-xl ${classtextnavbar}`}
-                >{nombreestablecimiento.length > 15? nombreestablecimiento.slice(0,15):nombreestablecimiento}</a>
+                  class={`ps-0 btn btn-ghost text-xl ${classtextnavbar}`}
+                >
+                  {nombreestablecimiento}
+                </a>
               </div>
               <div class="flex mr-1 pr-1 lg:mr-5 lg:pr-5">
                 <details class="dropdown dropdown-end">

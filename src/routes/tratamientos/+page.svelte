@@ -51,6 +51,8 @@
     let tipo = $state("")
     let observacion = $state("")
     let totalTratamientosEncontrados = $state(0)
+    //Para el edit
+    let caravaedit = $state("")
     //Validaciones
     let malanimal = $state(false)
     let malcategoria = $state(false)
@@ -154,9 +156,10 @@
             }
         }
     }
+    
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}'`
+            filter:`active=true && cab='${cab.id}' && delete=false`
         })
         animales = recordsa
     }
@@ -225,14 +228,14 @@
     async function editar(){
         try{
             let data = {
-                animal,
+                //animal,
                 categoria,
                 tipo,
                 observacion,
                 fecha:fecha +" 03:00:00"
             }
             const  record = await pb.collection("tratamientos").update(idtratamiento,data)
-            await getTratamienos()
+            await getTratamientos()
             Swal.fire("Éxito editar","Se pudo editar el tratamiento con exito","success")
         }
         catch(err){
@@ -378,10 +381,15 @@
 
     function openEditModal(id){
         idtratamiento = id
+
         let tratamiento = tratamientos.filter(t=>t.id==id)[0]
+        
         fecha = tratamiento.fecha.split(" ")[0]
         animal = tratamiento.animal
+        caravaedit = tratamiento.expand.animal.caravana
+
         tipo = tratamiento.tipo
+        categoria = tratamiento.expand.animal.categoria
         observacion = tratamiento.observacion
         
         nuevoModal.showModal()
@@ -583,34 +591,7 @@
             </div>
         {/if}
     </div>
-    <!--<div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div >
-            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo tratamiento</span>
-            </button>
-        </div>
-        <div>
-            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openTiposModal()}>
-                <span  class="text-xl">Tipo tratamientos</span>
-            </button>
-        </div>
-        <div>
-            <Exportar
-                titulo ={"Tratamientos"}
-                filtros = {[]}
-                confiltros = {false}
-                data = {tratamientosrow}
-                {prepararData}
-            />
-        </div>
-    </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div class="w-11/12 lg:w-1/2">
-            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>openTiposModal()}>
-                <span  class="text-xl">Tipo tratamientos</span>
-            </button>
-        </div>
-    </div>-->
+   
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
@@ -635,22 +616,7 @@
                         <td class="text-base mx-1 px-1 ">
                             {`${t.expand.tipo.nombre}`}
                         </td>
-                        <!--<td class="flex gap-2 text-base mx-1 px-1">
-                            <div class="tooltip" data-tip="Editar">
-                                <button aria-label="Editar" onclick={()=>openEditModal(t.id)}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-                                  </svg>
-                                </button>
-                            </div>
-                            <div class="tooltip" data-tip="Eliminar">
-                                <button aria-label="Eliminar" onclick={()=>eliminar(t.id)}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                    </svg>                              
-                                </button>
-                            </div>
-                        </td>-->
+                       
                     </tr>
                 {/each}
             </tbody>
@@ -675,32 +641,39 @@
             <h3 class="text-lg font-bold">Ver tratamiento</h3>  
         {/if}
         <div class="form-control">
+            
             <label for = "madre" class="label">
                 <span class="label-text text-base">Animal</span>
             </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
+            {#if idtratamiento == ""}
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
 
-                        ${estilos.bgdark2} 
-                        ${malanimal?"input-error":""}
-                    `}
-                    onchange={()=>oninput("ANIMAL")}
-                    bind:value={animal}
-                >
-                    <option value="agregar">Agregar</option>
-                    {#each animales as a}
-                        <option value={a.id}>{a.caravana}</option>    
-                    {/each}
-                </select>
-                <div class={`label ${malanimal?"":"hidden"}`}>
-                    <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
-                </div>
-            </label>
+                            ${estilos.bgdark2} 
+                            ${malanimal?"input-error":""}
+                        `}
+                        onchange={()=>oninput("ANIMAL")}
+                        bind:value={animal}
+                    >
+                        <option value="agregar">Agregar</option>
+                        {#each animales as a}
+                            <option value={a.id}>{a.caravana}</option>    
+                        {/each}
+                    </select>
+                    <div class={`label ${malanimal?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
+                    </div>
+                </label>
+            {:else}
+                <label for = "madre" class="label">
+                    <span class="label-text text-base">{caravaedit}</span>
+                </label>
+            {/if}
             {#if animal == "agregar"}
                 <form method="dialog">
                     <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>

@@ -109,7 +109,7 @@
         fechahastaserv = ""
         fechaparto = ""
         observacion = ""
-        padreslist = ""
+        padreslist = []
         nuevoModal.close()
     }
     async function getServicios(){
@@ -135,8 +135,16 @@
         serviciosrow = servicios
         totalServicios = serviciosrow.length
     }
-    function prepararData(){
+    function prepararData(item){
+        return {
+            MADRE:item.expand.madre.caravana,
+            PADRES:getNombrePadres(item.padres),
+            FECHA_DESDE:item.fechadesde?new Date(item.fechadesde).toLocaleDateString():"",
+            FECHA_HASTA:item.fechahasta?new Date(item.fechahasta).toLocaleDateString():"",
+            FECHA_PARTO:item.fechaparto?new Date(item.fechaparto).toLocaleDateString():"",
+            OBSERVACION:item.observacion
 
+        }
     }
     function getNombrePadres(p_padres){
         let ids = p_padres.split(",")

@@ -359,7 +359,7 @@
         {/if}
     </div>
 
-    <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:w-11/12 overflow-x-auto" >
+    <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-11/12 overflow-x-auto" >
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
