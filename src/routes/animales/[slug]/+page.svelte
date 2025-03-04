@@ -27,6 +27,7 @@
     const pb = new PocketBase(ruta);
     let caber = createCaber()
     let cab = caber.cab
+    let cargado = $state(false)
     // Datos
     let slug = $state("")
     let caravana = $state("")
@@ -161,9 +162,7 @@
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
                     motivobaja = recorda.motivobaja
                 }
-                
-                //await getPariciones(slug)
-                //await getTactos(slug)
+                cargado = true
                 
             }
             catch(err){
@@ -174,18 +173,19 @@
 
         }
     })
+    $effect(()=>{
+        console.log(prenada)
+    })
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos peso={peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
+        <DatosBasicos {peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
     </CardAnimal>
     {#if !modohistoria}
         <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
-            <Pesajes pesoanterior={peso} {caravana}></Pesajes>
+            <Pesajes pesoanterior={peso} bind:peso={peso} {caravana}></Pesajes>
         </CardAnimal>
-        <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
-            <Pariciones cabid={cab.id} sexoanimal = {sexo}/>
-        </CardAnimal>
+        
         <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
             <Tratamientos cabid={cab.id}></Tratamientos>
         </CardAnimal>
@@ -193,11 +193,16 @@
             <Observaciones cabid={cab.id} />
         </CardAnimal>
         {#if sexo=="H"}
+            <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
+                <Pariciones cabid={cab.id} sexoanimal = {sexo} bind:prenada={prenada}/>
+            </CardAnimal>
             <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-                <Tactos cabid={cab.id}  />
+                
+                <Tactos cabid={cab.id}  bind:prenadaori={prenada} {categoria}/>
+                
             </CardAnimal>
             <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
-                <Inseminaciones cabid={cab.id} />
+                <Inseminaciones cabid={cab.id} {categoria} bind:prenadaori={prenada}/>
             </CardAnimal>
         {/if}
         <CardAnimal cardsize="max-w-7xl" titulo="Historial">

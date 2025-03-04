@@ -21,3 +21,7 @@ export function randomString(len, an) {
     }
     return str;
 }
+export function getWholeWordButLastLetter(word){
+    let newword = word.slice(0,word.length - 2)
+    return newword
+}

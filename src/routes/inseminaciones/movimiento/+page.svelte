@@ -57,11 +57,18 @@
     let pajuela = $state("")
     let padre = $state("")
     let cadenapadre = $state("")
+    let observaciongeneral = $state("")
     //validacion
     let malfecha = $state(false)
     let malpadre = $state(false)
     let botonhabilitado = $state(false)
-
+    $effect(()=>{
+        if(padre == ""){
+            for(let i = 0;i<selectanimales.length;i++){
+                selectanimales[i].padre = ""
+            }
+        }
+    })
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
@@ -255,6 +262,11 @@
         selectanimales = []
 
     }
+    function inputObsGeneral(){
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].observacion = observaciongeneral
+        }
+    }
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]
         padre = p.id
@@ -388,7 +400,7 @@
             onclick={clickFilter}
         >
             <div class="flex justify-between items-center px-1">
-                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <h2 class="font-semibold text-xl py-2">Filtros</h2>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
@@ -396,6 +408,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
             </div> 
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-lg py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h2>
+            </div>
         </button>
         {#if isOpenFilter}
         <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
@@ -494,7 +509,7 @@
                             onclick={clickTodos}
                             class={`
                                 text-base bg-transparent rounded-lg
-                                px-3 py-3 text-base
+                                p-1 text-base
                                 ${estilos.secundario}
                             `}
                         >
@@ -534,7 +549,7 @@
                             onclick={()=>clickAnimal(a.id)}
                             class={`
                                 font-medium bg-transparent rounded-lg
-                                px-3 py-3 text-base
+                                p-1 text-base
                                 ${selecthashmap[a.id]?estilos.danger:estilos.primario}
                             `}
                         >
@@ -573,11 +588,11 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
-        <h3 class="text-lg font-bold">Inseminaciones múltiples</h3>
-        <div class="grid grid-cols-2 gap-1">
+        <h3 class="text-xl font-bold">Inseminaciones múltiples</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
-                <label for = "fechainseminacion" class="label">
-                    <span class="label-text text-base">Fecha inseminacion </span>
+                <label for = "fechains" class="label">
+                    <span class="label-text text-base">Fecha inseminación</span>
                 </label>
                 <label class="input-group ">
                     <input id ="fechainseminacion" type="date" max={HOY}  
@@ -600,8 +615,8 @@
                 </label>
             </div>
             <div>
-                <label for = "fechains" class="label">
-                    <span class="label-text text-base">Fecha Parto</span>
+                <label for = "fechaparto" class="label">
+                    <span class="label-text text-base">Fecha parto</span>
                 </label>
                 <label class="input-group ">
                     <input id ="fechains" type="date" max={HOY}  
@@ -622,76 +637,49 @@
             {#if cargadoanimales}
                 <PredictSelect {onwrite} {onelegir} bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres}  size="w-1/2"/>
             {/if}
-            <div class="hidden">
-                <label for = "nombrepadre" class="label">
-                    <span class="label-text text-base">Pajuela</span>
+            <div>
+                <label for = "obs" class="label">
+                    <span class="label-text text-base">Observacion </span>
                 </label>
-                <label class="input-group">
-                    <input 
-                        id ="nombrepadre" 
+                
+                <input 
+                        id ="observacion" 
                         type="text"  
                         class={`
                             input 
                             input-bordered 
                             border border-gray-300 rounded-md
-                            focus:outline-none 
-                            focus:ring-2 focus:ring-green-500 
-                            focus:border-green-500
-                            w-full 
-                            ${estilos.bgdark2} 
+                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                            w-full
+                            ${estilos.bgdark2}
                         `}
-                        bind:value={pajuela}
-                        oninput={()=>onInput("PAJUELA")}
+                        bind:value={observaciongeneral}
+                        oninput={inputObsGeneral}
                     />
-                    {#if malpadre}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe escribir el nombre del padre</span>                    
-                        </div>
-                    {/if}
-                </label>
-            
-                <label for = "padre" class="label">
-                    <span class="label-text text-base">Padre</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={padre}
-                        onchange={getNombrePadre}
-                    >
-                        {#each padres as p}
-                            <option value={p.id}>{p.caravana}</option>    
-                        {/each}
-                      </select>
-                </label>
             </div>
+            
         </div>
         <div class="w-full grid grid-cols-1 justify-items-start " >
             <div class="flex overflow-x-auto">
-                <table class="table table-lg w-full" >
+                <table class="table table-lg w-full w-11/12" >
                     <thead>
                         <tr>
-                            <th class="text-base px-0 lg:px-2">Caravana</th>
-                            <th class="text-base px-2">Pajuela</th>
+                            <th class="text-base px-1">Caravana</th>
+                            <th class="text-base px-1">Pajuela</th>
                             <th class="text-base px-1">Padre</th>
+                            <th class="text-base px-1">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {#each selectanimales as a,i}
                             <tr>
-                                <td class="text-base px-0 lg:px-2">{a.caravana}</td>
-                                <td class="px-2">
+                                <td class="text-base px-1">{a.caravana}</td>
+                                <td class="px-1">
                                     <input
                                         bind:value={selectanimales[i].pajuela}
                                         class={`
-                                            h-12 w-30 lg:w-50 border border-gray-300 
-                                            w-full
+                                            h-12 w-32 border border-gray-300 
+                                            px-1
                                             rounded-md
                                             focus:outline-none focus:ring-2 
                                             focus:ring-green-500 
@@ -700,13 +688,14 @@
                                         `}
                                     />
                                 </td>
-                                <td class="px-1 ">
+                                <td class="px-1">
                                     <label class="input-group ">
                                         <select 
                                             class={`
-                                                select select-bordered w-full
+                                                select select-bordered 
                                                 rounded-md
-                                                w-30 lg:w-50
+                                                px-1
+                                                w-32
                                                 focus:outline-none focus:ring-2 
                                                 focus:ring-green-500 
                                                 focus:border-green-500
@@ -722,6 +711,21 @@
                                         </select>
                                     </label>
                                 </td>
+                                <td class="px-1">
+                                    <input
+                                        bind:value={selectanimales[i].observacion}
+                                        class={`
+                                            h-12 w-32 border border-gray-300 
+                                            
+                                            px-1
+                                            rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2}
+                                        `}
+                                    />
+                                </td>
                             </tr>
                         {/each}
                     </tbody>
@@ -730,7 +734,7 @@
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
-                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={crearInseminacion} >Guardar inseminaciones</button>
+                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={crearInseminacion} >Guardar</button>
                 <button class="btn btn-error text-white" >Cancelar</button>
             </form>
         </div>

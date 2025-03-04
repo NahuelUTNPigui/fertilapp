@@ -534,7 +534,7 @@
             onclick={clickFilter}
         >
             <div class="flex justify-between items-center px-1">
-                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <h2 class="font-semibold text-xl py-2">Filtros</h2>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
@@ -543,6 +543,9 @@
                 </svg>
             </div> 
         </button>
+        <div class="flex justify-between items-center px-1">
+            <h3 class="font-semibold text-lg py-2">Animales seleccionados: {Object.keys(selecthashmap)}</h3>
+        </div>
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
                 <div>
@@ -794,7 +797,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="collapse">
+                <div class="collapse hidden">
                     <input type="radio" name="my-accordion-1" onchange={()=>onChangeCollapse("TRATAMIENTO")}/>
                     <div class="collapse-title text-xl font-medium">Agregar tratamientos</div>
                     <div class="collapse-content">

@@ -357,7 +357,7 @@
               </div>
             {/if}
           </li>
-          <li class={`hidden ${cab.exist?"":"disabled"} ${pageurl.includes("servicios")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
+          <li class={`${cab.exist?"":"disabled"} ${pageurl.includes("servicios")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
             {#if cab.exist}
             <a class = {classtext} href="/servicios">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

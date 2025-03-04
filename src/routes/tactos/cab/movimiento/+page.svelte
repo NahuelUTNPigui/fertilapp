@@ -46,6 +46,7 @@
     //movimiento
     let tipotactoselect = $state("")
     let fecha = $state("")
+    let observaciongeneral = $state("")
     //validacion
     let malfecha = $state(false)
     let botonhabilitado = $state(false)
@@ -236,6 +237,11 @@
         selecthashmap = {}
         selectanimales = []
     }
+    function inputObsGeneral(){
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].observacion = observaciongeneral
+        }
+    }
     onMount(async ()=>{
         await getAnimales()
         await getRodeos()
@@ -397,13 +403,13 @@
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
-                    <th class="">
+                    <th class="px-1 py-0 m-0">
                         <button    
                             aria-label="Todos"
                             onclick={clickTodos}
                             class={`
                                 text-base bg-transparent rounded-lg
-                                px-3 py-3 text-base
+                                p-1 text-base
                                 ${estilos.secundario}
                             `}
                         >
@@ -425,19 +431,19 @@
                           
                         </button>
                     </th>
-                    <th class="text-base ">Caravana</th>
-                    <th class="text-base ">Estado</th>
-                    <th class="text-base">Categoria</th>
-                    <th class="text-base">Peso</th>
-                    <th class="text-base">Rodeo</th>
-                    <th class="text-base">Lote</th>
+                    <th class="text-base mx-1 px-1">Caravana</th>
+                    <th class="text-base mx-1 px-1">Estado</th>
+                    <th class="text-base mx-1 px-1">Categoria</th>
+                    <th class="text-base mx-1 px-1">Peso</th>
+                    <th class="text-base mx-1 px-1">Rodeo</th>
+                    <th class="text-base mx-1 px-1">Lote</th>
                     
                 </tr>
             </thead>
             <tbody>
                 {#each animalesrows as a}
                 <tr>
-                    <td class="">
+                    <td class="px-1 py-0 m-0">
                         <button
                             aria-label="fila"
                             onclick={()=>clickAnimal(a.id)}
@@ -458,12 +464,12 @@
                             {/if}
                         </button>
                     </td>
-                    <td class="text-base">{a.caravana}</td>
-                    <td class="text-base">{getEstadoName(a.prenada)}</td>
-                    <td class="text-base">{a.categoria}</td>
-                    <td class="text-base">{a.peso}</td>
-                    <td class="text-base">{a.expand?.rodeo?.nombre||''}</td>
-                    <td class="text-base">{a.expand?.lote?.nombre||''}</td>
+                    <td class="text-base mx-1 px-1">{a.caravana}</td>
+                    <td class="text-base mx-1 px-1">{getEstadoName(a.prenada)}</td>
+                    <td class="text-base mx-1 px-1">{a.categoria}</td>
+                    <td class="text-base mx-1 px-1">{a.peso}</td>
+                    <td class="text-base mx-1 px-1">{a.expand?.rodeo?.nombre||''}</td>
+                    <td class="text-base mx-1 px-1">{a.expand?.lote?.nombre||''}</td>
                     
                 </tr>
                 {/each}
@@ -483,7 +489,7 @@
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
         <h3 class="text-lg font-bold">Tactos múltiples</h3>
-        <div class="grid grid-cols-2 gap-1">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
                 <label for = "fechatacto" class="label">
                     <span class="label-text text-base">Fecha </span>
@@ -542,6 +548,25 @@
                             {/each}
                       </select>
                 </label>
+            </div>
+            <div>
+                <label for = "obs" class="label">
+                    <span class="label-text text-base">Observación </span>
+                </label>
+                <input 
+                        id ="observacion" 
+                        type="text"  
+                        class={`
+                            input 
+                            input-bordered 
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                            w-full
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={observaciongeneral}
+                        oninput={inputObsGeneral}
+                    />
             </div>
         </div>
         <div class="w-full grid grid-cols-1 justify-items-start " >

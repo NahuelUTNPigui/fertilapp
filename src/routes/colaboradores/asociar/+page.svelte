@@ -44,9 +44,10 @@
             skipTotal:true
         })
         
-        let colabid = resultcolab.items[0].id
         let existecolab = resultcolab.items.length > 0
         if(existecolab){
+            
+            let colabid = resultcolab.items[0].id
             //verificar si ya esta asociado
             const recordasoci = await pb.collection('estxcolabs').getList(1,1,{
                 filter:`cab = '${cab.id}' && colab = '${colabid}'`

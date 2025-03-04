@@ -13,7 +13,7 @@
     import permisos from "$lib/stores/permisos";
     import estilos from '$lib/stores/estilos';
     import { guardarHistorial } from '$lib/historial/lib';
-    import { isEmpty } from '$lib/stringutil/lib';
+    import { isEmpty,getWholeWordButLastLetter } from '$lib/stringutil/lib';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -32,6 +32,7 @@
     let buscar = $state("")
     let isOpenFilter = $state(false)
     let totalServicios = $state(0)
+    
     //Datos servicios
     let idserv = $state("")
     let padresserv = $state("")
@@ -67,7 +68,7 @@
         const records = await pb.collection('servicios').getFullList({
             sort: '-fechadesde ',
             filter :`cab = '${cab.id}' && active = true`,
-            expand:"animal"
+            expand:"madre"
         });
         servicios = records
     }
@@ -86,6 +87,17 @@
         totalServicios = serviciosrow.length
     }
     function prepararData(){
+
+    }
+    function getNombrePadres(p_padres){
+        let ids = p_padres.split(",")
+        
+        let nombres = ids.reduce(
+            (acc,valor)=>padres.filter(p=>p.id==valor)[0].caravana + " , " +acc,
+            ""
+        )
+
+        return getWholeWordButLastLetter(nombres)
 
     }
     onMount(async ()=>{
@@ -235,18 +247,18 @@
                     <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha desde</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Hasta</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Parto</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Caravana</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Pajuelas</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Madre</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Padres</th>
                 </tr>
             </thead>
             <tbody>
                 {#each serviciosrow as s}
                 <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>openEditModal(s.id)}>
-                    <td class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">{new Date(s.fechadesde).toLocaleDateString()}</td>
-                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{new Date(s.fechahasta).toLocaleDateString()}</td>
-                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{new Date(s.fechaparto).toLocaleDateString()}</td>
+                    <td class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">{s.fechadesde?new Date(s.fechadesde).toLocaleDateString():""}</td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{s.fechahasta?new Date(s.fechahasta).toLocaleDateString():""}</td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{s.fechaparto?new Date(s.fechaparto).toLocaleDateString():"   "}</td>
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{`${s.expand.madre.caravana}`}</td>
-                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">Pajuelas</td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{getNombrePadres(s.padres)}</td>
                 </tr>
                 {/each}
             </tbody>

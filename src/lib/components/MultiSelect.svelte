@@ -22,7 +22,9 @@
     }
 </script>
 <div class="">
-    <label for="">{etiqueta}</label>
+    <label for = "" class="label">
+        <span class="label-text text-base">{etiqueta} </span>
+    </label>
     <button 
         class={`
             mt-2 h-12 w-full p-2 text-left 
@@ -63,7 +65,6 @@
         
         <ChevronDown class={`w-5 h-5 ml-2 -mr-1 text-gray-400 transition-all duration-150 ${isOpen? 'transform rotate-180':''}`} />
     </button>
-
     {#if isOpen}
 
         <div 

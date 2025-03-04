@@ -17,14 +17,14 @@
         else{
             isOpen = true
             listarow = lista.filter(e=>e.nombre.toLowerCase().includes(cadena.toLowerCase()))
-            if(listarow.length == 1){
-                valor = listarow[0].id
-                if(onelegir){
-                    onelegir(valor)
-                }
-                
-                nombre = listarow[0].nombre
-            }
+            //if(listarow.length == 1){
+            //    valor = listarow[0].id
+            //    if(onelegir){
+            //        onelegir(valor)
+            //    }
+            //    
+            //    nombre = listarow[0].nombre
+            //}
             if(listarow.length == 0){
                 valor = ""
             }
@@ -44,7 +44,10 @@
     
 </script>
 <div class="w-full">
-    <label for="" class={estilos.labelForm}>{etiqueta}</label>
+    
+    <label for = "" class="label">
+        <span class="label-text text-base">{etiqueta}</span>
+    </label>
     <input
         type="text"  
         class={`

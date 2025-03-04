@@ -55,6 +55,7 @@
             provincia = record.provincia
             telefono = record.telefono
             mail = record.mail
+            localidadesProv = localidades.filter(lo => lo.idProv == provincia)
             caber.setCab(record.nombre,record.id)
         }
         catch(err){

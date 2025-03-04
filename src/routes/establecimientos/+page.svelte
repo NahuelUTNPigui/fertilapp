@@ -23,6 +23,8 @@
     function irEstablecimientoColab(id){
         let per = createPer()
         let est = establecimientoscolab.filter(e=>e.id == id)[0]
+        console.log(est.expand.cab.nombre)
+        caber.setCab(est.expand.cab.nombre,est.expand.cab.id)
         per.setPer("0,1,2,3,4,5",usuarioid)
         goto("/")
     }

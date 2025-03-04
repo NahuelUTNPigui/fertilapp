@@ -50,6 +50,7 @@
     //movimiento
     let fecha = $state("")
     let tipotratamientoselect = $state("")
+    let observaciongeneral = $state("")
 
     //validacion
     let malfecha = $state(false)
@@ -139,6 +140,13 @@
             ninguno = true
         }
         
+    }
+    function inputObsGeneral(){
+        
+        for(let i = 0 ;i < selectanimales.length;i++){
+            selectanimales[i].observacionnuevo = observaciongeneral
+            
+        }
     }
     async function getLotes(){
         const records = await pb.collection('lotes').getFullList({
@@ -289,7 +297,7 @@
             onclick={clickFilter}
         >
             <div class="flex justify-between items-center px-1">
-                <h1 class="font-semibold text-lg py-2">Filtros</h1>
+                <h2 class="font-semibold text-xl py-2">Filtros</h2>
                 <svg 
                     xmlns="http://www.w3.org/2000/svg" 
                     class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
@@ -298,6 +306,9 @@
                 </svg>
             </div>
         </button>
+        <div class="flex justify-between items-center px-1">
+            <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
+        </div>
         {#if isOpenFilter}
         <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
             <div>
@@ -404,11 +415,11 @@
         </div>
         {/if}
     </div>
-    <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:w-11/12 overflow-x-auto" >
+    <div class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-11/12 overflow-x-auto" >
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
-                    <th class="px-1 p-0 m-0">
+                    <th class="px-1 py-0 m-0">
                         <button    
                             aria-label="Todos"
                             onclick={clickTodos}
@@ -447,7 +458,7 @@
             <tbody>
                 {#each animalesrows as a}
                     <tr>
-                        <td class="px-1 p-0 m-0">
+                        <td class="px-1 py-0 m-0">
                             <button
                                 aria-label="fila"
                                 onclick={()=>clickAnimal(a.id)}
@@ -491,8 +502,8 @@
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
-        <h3 class="text-lg font-bold">Tratamientos múltiples</h3>
-        <div class="grid grid-cols-2 gap-1">
+        <h3 class="text-lg font-bold">Tratamientos</h3>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-1">
             <div>
                 <label for = "fechatrata" class="label">
                     <span class="label-text text-base">Fecha </span>
@@ -572,12 +583,32 @@
                     </div>
                 </label>
             </div>
+            <div>
+                <label for = "obs" class="label">
+                    <span class="label-text text-base">Observación </span>
+                </label>
+                <input 
+                    id ="obs" 
+                    type="text"  
+                    class={`
+                        input 
+                        input-bordered 
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                        w-full
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={observaciongeneral}
+                    oninput={inputObsGeneral}
+                />
+            </div>
         </div>
         <div class="w-full grid grid-cols-1 justify-items-start " >
             <div class="flex overflow-x-auto">
-                <table class="table table-lg w-full w-11/12" >
+                <table class="table table-lg w-full" >
                     <thead>
                         <tr>
+                            
                             <th class="text-base ">Caravana</th>
                             <th class="text-base ">Categoria</th>
                             <th class="text-base ">Observación</th>
@@ -590,8 +621,9 @@
                                 <td class="text-base">{a.categoria}</td>
                                 <td class="">
                                     <input
-                                    bind:value={selectanimales[i].observacion}
+                                    bind:value={selectanimales[i].observacionnuevo}
                                     class={`
+                                        px-1
                                         h-12 border border-gray-300 
                                         w-full
                                         rounded-md

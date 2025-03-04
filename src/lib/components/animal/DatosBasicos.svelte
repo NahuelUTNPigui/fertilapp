@@ -14,7 +14,19 @@
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
     import { guardarHistorial } from "$lib/historial/lib";
-    let {caravana,rodeo,lote,connacimiento,peso,sexo,nacimiento,fechanacimiento,categoria,prenada,modohistoria=$bindable()} = $props()
+    let {
+        caravana,
+        rodeo,
+        lote,
+        connacimiento,
+        peso,
+        sexo,
+        nacimiento,
+        fechanacimiento,
+        categoria,
+        prenada,
+        modohistoria=$bindable()
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -263,9 +275,9 @@
     function getNombreMadre(){
         let m = madres.filter(item=>item.id == madre)[0]
         nombremadre = m.caravana
-        console.log(m)
+        
         tipomadre = m.categoria
-        console.log(tipomadre)
+        
     }
     function getNombrePadre(){
         let p = padres.filter(item=>item.id == padre)[0]
@@ -366,9 +378,17 @@
     //Editar animal class="btn text-lg px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
 </script>
 <div class="grid grid-cols-2 lg:grid-cols-3">
-    <h2 class="text-2xl mx-1 font-bold mb-2 text-left mt-2">
-        Caravana: {caravana}
-    </h2>
+    <button
+        onclick={()=>goto("/animales")}
+    >
+                  
+        <h2 class="flex text-2xl mx-1 font-bold mb-2 text-left mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 mt-1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+            Caravana: {caravana}
+        </h2>
+    </button>
     <div class="flex w-11/12">
         <button
             onclick={openEditar}
@@ -528,37 +548,10 @@
             <span class="label-text text-base">Estado</span>
         </label>
         {#if modoedicion}
-            <!--
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2}
-                    `} bind:value={prenada}>
-                    {#each estados as e}
-                        <option value={e.id}>{e.nombre}</option>    
-                    {/each}
-                </select>
-
-            </label>
-            -->
+            
             <RadioButton bind:option={prenada} deshabilitado={false}/>
         {:else}
             <RadioButton bind:option={prenada} deshabilitado={true}/>
-            <!--
-            <label for = "prenada" class="label">
-                <span class="label-text text-base p-1">
-                    {
-                        prenada==2?"Preñada":
-                        prenada==1?"Dudosa":
-                        "Vacia"
-                    }
-                </span>
-            </label>
-            -->
             
         {/if}
     </div>
@@ -686,15 +679,9 @@
         
     </div>
 {/if}
-<div class="grid grid-cols-3 mx-1  mt-1 ">
-    <div class="flex justify-start p-0 m-0">
-        <button aria-label="volver" class={`btn ${estilos.btnsecondary}`} onclick={()=>goto("/animales")}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-            </svg>          
-        </button>
-    </div>
-    <div class="flex col-span-2 gap-1 justify-end">
+<div class="grid grid-cols-3 mx-0  mt-1 ">
+    
+    <div class="flex col-span-2 gap-1 justify-start">
         <button aria-label="historiaclinica" class={` btn btn-primary rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = !modohistoria}>
             <span  class="text-lg m-1">{modohistoria?"Ocultar":"Mostrar"} historia clinica</span>      
         </button>

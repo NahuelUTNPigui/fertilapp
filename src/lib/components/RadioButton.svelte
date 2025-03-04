@@ -10,6 +10,7 @@
     function select(id){
         option = id
     }
+    
 </script>
 <div class="bg-transparent flex flex-row gap-4">
     {#each options as op}

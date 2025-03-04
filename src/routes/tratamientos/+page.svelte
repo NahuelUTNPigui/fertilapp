@@ -49,6 +49,7 @@
     let categoria = $state("")
     let fecha = $state("")
     let tipo = $state("")
+    let observacion = $state("")
     let totalTratamientosEncontrados = $state(0)
     //Validaciones
     let malanimal = $state(false)
@@ -102,6 +103,8 @@
         } else {
             let a = animales.filter(an=>an.id==animal)[0]
             categoria = a.categoria
+            
+
         }
     }
 
@@ -181,6 +184,7 @@
                 categoria,
                 tipo,
                 fecha:fecha +" 03:00:00",
+                observacion,
                 active : true,
                 cab:cab.id
             }
@@ -224,6 +228,7 @@
                 animal,
                 categoria,
                 tipo,
+                observacion,
                 fecha:fecha +" 03:00:00"
             }
             const  record = await pb.collection("tratamientos").update(idtratamiento,data)
@@ -377,6 +382,7 @@
         fecha = tratamiento.fecha.split(" ")[0]
         animal = tratamiento.animal
         tipo = tratamiento.tipo
+        observacion = tratamiento.observacion
         
         nuevoModal.showModal()
 
@@ -650,24 +656,80 @@
             </tbody>
         </table>
     </div>
-    <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-        <div class="
-                modal-box w-11/12 max-w-3xl
-                bg-gradient-to-br from-white to-gray-100 
-                dark:from-gray-900 dark:to-gray-800
-            "
-        >
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-            </form>
-            {#if idtratamiento == ""}
-                <h3 class="text-lg font-bold">Nuevo tratamiento</h3>  
-            {:else}
-                <h3 class="text-lg font-bold">Ver tratamiento</h3>  
-            {/if}
-            <div class="form-control">
-                <label for = "madre" class="label">
-                    <span class="label-text text-base">Animal</span>
+    
+    
+</Navbarr>
+<dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div class="
+            modal-box w-11/12 max-w-3xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        {#if idtratamiento == ""}
+            <h3 class="text-lg font-bold">Nuevo tratamiento</h3>  
+        {:else}
+            <h3 class="text-lg font-bold">Ver tratamiento</h3>  
+        {/if}
+        <div class="form-control">
+            <label for = "madre" class="label">
+                <span class="label-text text-base">Animal</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+
+                        ${estilos.bgdark2} 
+                        ${malanimal?"input-error":""}
+                    `}
+                    onchange={()=>oninput("ANIMAL")}
+                    bind:value={animal}
+                >
+                    <option value="agregar">Agregar</option>
+                    {#each animales as a}
+                        <option value={a.id}>{a.caravana}</option>    
+                    {/each}
+                </select>
+                <div class={`label ${malanimal?"":"hidden"}`}>
+                    <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
+                </div>
+            </label>
+            {#if animal == "agregar"}
+                <form method="dialog">
+                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+                </form>
+                <label for = "nombre" class="label">
+                    <span class="label-text text-base">Caravana</span>
+                </label>
+                <label class="input-group">
+                    <input 
+                        id ="nombre" 
+                        type="text"  
+                        class={`
+                            input 
+                            input-bordered 
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                            w-full
+                            ${estilos.bgdark2} 
+                            ${malcaravana?"input-error":""}
+                        `}
+                        bind:value={caravana}
+                        oninput={()=>oninput("NOMBRE")}
+                    />
+                    <div class={`label ${malcaravana?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
+                    </div>
+                </label>
+                <label for = "sexo" class="label">
+                    <span class="label-text text-base">Sexo</span>
                 </label>
                 <label class="input-group ">
                     <select 
@@ -676,285 +738,250 @@
                             border border-gray-300 rounded-md
                             focus:outline-none focus:ring-2 
                             focus:ring-green-500 focus:border-green-500
-
-                            ${estilos.bgdark2} 
-                            ${malanimal?"input-error":""}
-                        `}
-                        onchange={()=>oninput("ANIMAL")}
-                        bind:value={animal}
-                    >
-                        <option value="agregar">Agregar</option>
-                        {#each animales as a}
-                            <option value={a.id}>{a.caravana}</option>    
+                            ${estilos.bgdark2}
+                        `} bind:value={sexo}>
+                        {#each sexos as s}
+                            <option value={s.id}>{s.nombre}</option>    
                         {/each}
-                    </select>
-                    <div class={`label ${malanimal?"":"hidden"}`}>
-                        <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
-                    </div>
+                      </select>
                 </label>
-                {#if animal == "agregar"}
-                    <form method="dialog">
-                        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-                    </form>
-                    <label for = "nombre" class="label">
-                        <span class="label-text text-base">Caravana</span>
-                    </label>
-                    <label class="input-group">
-                        <input 
-                            id ="nombre" 
-                            type="text"  
-                            class={`
-                                input 
-                                input-bordered 
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                                w-full
-                                ${estilos.bgdark2} 
-                                ${malcaravana?"input-error":""}
-                            `}
-                            bind:value={caravana}
-                            oninput={()=>oninput("NOMBRE")}
-                        />
-                        <div class={`label ${malcaravana?"":"hidden"}`}>
-                            <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
-                        </div>
-                    </label>
-                    <label for = "sexo" class="label">
-                        <span class="label-text text-base">Sexo</span>
-                    </label>
-                    <label class="input-group ">
-                        <select 
-                            class={`
-                                select select-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `} bind:value={sexo}>
-                            {#each sexos as s}
-                                <option value={s.id}>{s.nombre}</option>    
-                            {/each}
-                          </select>
-                    </label>
-                    <label for = "peso" class="label">
-                        <span class="label-text text-base">Peso (KG)</span>
-                    </label>
-                    <label class="input-group">
-                        <input id ="peso" type="number"  
-                            class={`
-                                input input-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                            bind:value={peso}
-                        />
-                    </label>
-                    <div class="modal-action justify-start ">
-                        <form method="dialog" >
-                            <button class="btn btn-success text-white" disabled='{!botonhabilitadoAnimal}' onclick={guardarAnimal} >Guardar Animal</button>
-                        </form>
-                    </div>
-                {/if}
-                <label for = "fecha" class="label">
-                    <span class="label-text text-base">Fecha</span>
+                <label for = "peso" class="label">
+                    <span class="label-text text-base">Peso (KG)</span>
                 </label>
-                <label class="input-group ">
-                    <input id ="fecha" type="date" max={HOY}  
+                <label class="input-group">
+                    <input id ="peso" type="number"  
                         class={`
                             input input-bordered w-full
                             border border-gray-300 rounded-md
                             focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2}
                         `}
-                        bind:value={fecha}
-                        onchange={()=>oninput("FECHA")}
+                        bind:value={peso}
                     />
-                    <div class={`label ${malfecha?"":"hidden"}`}>
-                        <span class="label-text-alt text-red-400">Debe seleccionar la fecha</span>
-                    </div>
                 </label>
-                <label for = "categoria" class="label">
-                    <span class="label-text text-base">Categoria</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={categoria} read
-                        onchange={()=>oninput("CATEGORIA")}
-                    >
-                        {#each categorias as c}
-                            <option value={c.id}>{c.nombre}</option>    
-                        {/each}
-                    </select>
-                    <div class={`label ${malcategoria?"":"hidden"}`}>
-                        <span class="label-text-alt text-red-400">Debe seleccionar la categoria</span>
-                    </div>
-                </label>
-                
-                <label for = "tipo" class="label">
-                    <span class="label-text text-base">Tipo tratamiento</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={tipo}
-                        onchange={()=>oninput("TIPO")}
-                    >
-                        {#each tipotratamientos as t}
-                            <option value={t.id}>{t.nombre}</option>    
-                        {/each}
-                    </select>
-                    <div class={`label ${maltipo?"":"hidden"}`}>
-                        <span class="label-text-alt text-red-400">Debe seleccionar un tipo</span>
-                    </div>
-                </label>
-            </div>
-            <div class="modal-action justify-start ">
-                <form method="dialog" >
-                  <!-- if there is a button, it will close the modal -->
-                  {#if idtratamiento == ""}
-                    <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
-                    {:else}
-                    <button class="btn btn-success text-white" onclick={editar} >Editar</button>
-                    <button class="btn btn-error text-white" onclick={()=>eliminar(idtratamiento)}>Eliminar</button>
-                  {/if}
-                  <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
-                  
-                </form>
-            </div>
-        </div>
-
-    </dialog>
-    <dialog id="tiposmodal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-        <div class="
-                modal-box max-w-xl w-11/12
-                bg-gradient-to-br from-white to-gray-100 
-                dark:from-gray-900 dark:to-gray-800
-            "
-        >
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-            </form>
-            <h3 class="text-xl font-bold">Tipo tratamientos</h3>  
-            <div class="grid grid-cols-1 m-0 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
-                <div class="w-11/12">
-                    <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>nuevoTipo()}>
-                        <span  class="text-xl">Nuevo tipo</span>
-                    </button>
-                    {#if addtipo}
-                    <div class="grid grid-cols-3 gap-1">
-                        <div class="col-span-2">
-                            <label for = "nombre" class="label">
-                                <span class="label-text text-base">Nombre</span>
-                            </label>
-                            <label class="input-group">
-                                <input id ="nombre" type="text"  
-                                    class={`
-                                        input input-bordered 
-                                        w-full
-                                        border border-gray-300 rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2} 
-                                        
-                                    `}
-                                    bind:value={nombretipotratamiento}
-                                    oninput={validarBotonTipo}
-                                />
-                            </label>
-                        </div>
-                        
-                        <div class="flex flex-row gap-1 mt-10">
-                            
-                            <button
-                                aria-label="guardar"
-                                class={`
-                                    ${estilos.basico} ${estilos.chico} ${estilos.primario}
-                                `}
-                                onclick={guardarTipo}
-                                disabled='{!botontipo}'
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
-                                    <path d="M11 2H9v3h2z"/>
-                                    <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
-                                </svg>
-                            </button>
-                            <button 
-                                aria-label="cerrar"
-                                class={`
-                                    ${estilos.basico} ${estilos.chico} ${estilos.danger}
-                                `}
-                                onclick={cerrarTipoModal}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    {/if}
-                    
-                        <table class="table table-lg w-full" >
-                            <thead>
-                                <tr>
-                                    <th class="text-base"  >Nombre</th>
-                                    <th class="text-base"  >Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each tipotratamientos as tp}
-                                    <tr>
-                                        <td class="text-base">
-                                            {tp.nombre}
-                                        </td>
-                                        <td class={`flex gap-2 ${tp.generico?"hidden":""}`}>
-                                            <div class="tooltip" data-tip="Editar">
-                                                <button aria-label="Editar" onclick={()=>openEditTipoModal(tp.id)}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                            <div class="tooltip" data-tip="Eliminar">
-                                                <button aria-label="Eliminar" onclick={()=>eliminarTipo(tp.id)}>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                                    </svg>                              
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {/each}            
-                            </tbody>
-                        </table>
-                    
+                <div class="modal-action justify-start ">
+                    <form method="dialog" >
+                        <button class="btn btn-success text-white" disabled='{!botonhabilitadoAnimal}' onclick={guardarAnimal} >Guardar Animal</button>
+                    </form>
                 </div>
-            </div>  
+            {/if}
+            <label for = "fecha" class="label">
+                <span class="label-text text-base">Fecha</span>
+            </label>
+            <label class="input-group ">
+                <input id ="fecha" type="date" max={HOY}  
+                    class={`
+                        input input-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={fecha}
+                    onchange={()=>oninput("FECHA")}
+                />
+                <div class={`label ${malfecha?"":"hidden"}`}>
+                    <span class="label-text-alt text-red-400">Debe seleccionar la fecha</span>
+                </div>
+            </label>
+            <label for = "categoria" class="label">
+                <span class="label-text text-base">Categoria</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={categoria} read
+                    onchange={()=>oninput("CATEGORIA")}
+                >
+                    {#each categorias as c}
+                        <option value={c.id}>{c.nombre}</option>    
+                    {/each}
+                </select>
+                <div class={`label ${malcategoria?"":"hidden"}`}>
+                    <span class="label-text-alt text-red-400">Debe seleccionar la categoria</span>
+                </div>
+            </label>
             
-            <div class="modal-action justify-start ">
-                <button class="btn btn-error text-white" onclick={()=>tiposmodal.close()}>Cerrar</button>
-            </div>
-        </div>
+            <label for = "tipo" class="label">
+                <span class="label-text text-base">Tipo tratamiento</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={tipo}
+                    onchange={()=>oninput("TIPO")}
+                >
+                    {#each tipotratamientos as t}
+                        <option value={t.id}>{t.nombre}</option>    
+                    {/each}
+                </select>
+                <div class={`label ${maltipo?"":"hidden"}`}>
+                    <span class="label-text-alt text-red-400">Debe seleccionar un tipo</span>
+                </div>
+            </label>
+            <label class="form-control">
+                <div class="label">
+                    <span class="label-text">Observacion</span>                    
+                </div>
+                <input 
+                    id ="observacion" 
+                    type="text"  
+                    class={`
+                        input 
+                        input-bordered 
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                        w-full
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={observacion}
+                />
+            </label>
 
-    </dialog>
-</Navbarr>
+        </div>
+        <div class="modal-action justify-start ">
+            <form method="dialog" >
+              <!-- if there is a button, it will close the modal -->
+              {#if idtratamiento == ""}
+                <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={guardar} >Guardar</button>
+                {:else}
+                <button class="btn btn-success text-white" onclick={editar} >Editar</button>
+                <button class="btn btn-error text-white" onclick={()=>eliminar(idtratamiento)}>Eliminar</button>
+              {/if}
+              <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
+              
+            </form>
+        </div>
+    </div>
+
+</dialog>
+<dialog id="tiposmodal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div class="
+            modal-box max-w-xl w-11/12
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-xl font-bold">Tipo tratamientos</h3>  
+        <div class="grid grid-cols-1 m-0 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+            <div class="w-11/12">
+                <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={()=>nuevoTipo()}>
+                    <span  class="text-xl">Nuevo tipo</span>
+                </button>
+                {#if addtipo}
+                <div class="grid grid-cols-3 gap-1">
+                    <div class="col-span-2">
+                        <label for = "nombre" class="label">
+                            <span class="label-text text-base">Nombre</span>
+                        </label>
+                        <label class="input-group">
+                            <input id ="nombre" type="text"  
+                                class={`
+                                    input input-bordered 
+                                    w-full
+                                    border border-gray-300 rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2} 
+                                    
+                                `}
+                                bind:value={nombretipotratamiento}
+                                oninput={validarBotonTipo}
+                            />
+                        </label>
+                    </div>
+                    
+                    <div class="flex flex-row gap-1 mt-10">
+                        
+                        <button
+                            aria-label="guardar"
+                            class={`
+                                ${estilos.basico} ${estilos.chico} ${estilos.primario}
+                            `}
+                            onclick={guardarTipo}
+                            disabled='{!botontipo}'
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-floppy" viewBox="0 0 16 16">
+                                <path d="M11 2H9v3h2z"/>
+                                <path d="M1.5 0h11.586a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0M1 1.5v13a.5.5 0 0 0 .5.5H2v-4.5A1.5 1.5 0 0 1 3.5 9h9a1.5 1.5 0 0 1 1.5 1.5V15h.5a.5.5 0 0 0 .5-.5V2.914a.5.5 0 0 0-.146-.353l-1.415-1.415A.5.5 0 0 0 13.086 1H13v4.5A1.5 1.5 0 0 1 11.5 7h-7A1.5 1.5 0 0 1 3 5.5V1H1.5a.5.5 0 0 0-.5.5m3 4a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5V1H4zM3 15h10v-4.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5z"/>
+                            </svg>
+                        </button>
+                        <button 
+                            aria-label="cerrar"
+                            class={`
+                                ${estilos.basico} ${estilos.chico} ${estilos.danger}
+                            `}
+                            onclick={cerrarTipoModal}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                {/if}
+                
+                    <table class="table table-lg w-full" >
+                        <thead>
+                            <tr>
+                                <th class="text-base"  >Nombre</th>
+                                <th class="text-base"  >Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {#each tipotratamientos as tp}
+                                <tr>
+                                    <td class="text-base">
+                                        {tp.nombre}
+                                    </td>
+                                    <td class={`flex gap-2 ${tp.generico?"hidden":""}`}>
+                                        <div class="tooltip" data-tip="Editar">
+                                            <button aria-label="Editar" onclick={()=>openEditTipoModal(tp.id)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div class="tooltip" data-tip="Eliminar">
+                                            <button aria-label="Eliminar" onclick={()=>eliminarTipo(tp.id)}>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                                </svg>                              
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {/each}            
+                        </tbody>
+                    </table>
+                
+            </div>
+        </div>  
+        
+        <div class="modal-action justify-start ">
+            <button class="btn btn-error text-white" onclick={()=>tiposmodal.close()}>Cerrar</button>
+        </div>
+    </div>
+
+</dialog>
