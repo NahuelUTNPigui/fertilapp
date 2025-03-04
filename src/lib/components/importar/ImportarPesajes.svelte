@@ -71,7 +71,7 @@
                     pesajeshashmap[tail].peso = value.v
                 }
                 if(firstLetter=="C"){
-                    pesajeshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
+                    pesajeshashmap[tail].fecha = value.w?new Date(value.w):""
                 }
                 
             }
@@ -86,7 +86,7 @@
                     pesajeshashmap[tail].peso = value.v
                 }
                 if(firstLetter=="C"){
-                    pesajeshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
+                    pesajeshashmap[tail].fecha = value.w?new Date(value.w):""
                 }                
             }
         }
@@ -99,7 +99,7 @@
             let datapesaje = {
                 pesonuevo:pe.peso,
                 cab:cab.id,
-                fecha:pe.fecha
+                fecha:pe.fecha?pe.fecha.toISOString().split("T")[0]:""
             }
 
             let datamod = {

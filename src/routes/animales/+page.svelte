@@ -450,8 +450,8 @@
                                 filterUpdate = {filterUpdate}
                             />
                         </div>
-                        <div>
-                            <label for = "sexo" class="label">
+                        <div class="mt-2">
+                            <label for = "sexo" class="label mb-2">
                                 <span class="label-text text-base">Sexo</span>
                             </label>
                             <label class="input-group ">

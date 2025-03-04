@@ -15,7 +15,7 @@
     ]
     //eventos animales,tactos,nacimientos,rodeos,lotes,tratamientos,inseminaciones ,observaciones,pesajes
 
-    let totaleventos = {
+    let totaleventos = $state({
         animales:0,
         tactos:0,
         nacimientos:0,
@@ -24,8 +24,9 @@
         tratamientos:0,
         inseminaciones:0,
         observaciones:0,
-        pesajes:0
-    }
+        pesajes:0,
+        servicios:0
+    })
     let opcion = $state(1)
     let ruta = import.meta.env.VITE_RUTA
 
@@ -42,6 +43,7 @@
     let opensFilterlotes = $state([])
     let opensFilterrodeos = $state([])
     let animales = $state([])
+    let cargados = $state(false)
 
     let ctx;
 	let canvas;
@@ -558,6 +560,11 @@
             filter:`active=True && cab='${cab.id}'`
         })
         let recordpesajes = await pb.collection('pesaje').getList(1,1,{
+            expand:"animal",
+            filter:`animal.cab='${cab.id}'`
+        })
+        let recordservicios = await pb.collection('servicios').getList(1,1,{
+            
             filter:`cab='${cab.id}'`
         })
         totaleventos.tactos = recordtactos.totalItems
@@ -566,6 +573,7 @@
         totaleventos.tratamientos = recordtratamientos.totalItems
         totaleventos.observaciones = recordobservaciones.totalItems
         totaleventos.pesajes = recordpesajes.totalItems
+        totaleventos.servicios = recordservicios.totalItems
          
     }
     onMount(async ()=>{
@@ -574,6 +582,7 @@
         await getLotes()
         await getRodeos()
         await getCategoriasRows()
+        cargados =  true
         
     })
     
@@ -596,152 +605,214 @@
     <div class="mx-1 lg:mx-10 w-4/5 lg:w-1/3 justify-items-left ">
         <RadioBadges opciones={opciones} bind:valor={opcion}/>
     </div>
-    {#if opcion == 0}
-        <div class="mx-1 lg:mx-10 grid grid-cols-2  lg:grid-cols-3 gap-6">
-            <StatCard titulo="Animales" valor={totaleventos.animales}/>
-            <StatCard titulo="Lotes" valor={totaleventos.lotes}/>
-            <StatCard titulo="Rodeos" valor={totaleventos.rodeos}/>
-            <StatCard titulo="Inseminaciones" valor={totaleventos.inseminaciones}/>
-            <StatCard titulo="Nacimientos" valor={totaleventos.nacimientos}/>
-            <StatCard titulo="Tratamientos" valor={totaleventos.tratamientos}/>
-            <StatCard titulo="Observaciones" valor={totaleventos.observaciones}/>
-            <StatCard titulo="Pesajes" valor={totaleventos.pesajes}/>
-            <StatCard titulo="Tactos" valor={totaleventos.tactos}/>
-        </div>
-    {:else}
-        
-        <div class="mx-1 lg:mx-10 grid grid-cols-2 lg:grid-cols-3">
-            <div>
-                <label for = "sexo" class="label">
-                    <span class="label-text text-base">Tipo Reporte</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={tiporeporte}
-                        
-                    >
-                            <option value={0} class="rounded">General</option>
-                            <option value={1} class="rounded">Lotes</option>
-                            <option value={2} class="rounded">Rodeos</option>
-                            
-                      </select>
-                </label>
+    {#if cargados}
+        {#if opcion == 0}
+            <div class="mx-1 lg:mx-10 grid grid-cols-2  lg:grid-cols-3 gap-6">
+                <StatCard  titulo="Animales" valor={totaleventos.animales}/>
+                <StatCard  titulo="Lotes" valor={totaleventos.lotes}/>
+                <StatCard  titulo="Rodeos" valor={totaleventos.rodeos}/>
+                <StatCard  titulo="Inseminaciones" valor={totaleventos.inseminaciones}/>
+                <StatCard  titulo="Servicios" valor={totaleventos.servicios}/>
+                <StatCard  titulo="Nacimientos" valor={totaleventos.nacimientos}/>
+                <StatCard  titulo="Tratamientos" valor={totaleventos.tratamientos}/>
+                <StatCard  titulo="Observaciones" valor={totaleventos.observaciones}/>
+                <StatCard  titulo="Pesajes" valor={totaleventos.pesajes}/>
+                <StatCard  titulo="Tactos" valor={totaleventos.tactos}/>
             </div>
-            <div>
-                <div class=" mb-2 mt-2 mx-1 lg:mx-10" >
-                    <div >
-                        <br>
-                        <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={onchangeTipo}>
-                            <span  class="text-xl">Generar reporte</span>
-                        </button>
+        {:else}
+            
+            <div class="mx-1 lg:mx-10 grid grid-cols-2 lg:grid-cols-3">
+                <div>
+                    <label for = "sexo" class="label">
+                        <span class="label-text text-base">Tipo Reporte</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={tiporeporte}
+                            
+                        >
+                                <option value={0} class="rounded">General</option>
+                                <option value={1} class="rounded">Lotes</option>
+                                <option value={2} class="rounded">Rodeos</option>
+                                
+                        </select>
+                    </label>
+                </div>
+                <div>
+                    <div class=" mb-2 mt-2 mx-1 lg:mx-10" >
+                        <div >
+                            <br>
+                            <button class={`w-full btn flex btn-primary ${estilos.btntext}`} data-theme="forest" onclick={onchangeTipo}>
+                                <span  class="text-xl">Reporte</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        
-        {#if generarReporte}
-            <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
-                <table class="table table-lg w-full" >
-                    <thead>
-                        <tr>
-                            <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Categoria</th>
-                            <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Total</th>
-                            <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso promedio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {#each categoriasrows as c}
-                        <tr>
-                            <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{c.nombre}</td>
-                            <td class="text-base mx-1 px-1 ">{c.total}</td>
-                            <td class="text-base mx-1 px-1 ">{c.pesoProm}</td>
-                        </tr>
-                    {/each}
-                </tbody>
-                </table>
-            </div>
-            <div class="mx-1 lg:mx-10">
-                <button
-                    aria-label="Evolucion"
-                    onclick={()=>chartpesaje.showModal()}
-                    class={`
-                        ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
-                    `}
-                >
-                    Mostrar grafico
-                </button>
-            </div>      
-        {/if}
-        {#if generarReportePersonalizado}
-            {#if generarReporteRodeos}
-                
+            
+            
+            {#if generarReporte}
+                <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+                    <table class="table table-lg w-full" >
+                        <thead>
+                            <tr>
+                                <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Categoria</th>
+                                <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Total</th>
+                                <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Peso promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {#each categoriasrows as c}
+                            <tr>
+                                <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10">{c.nombre}</td>
+                                <td class="text-base mx-1 px-1 ">{c.total}</td>
+                                <td class="text-base mx-1 px-1 ">{c.pesoProm}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                    </table>
+                </div>
+                <div class="mx-1 lg:mx-10">
+                    <button
+                        aria-label="Evolucion"
+                        onclick={()=>chartpesaje.showModal()}
+                        class={`
+                            ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                        `}
+                    >
+                        Mostrar grafico
+                    </button>
+                </div>      
+            {/if}
+            {#if generarReportePersonalizado}
+                {#if generarReporteRodeos}
+                    
+                    <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+                        <table class="table table-lg w-full">
+                            <thead>
+                                <tr>
+                                    <th class="text-base justify-start border-b dark:border-gray-600">Nombre del rodeo</th>
+                                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600" >Total</th>
+                                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each rodeosrows as r, i}
+                                <tr class="border-b dark:border-gray-800">
+                                    
+                                    <td class="text-base ">
+                                        <button 
+                                            aria-label="Filtrar" 
+                                            class="w-full"
+                                            onclick={()=>clickFilterrodeo(i)}
+                                        >
+                                        <div class="flex justify-between items-center px-1">
+                                            <h1 class="font-semibold text-lg py-2">{r.nombre}</h1>
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                class={`size-6 transition-all duration-300 ${opensFilterrodeos[i]? 'transform rotate-180':''}`}
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>            
+                                        </button>
+                                        
+                                    </td>
+                                    <td class="font-semibold mx-1 px-1">{r.total}</td>
+                                    <td class="font-semibold mx-1 px-1">{r.pesoProm}</td>
+                                    
+                                </tr>
+                                    {#if opensFilterrodeos[i]}
+                                        {#each r.categoriasrodeos as cr}
+                                            <tr transition:slide>
+                                                <td class="text-base  ">{cr.nombre}</td>
+                                                <td class="text-base mx-1 px-1 ">{cr.total}</td>
+                                                <td class="text-base mx-1 px-1 ">{cr.pesoProm}</td>
+                                                
+                                            </tr>
+                                        {/each}
+                                        
+                                        
+                                    {/if}
+                                {/each}
+                                
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    <div class="mt-1 justify-items-left mx-1 lg:mx-10">
+                        <button
+                            aria-label="Pesaje Rodeos"
+                            onclick={()=>chartpesajepersonalizadorodeos.showModal()}
+                            class={`
+                                ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
+                            `}
+                        >
+                            Mostrar grafico
+                        </button>
+                    </div>
+                    
+                {/if}
+                {#if generarReporteLotes}
                 <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
                     <table class="table table-lg w-full">
                         <thead>
                             <tr>
-                                <th class="text-base justify-start border-b dark:border-gray-600">Nombre del rodeo</th>
+                                <th class="text-base justify-start border-b dark:border-gray-600">Nombre del lote</th>
                                 <th class="text-base mx-1 px-1 border-b dark:border-gray-600" >Total</th>
                                 <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Promedio</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {#each rodeosrows as r, i}
-                            <tr class="border-b dark:border-gray-800">
-                                
-                                <td class="text-base ">
-                                    <button 
-                                        aria-label="Filtrar" 
-                                        class="w-full"
-                                        onclick={()=>clickFilterrodeo(i)}
-                                    >
-                                    <div class="flex justify-between items-center px-1">
-                                        <h1 class="font-semibold text-lg py-2">{r.nombre}</h1>
-                                        <svg 
-                                            xmlns="http://www.w3.org/2000/svg" 
-                                            class={`size-6 transition-all duration-300 ${opensFilterrodeos[i]? 'transform rotate-180':''}`}
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>            
-                                    </button>
-                                    
-                                </td>
-                                <td class="font-semibold mx-1 px-1">{r.total}</td>
-                                <td class="font-semibold mx-1 px-1">{r.pesoProm}</td>
-                                
-                            </tr>
-                                {#if opensFilterrodeos[i]}
-                                    {#each r.categoriasrodeos as cr}
-                                        <tr transition:slide>
-                                            <td class="text-base  ">{cr.nombre}</td>
-                                            <td class="text-base mx-1 px-1 ">{cr.total}</td>
-                                            <td class="text-base mx-1 px-1 ">{cr.pesoProm}</td>
-                                            
+                            {#each lotesrows as l, i}
+                                <tr class="border-b dark:border-gray-800">
+                                    <td class="text-base  lg:ml-10 justify-start">
+                                        <button 
+                                            aria-label="Filtrar" 
+                                            class="w-full"
+                                            onclick={()=>clickFilterlote(i)}
+                                        >
+                                        <div class="flex justify-between items-center px-1">
+                                            <h1 class="font-semibold text-lg py-2">{l.nombre}</h1>
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                class={`size-6 transition-all duration-300 ${opensFilterlotes[i]? 'transform rotate-180':''}`}
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>            
+                                        </button>
+                                    </td>
+                                    <td class="text-base mx-1 px-1 ">{l.total}</td>
+                                    <td class="text-base mx-1 px-1 ">{l.pesoProm}</td>
+                                </tr>
+                                {#if opensFilterlotes[i]}
+                                    {#each l.categoriaslotes as cl}
+                                        <tr>
+                                            <td class="text-base ">{cl.nombre}</td>
+                                            <td class="text-base mx-1 px-1">{cl.total}</td>
+                                            <td class="text-base mx-1 px-1">{cl.pesoProm}</td>
                                         </tr>
                                     {/each}
-                                    
-                                    
                                 {/if}
                             {/each}
-                            
                         </tbody>
                     </table>
                     
                 </div>
                 <div class="mt-1 justify-items-left mx-1 lg:mx-10">
                     <button
-                        aria-label="Pesaje Rodeos"
-                        onclick={()=>chartpesajepersonalizadorodeos.showModal()}
+                        aria-label="Pesaje Lotes"
+                        onclick={()=>chartpesajepersonalizadolotes.showModal()}
                         class={`
                             ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
                         `}
@@ -749,66 +820,7 @@
                         Mostrar grafico
                     </button>
                 </div>
-                
-            {/if}
-            {#if generarReporteLotes}
-            <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
-                <table class="table table-lg w-full">
-                    <thead>
-                        <tr>
-                            <th class="text-base justify-start border-b dark:border-gray-600">Nombre del lote</th>
-                            <th class="text-base mx-1 px-1 border-b dark:border-gray-600" >Total</th>
-                            <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Promedio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each lotesrows as l, i}
-                            <tr class="border-b dark:border-gray-800">
-                                <td class="text-base  lg:ml-10 justify-start">
-                                    <button 
-                                        aria-label="Filtrar" 
-                                        class="w-full"
-                                        onclick={()=>clickFilterlote(i)}
-                                    >
-                                    <div class="flex justify-between items-center px-1">
-                                        <h1 class="font-semibold text-lg py-2">{l.nombre}</h1>
-                                        <svg 
-                                            xmlns="http://www.w3.org/2000/svg" 
-                                            class={`size-6 transition-all duration-300 ${opensFilterlotes[i]? 'transform rotate-180':''}`}
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>            
-                                    </button>
-                                </td>
-                                <td class="text-base mx-1 px-1 ">{l.total}</td>
-                                <td class="text-base mx-1 px-1 ">{l.pesoProm}</td>
-                            </tr>
-                            {#if opensFilterlotes[i]}
-                                {#each l.categoriaslotes as cl}
-                                    <tr>
-                                        <td class="text-base ">{cl.nombre}</td>
-                                        <td class="text-base mx-1 px-1">{cl.total}</td>
-                                        <td class="text-base mx-1 px-1">{cl.pesoProm}</td>
-                                    </tr>
-                                {/each}
-                            {/if}
-                        {/each}
-                    </tbody>
-                </table>
-                
-            </div>
-            <div class="mt-1 justify-items-left mx-1 lg:mx-10">
-                <button
-                    aria-label="Pesaje Lotes"
-                    onclick={()=>chartpesajepersonalizadolotes.showModal()}
-                    class={`
-                        ${estilos.sinbordes} ${estilos.chico} ${estilos.primario}
-                    `}
-                >
-                    Mostrar grafico
-                </button>
-            </div>
+                {/if}
             {/if}
         {/if}
     {/if}

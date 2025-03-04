@@ -5,6 +5,7 @@
     import PocketBase from 'pocketbase';
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import { guardarHistorial } from "$lib/historial/lib";
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
@@ -17,21 +18,18 @@
     let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
-            fecha:"AAAA/MM/DD",
-            observacion:"",
+            fecha:"DD/MM/AAAA",
             caravana:"AAA",
-            categoria:"Vaca/Vaquillona",
-            prenada:"preñada/dudosa/vacia",
+            prenada:"preñada/dudosa/vacia/servicio",
             tipo:"eco/tacto",
-            nombreveterinario:""
+            observacion:"",
         }].map(item=>({
             FECHA: item.fecha,
-            OBSERVACION: item.observacion,
             CARAVANA: item.caravana,
-            CATEGORIA: item.categoria,
             PREÑADA: item.prenada,
             TIPO_TACTO: item.tipo,
-            NOMBRE_VETERINARIO: item.nombreveterinario
+            OBSERVACION: item.observacion,
+            
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -73,86 +71,98 @@
             }
             if(tactoshashmap[tail]){
                 if(firstLetter=="A"){
-                    tactoshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
+                    tactoshashmap[tail].fecha = value.w?new Date(value.w):""
                 }
                 if(firstLetter=="B"){
-                    tactoshashmap[tail].observacion = value.v
-                }
-                if(firstLetter=="C"){
                     tactoshashmap[tail].caravana = value.v
                 }
-                if(firstLetter=="D"){
-                    tactoshashmap[tail].categoria = value.v.toLowerCase()
-                }
-                if(firstLetter=="E"){
-                    if (value.v == "preñada"){
+                if(firstLetter=="C"){
+                    let estado = value.v.toLocaleLowerCase()
+                    if (estado == "preñada"){
                         tactoshashmap[tail].prenada = 2
                     }
-                    else if(value.v == "dudosa"){
+                    else if(estado == "dudosa"){
                         tactoshashmap[tail].prenada = 1
+                    }
+                    else if(estado == "servicio"){
+                        tactoshashmap[tail].prenada = 3
                     }
                     else{
                         tactoshashmap[tail].prenada = 0
                     }
                 }
-                if(firstLetter=="F"){
+                if(firstLetter=="D"){
                     tactoshashmap[tail].tipo = value.v.toLowerCase()
                 }
-                if(firstLetter=="G"){
-                    tactoshashmap[tail].nombreveterinario = value.v
+                if(firstLetter=="E"){
+                    tactoshashmap[tail].observacion = value.v
                 }
+                
             }
             else{
                 tactoshashmap[tail]={
                     fecha:"", observacion:"", caravana:"", categoria:"", prenada:"", tipo:"", nombreveterinario:""
                 }
                 if(firstLetter=="A"){
-                    tactoshashmap[tail].fecha = new Date(value.w).toISOString().split("T")[0]
+                    tactoshashmap[tail].fecha = value.w?new Date(value.w):""
                 }
+                
                 if(firstLetter=="B"){
-                    tactoshashmap[tail].observacion = value.v
-                }
-                if(firstLetter=="C"){
                     tactoshashmap[tail].caravana = value.v
                 }
-                if(firstLetter=="D"){
-                    tactoshashmap[tail].categoria = value.v.toLowerCase()
-                }
-                if(firstLetter=="E"){
-                    if (value.v == "preñada"){
+                
+                if(firstLetter=="C"){
+                    let estado = value.v.toLocaleLowerCase()
+                    if (estado == "preñada"){
                         tactoshashmap[tail].prenada = 2
                     }
-                    else if(value.v == "dudosa"){
+                    else if(estado == "dudosa"){
                         tactoshashmap[tail].prenada = 1
+                    }
+                    else if(estado == "servicio"){
+                        tactoshashmap[tail].prenada = 3
                     }
                     else{
                         tactoshashmap[tail].prenada = 0
                     }
                 }
-                if(firstLetter=="F"){
+                if(firstLetter=="D"){
                     tactoshashmap[tail].tipo = value.v.toLowerCase()
                 }
-                if(firstLetter=="G"){
-                    tactoshashmap[tail].nombreveterinario = value.v
+                if(firstLetter=="E"){
+                    tactoshashmap[tail].observacion = value.v
                 }
+                
             }
         }
         for (const [key, value ] of Object.entries(tactoshashmap)) {
-            tactos.push(value)
+            if(value.caravana != "" && value.fecha != "" && value.tipo != ""){
+                tactos.push(value)
+            }
+            
         }
+        
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
-            let an = animales.filter(a=>a.caravana==ta.caravana)[0]
+
+            let ans = animales.filter(a=>a.caravana==ta.caravana)
+            if(ans.length == 0){
+                continue
+            }
+            let an = ans[0]
+            if(an.sexo == "M"){
+                continue
+            }
             //Agregar Tacto si no existe
+            let fecha = ta.fecha.toISOString().split("T")[0] + " 03:00:00"
             let dataadd = {
-                fecha: ta.fecha + " 03:00:00",
+                fecha: fecha,
                 active: true,
                 observacion: ta.observacion,
                 animal: an.id,
-                categoria: ta.categoria,
+                categoria: an.categoria,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
-                nombreveterinario: ta.nombreveterinario,
                 cab: cab.id
             }
 
@@ -160,19 +170,20 @@
                 observacion: ta.observacion,
                 prenada: ta.prenada,
                 tipo: ta.tipo,
-                nombreveterinario: ta.nombreveterinario
+                
             }
+            
 
             try{
-                const record = await pb.collection('tactos').getFirstListItem(`fecha="${ta.fecha + " 03:00:00"}" && animal="${an.id}"`,{});
-                await pb.collection('tactos').update(record.id, datamod);               
+                const record = await pb.collection('tactos').getFirstListItem(`fecha="${fecha}" && animal="${an.id}"`,{});
+                await pb.collection('tactos').update(record.id, datamod);         
+                await guardarHistorial(pb,an.id)      
                 await pb.collection("animales").update(an.id,{prenada:ta.prenada})
             }
             catch(err){
-                
                 await pb.collection('tactos').create(dataadd);
+                await guardarHistorial(pb,an.id)      
                 await pb.collection("animales").update(an.id,{prenada:ta.prenada})
-
             }
         }
         filename = ""

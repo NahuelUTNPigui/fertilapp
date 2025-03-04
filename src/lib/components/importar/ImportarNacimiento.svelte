@@ -25,7 +25,7 @@
             sexo:"H/M",
             rodeo:"",
             lote:"",
-            fechanacimiento:"AAAA/MM/DD",
+            fechanacimiento:"DD/MM/AAAA",
             nombremadre:"",
             nombrepadre:"",
             observaciones:""
@@ -35,7 +35,7 @@
             SEXO: item.sexo,
             RODEO: item.rodeo,
             LOTE: item.lote,
-            fechanacimientoIMIENTO: item.fechanacimiento,
+            FECHANACIMIENTO: item.fechanacimiento,
             CARAVANA_MADRE: item.nombremadre,
             CARAVANA_PADRE: item.nombrepadre,
             OBSERVACIONES:item.observaciones
@@ -95,7 +95,7 @@
                     animaleshashmap[tail].lote = value.v
                 }
                 if(firstLetter=="F"){
-                    animaleshashmap[tail].fechanacimiento = new Date(value.w).toISOString().split("T")[0]
+                    animaleshashmap[tail].fechanacimiento = value.w?new Date(value.w):""
                 }
                 if(firstLetter=="G"){
                     animaleshashmap[tail].nombremadre = value.v
@@ -127,7 +127,7 @@
                     animaleshashmap[tail].lote = value.v
                 }
                 if(firstLetter=="F"){
-                    animaleshashmap[tail].fechanacimiento = new Date(value.w).toISOString().split("T")[0]
+                    animaleshashmap[tail].fechanacimiento = value.w?new Date(value.w):""
                 }
                 if(firstLetter=="G"){
                     animaleshashmap[tail].nombremadre = value.v
@@ -149,7 +149,7 @@
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
             let padre = padres.filter(p=>p.caravana==an.nombrepadre)[0]
-            let madre = padres.filter(m=>m.caravana==an.nombremadre)[0]
+            let madre = madres.filter(m=>m.caravana==an.nombremadre)[0]
             
             // Agregar animal si no existe y nacimiento
             let dataadd = {
@@ -158,7 +158,7 @@
                 delete:false,
                 sexo:an.sexo,
                 peso:an.peso,
-                fechanacimiento: an.fechanacimiento+ " 03:00:00",
+                fechanacimiento: an.fechanacimiento?an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00":"",
                 nombremadre: an.nombremadre,
                 nombrepadre: an.nombrepadre,
                 cab:cab.id

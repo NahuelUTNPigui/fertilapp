@@ -17,6 +17,7 @@
     import PredictSelect from '$lib/components/PredictSelect.svelte';
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
+    import StatCard from "$lib/components/StatCard.svelte";
 
     
 
@@ -29,6 +30,19 @@
         nombre:"",
         id:""
     })
+    let totaleventos = $state({
+        animales:0,
+        tactos:0,
+        nacimientos:0,
+        rodeos:0,
+        lotes:0,
+        tratamientos:0,
+        inseminaciones:0,
+        observaciones:0,
+        pesajes:0,
+        servicios:0
+    })
+    let cargados = $state(false)
     let caber = createCaber()
     let animales = $state([])
     let madres = $state([])
@@ -125,6 +139,7 @@
         })
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+        totaleventos.animales = animales.length
         
         
         cargadoanimales = true
@@ -614,6 +629,47 @@
             }
         }
     }
+    async function getTotales() {
+        let recordtactos = await pb.collection('tactos').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`
+        })
+        let recordnacimientos = await pb.collection('nacimientos').getList(1,1,{
+            filter:`cab='${cab.id}'`
+        })
+        let recordtratamientos = await pb.collection('tratamientos').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`
+        })
+        let recordinseminaciones = await pb.collection('inseminacion').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`
+        })
+        let recordobservaciones = await pb.collection('observaciones').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`
+        })
+        let recordpesajes = await pb.collection('pesaje').getList(1,1,{
+            expand:"animal",
+            filter:`animal.cab='${cab.id}'`
+        })
+        let recordservicios = await pb.collection('servicios').getList(1,1,{
+            filter:`cab='${cab.id}'`
+        })
+        const recordslotes = await pb.collection('lotes').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`,
+        });
+        
+        const recordsrodeos = await pb.collection('rodeos').getList(1,1,{
+            filter:`active=True && cab='${cab.id}'`,
+            
+        });
+        totaleventos.tactos = recordtactos.totalItems
+        totaleventos.inseminaciones = recordinseminaciones.totalItems
+        totaleventos.nacimientos = recordnacimientos.totalItems
+        totaleventos.tratamientos = recordtratamientos.totalItems
+        totaleventos.observaciones = recordobservaciones.totalItems
+        totaleventos.pesajes = recordpesajes.totalItems
+        totaleventos.servicios = recordservicios.totalItems
+        totaleventos.lotes = recordslotes.totalItems
+        totaleventos.rodeos = recordsrodeos.totalItems
+    }
     onMount(async ()=>{
         cab = caber.cab
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
@@ -621,13 +677,29 @@
         if(cab.exist){
             await getAnimales()
             await getTiposTratamientos()
+            await getTotales()
+            cargados = true
         }
     })
  
 </script>
 <Navbarr>
     {#if cab.exist}
+    
         <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
+            <div class="mx-1 my-2 lg:mx-10 grid grid-cols-2  lg:grid-cols-3 gap-1">
+                <StatCard titsize={"text-md"} titulo="Animales" valor={totaleventos.animales}/>
+                <StatCard titsize={"text-md"} titulo="Lotes" valor={totaleventos.lotes}/>
+                <StatCard titsize={"text-md"} titulo="Rodeos" valor={totaleventos.rodeos}/>
+                <StatCard titsize={"text-md"} titulo="Inseminaciones" valor={totaleventos.inseminaciones}/>
+                <StatCard titsize={"text-md"} titulo="Servicios" valor={totaleventos.servicios}/>
+                <StatCard titsize={"text-md"} titulo="Nacimientos" valor={totaleventos.nacimientos}/>
+                <StatCard titsize={"text-md"} titulo="Tratamientos" valor={totaleventos.tratamientos}/>
+                <StatCard titsize={"text-md"} titulo="Observaciones" valor={totaleventos.observaciones}/>
+                <StatCard titsize={"text-md"} titulo="Pesajes" valor={totaleventos.pesajes}/>
+                <StatCard titsize={"text-md"} titulo="Tactos" valor={totaleventos.tactos}/>
+            </div>
+            <h2 class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">Opciones</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <a class={classbutton}
