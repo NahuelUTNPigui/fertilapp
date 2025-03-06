@@ -17,6 +17,7 @@
     let rodeos = $state([])
     let animales = $state([])
     let padres = $state([])
+    let madres = $state([])
 
     function exportarTemplate(){
         let csvData = [{
@@ -148,8 +149,8 @@
             let conlote = false
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
-            let padre = padres.filter(p=>p.caravana==an.nombrepadre)[0]
-            let madre = madres.filter(m=>m.caravana==an.nombremadre)[0]
+            let padre = animales.filter(p=>p.caravana==an.nombrepadre)[0]
+            let madre = animales.filter(m=>m.caravana==an.nombremadre)[0]
             
             // Agregar animal si no existe y nacimiento
             let dataadd = {
@@ -239,9 +240,7 @@
             filter:`delete = false && cab ='${cab.id}'`,
         })
 
-        padres = await pb.collection('animales').getFullList({
-            filter:`delete = false && cab ='${cab.id}'`
-        })
+        
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">

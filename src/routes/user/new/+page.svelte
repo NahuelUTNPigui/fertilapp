@@ -115,20 +115,22 @@
             return
         }
         try{
+            let nombredata = nombre.trim().split(" ").filter(w=>w !== "").join(".")
+            let apellidodata = nombre.trim().split(" ").filter(w=>w !== "").join(".")
             const data = {
-                "username": nombre+"."+apellido,
-                "email": usuarioemail,
+                "username": nombredata+"."+apellidodata,
+                "email": usuarioemail.trim(),
                 "emailVisibility": true,
                 "password": contra,
                 "passwordConfirm": confirmcontra,
-                "name": usuarioemail,
-                "nombre":nombre,
-                "apellido":apellido,
+                "name": usuarioemail.trim(),
+                "nombre":nombre.trim(),
+                "apellido":apellido.trim(),
                 "active": true,
                 "codigo":randomString(10,"n")
             };
             const record = await pb.collection('users').create(data);
-            Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario.Ingrese a la aplicación', 'success');
+            Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario. Ingrese a la aplicación', 'success');
             goto("/")
         }catch(e){
             console.log(e)

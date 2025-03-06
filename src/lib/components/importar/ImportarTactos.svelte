@@ -18,7 +18,7 @@
     let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
-            fecha:"MM/DD/AAAA",
+            fecha:"DD/MM/AAAA",
             caravana:"AAA",
             prenada:"preñada/dudosa/vacia/servicio",
             tipo:"eco/tacto",
