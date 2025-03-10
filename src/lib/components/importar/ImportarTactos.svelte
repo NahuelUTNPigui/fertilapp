@@ -18,7 +18,7 @@
     let loading = $state(false)
     function exportarTemplate(){
         let csvData = [{
-            fecha:"DD/MM/AAAA",
+            fecha:"MM/DD/AAAA",
             caravana:"AAA",
             prenada:"preñada/dudosa/vacia/servicio",
             tipo:"eco/tacto",
@@ -141,7 +141,7 @@
             }
             
         }
-        
+        let errores = false
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
 
@@ -153,10 +153,8 @@
             if(an.sexo == "M"){
                 continue
             }
-            //Agregar Tacto si no existe
-            let fecha = ta.fecha.toISOString().split("T")[0] + " 03:00:00"
             let dataadd = {
-                fecha: fecha,
+                fecha: "",
                 active: true,
                 observacion: ta.observacion,
                 animal: an.id,
@@ -172,7 +170,20 @@
                 tipo: ta.tipo,
                 
             }
-            
+            try{
+                //Agregar Tacto si no existe
+                
+                console.log(ta.fecha)
+                
+                let fecha = ta.fecha.toISOString().split("T")[0] + " 03:00:00"
+                console.log(fecha)
+                dataadd.fecha = fecha
+            }
+            catch(err){
+                console.error(err)
+                errores = true
+                continue
+            }
 
             try{
                 const record = await pb.collection('tactos').getFirstListItem(`fecha="${fecha}" && animal="${an.id}"`,{});
@@ -186,10 +197,16 @@
                 await pb.collection("animales").update(an.id,{prenada:ta.prenada})
             }
         }
+        if(errores){
+            Swal.fire("Error importart","Hubo algún tacto con error","error")
+        }
+        else{
+            Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        }
         filename = ""
         wkbk = null
         loading = false
-        Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        
     }
     onMount(async ()=>{
         const tactos = await pb.collection('tactos').getFullList({
