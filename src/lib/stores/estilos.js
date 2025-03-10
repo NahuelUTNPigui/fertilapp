@@ -19,7 +19,7 @@ export default{
     mediumsolidgreen:"w-full flex items-center justify-center space-x-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 dark:bg-green-700 dark:hover:bg-green-600",    
     mediumsolidred:"w-full flex items-center justify-center space-x-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 dark:bg-red-700 dark:hover:bg-red-600",
 
-    labelForm:"label-text text-base font-semibold"
+    labelForm:"label-text text-base"
 
 
 

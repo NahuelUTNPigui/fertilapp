@@ -196,7 +196,7 @@
             Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
             return
         }
-        return 
+        
         try{
             let recordparicion = null
             if(conparicion){

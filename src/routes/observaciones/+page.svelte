@@ -11,6 +11,8 @@
     import { createUserer } from '$lib/stores/user.svelte';
     import categorias from '$lib/stores/categorias';
     import estilos from '$lib/stores/estilos';
+    import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
+    import cuentas from '$lib/stores/cuentas';
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -28,7 +30,7 @@
     let malcaravana = $state(false)
     let sexo = $state("")
     let peso = $state(0)
-
+    let usuarioid = $state("")
     //Datos observaciones
     let idobservacion = $state("")
     let animal = $state("")
@@ -47,6 +49,13 @@
     let fechadesde = $state("")
     let fechahasta = $state("")
     let isOpenFilter = $state(false)
+    //Datos animal
+    let caravananuevo = $state("")
+    let categorianuevo = $state("")
+    let sexonuevo = $state("")
+    let fechanacimientonuevo = $state("")
+    let pesonuevo = $state("")
+    let agregaranimal = $state(false)
     //Funciones
     //Para el collapse de los filtros
     function clickFilter(){
@@ -148,6 +157,12 @@
         observacion = ""
         categoria = ""
         animal = ""
+        caravananuevo = ""
+        categorianuevo = ""
+        sexonuevo = ""
+        fechanacimientonuevo = ""
+        pesonuevo = ""
+        agregaranimal = false
         nuevoModal.close()
     }
     function filterUpdate(){
@@ -171,38 +186,59 @@
         }
     }
     onMount(async ()=>{
-        
+        let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
+        usuarioid = pb_json.model.id
         await getObservaciones()
         filterUpdate()
         await getAnimales()
     })
     async function guardar(){
-        try{
-            let data = {
-                animal,
-                fecha:fecha +" 03:00:00",
-                categoria,
-                cab:cab.id,
-                observacion,
-                active:true
+        if (agregaranimal){
+            try{
+                let a = await guardarAnimal()
+                let data = {
+                    animal:a.id,
+                    fecha:fecha +" 03:00:00",
+                    categoria:a.categoria,
+                    cab:cab.id,
+                    observacion,
+                    active:true
+                }
+                const record = await pb.collection('observaciones').create(data);
+                await getObservaciones()
+                
+                filterUpdate()
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
             }
-            const record = await pb.collection('observaciones').create(data);
-            let a = animales.filter(an=>an.id==animal)[0]
-            let item = {
-                ...record,
-                expand:{animal:a}
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar la observación","error")
             }
-            observaciones.push(item)
-            observaciones.sort((o1,o2)=>new Date(o1.fecha)>new Date(o2.fecha)?-1:1)
-
-            filterUpdate()
-            Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
-
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","No se pudo guardar la observación","error")
+        else{
+            try{
+                let data = {
+                    animal,
+                    fecha:fecha +" 03:00:00",
+                    categoria,
+                    cab:cab.id,
+                    observacion,
+                    active:true
+                }
+                const record = await pb.collection('observaciones').create(data);
+                await getObservaciones()
+
+                filterUpdate()
+                Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
+
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar la observación","error")
+            }
         }
+        
         idobservacion = ""
         fecha = ""
         observacion = ""
@@ -211,25 +247,29 @@
     }
 
     async function guardarAnimal(){
-        try{
-            let data = {
-                caravana,
-                active:true,
-                delete:false,
-                sexo,
-                peso,
-                cab:cab.id
-            }
-            let recorda = await pb.collection('animales').create(data)
-            Swal.fire("Éxito guardar","Se pudo guardar el animal con exito","success")
-            caravana = ""
-            sexo = "H"
+        let user = await pb.collection("users").getOne(usuarioid)
+        
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+        
+        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
+        let verificar = true
+        if(nivel.animales != -1 && animals.totalItems > nivel.animales){
+            verificar =  false
         }
-        catch(e){
-            console.error(e)
-            Swal.fire("Error guardar","Hubo un error para guardar el animal","error")
+        
+        let data = {
+            caravana:caravananuevo,
+            active:true,
+            categoria:categorianuevo,
+            delete:false,
+            fechanacimiento:fechanacimientonuevo +" 03:00:00",
+            sexo:sexonuevo,
+            peso:pesonuevo,
+            cab:cab.id
         }
-        await getAnimales()
+        
+        let recorda = await pb.collection('animales').create(data); 
+        return recorda
     }
     
     async function editar(){
@@ -257,7 +297,7 @@
     }
     function validarBoton(){
         botonhabilitado = true
-        if(isEmpty(animal)){
+        if(!agregaranimal && isEmpty(animal)){
             botonhabilitado=false
         }
         if(isEmpty(fecha)){
@@ -267,7 +307,7 @@
 
     function validarBotonAnimal(){
         botonhabilitadoAnimal = true
-        if(isEmpty(caravana)){
+        if(!agregaranimal && isEmpty(caravana)){
             botonhabilitadoAnimal=false
         }
     }
@@ -282,8 +322,8 @@
     }
     function oninput(inputName){
         validarBoton()
-        validarBotonAnimal()
-        if(inputName == "ANIMAL"){
+        //validarBotonAnimal()
+        if(!agregaranimal && inputName == "ANIMAL"){
             if(isEmpty(animal)){
                 malanimal = true
             }
@@ -482,34 +522,59 @@
                 <h3 class="text-lg font-bold">Editar observación</h3>  
             {/if}
             <div class="form-control">
-                <label for = "animal" class="label">
-                    <span class="label-text text-base">Animal</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={animal}
-                        onchange={()=>oninput("ANIMAL")}
-                    >
-                        <option value="agregar">Agregar animal</option>
-                        {#each animales as a}
-                            <option value={a.id}>{a.caravana}</option>    
-                        {/each}
-                    </select>
-                    {#if malanimal}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
-                        </div>
-                    {/if}
-                </label>
-                {#if animal == "agregar"}
+                {#if idobservacion==""}
+                    <AgregarAnimal bind:agregaranimal bind:caravana = {caravananuevo} bind:categoria = {categorianuevo} bind:sexo = {sexonuevo} bind:peso = {pesonuevo} bind:fechanacimiento = {fechanacimientonuevo}/>
+                {/if}
+                {#if !agregaranimal}
+                    <label for = "animal" class="label">
+                        <span class="label-text text-base">Animal</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={animal}
+                            onchange={()=>oninput("ANIMAL")}
+                        >
+                            
+                            {#each animales as a}
+                                <option value={a.id}>{a.caravana}</option>    
+                            {/each}
+                        </select>
+                        {#if malanimal}
+                            <div class="label">
+                                <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                            </div>
+                        {/if}
+                    </label>
+                    <label for = "categoria" class="label">
+                        <span class="label-text text-base">Categoria</span>
+                    </label>
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={categoria}
+                        >
+                            {#each categorias as c}
+                                <option value={c.id}>{c.nombre}</option>    
+                            {/each}
+                        </select>
+                    </label>
+                {/if}
+                {#if false && animal == "agregar"}
                     <form method="dialog">
                         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
                     </form>
@@ -574,28 +639,8 @@
                         </form>
                     </div>
                 {/if}
-                <label for = "categoria" class="label">
-                    <span class="label-text text-base">Categoria</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={categoria}
-                    >
-                        {#each categorias as c}
-                            <option value={c.id}>{c.nombre}</option>    
-                        {/each}
-                      </select>
-                </label>
                 <label for = "fecha" class="label">
-                    <span class="label-text text-base">Fecha </span>
+                    <span class="label-text text-base">Fecha observación</span>
                 </label>
                 <label class="input-group ">
                     <input id ="fecha" type="date" max={HOY}  

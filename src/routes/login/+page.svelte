@@ -12,8 +12,9 @@
     
     
     let ruta = import.meta.env.VITE_RUTA
-    let usuarioname=''
-    let contra = ''
+    let usuarioname= $state('')
+    let contra = $state('')
+    let showpass = $state(false)
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
@@ -132,12 +133,18 @@
                         Contraseña
                     </label>
                     <input 
-                        type="password" 
+                        type={showpass?"text":"password"} 
                         id="password" 
                         bind:value={contra} 
                         required 
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
                     />
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                          <span class="label-text">Mostrar constraseña</span>
+                          <input type="checkbox" bind:checked={showpass} class="checkbox" />
+                        </label>
+                    </div>
                 </div>
                 <div>
                     <button 

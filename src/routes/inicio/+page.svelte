@@ -18,7 +18,8 @@
     import estilos from '$lib/stores/estilos';
     import estados from "$lib/stores/estados";
     import StatCard from "$lib/components/StatCard.svelte";
-
+    import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
+    import cuentas from '$lib/stores/cuentas';
     
 
     let ruta = import.meta.env.VITE_RUTA
@@ -60,10 +61,10 @@
     let animaltacto = $state("")
     let cadenatacto = $state("")
     //Tipo animal
-    let categoriatacto = $state("vaca")
+    let categoriatacto = $state("")
     let prenadatacto = $state(0)
     //tipo tacto
-    let tipotacto = $state("tacto")
+    let tipotacto = $state("")
     //Validaciones
     let malfechatacto = $state("")
     let malanimaltacto = $state("")
@@ -127,10 +128,18 @@
     let categoriaobs = $state("")
     let fechaobs = $state("")
     let observacionobs = $state("")
-    //Validacioones
+    //Validaciones
     let malanimalobs = $state(false)
     let malfechaobs = $state(false)
     let botonhabilitadoobs = $state(false)
+    //Nuevo animal
+    let agregaranimal = $state(false)
+    let caravana = $state("")
+    let peso = $state("")
+    let sexo = $state("")
+    let fechanacimiento = $state("")
+    let categoria = $state("")
+
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
@@ -164,19 +173,29 @@
         tipotratamientos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
     }
     function openNewModalTacto(){ 
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
         fechatacto = ""
         observaciontacto =  ""
         animaltacto = ""
         cadenatacto = ""
-        categoriatacto = "vaca"
+        categoriatacto = ""
         prenadatacto = 0
-        tipotacto = "tacto"
+        tipotacto = ""
         botonhabilitadotacto = false
         malfechatacto = false
         malanimaltacto = false
         nuevoModalTacto.showModal()
     }
     function openNewModalNacimiento(){
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
         caravananac = ""
         sexonac = ""
         padrenac = ""
@@ -195,7 +214,11 @@
 
     }
     function  openNewModalTratamiento(){
-        
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
         fechatrat = ""
         animaltrat = ""
         cadenatrat = ""
@@ -204,6 +227,11 @@
         nuevoModalTratamiento.showModal()
     }
     function openNewModalInseminacion(){
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
         botonhabilitadoins = false
         malanimalins = false
         malpadreins = false
@@ -219,7 +247,11 @@
         nuevoModalInseminacion.showModal()
     }
     function openNewModalObservacion(){
-        
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
         observacionobs = ""
         categoriaobs = ""
         fechaobs = ""
@@ -229,30 +261,94 @@
         malfechaobs = false
         nuevoModalObservacion.showModal()
     }
+    async function guardarAnimal(esTacto,esInseminacion) {
+        let user = await pb.collection("users").getOne(usuarioid)
+        
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+        
+        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
+        let verificar = true
+        if(nivel.animales != -1 && animals.totalItems > nivel.animales){
+            verificar =  false
+        }
+        
+        let data = {
+            caravana,
+            active:true,
+            categoria,
+            delete:false,
+            fechanacimiento:fechanacimiento +" 03:00:00",
+            sexo,
+            peso,
+            cab:cab.id
+        }
+        if(esTacto){
+            data.prenada = prenadatacto
+        }
+        if(esInseminacion){
+            data.prenada = 3
+        }
+        let recorda = await pb.collection('animales').create(data); 
+        return recorda
+        
+        
+    }
     async function guardarTacto(){
-        try{
-            let data = {
-               fecha:fechatacto +" 03:00:00" ,
-               observacion:observaciontacto,
-               animal:animaltacto,
-               categoria:categoriatacto,
-               prenada:prenadatacto,
-               tipo:tipotacto,
-               nombreveterinario:"",
-               cab:cab.id,
-               active:true
+        if(agregaranimal){
+            if(caravana == ""){
+                Swal.fire("Error guardar","No se pudo guardar el tacto porque el animal no tiene caravana","error")
+                return
             }
-            const record = await pb.collection('tactos').create(data);
-            await pb.collection('animales').update(animaltacto,{
-                prenada:prenadatacto
-            })
-            await guardarHistorial(pb,animaltacto)
-            Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
+            try{
+                
+                let a = await guardarAnimal(true,false)
+                let data = {
+                    fecha:fechatacto +" 03:00:00" ,
+                    observacion:observaciontacto,
+                    animal:a.id,
+                    categoria:categoriatacto,
+                    prenada:prenadatacto,
+                    tipo:tipotacto,
+                    nombreveterinario:"",
+                    cab:cab.id,
+                    active:true
+                }
+                const record = await pb.collection('tactos').create(data);
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar el tacto","error")
+            }
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","No se pudo guardar el tacto","error")
+        else{
+            try{
+            
+                let data = {
+                fecha:fechatacto +" 03:00:00" ,
+                observacion:observaciontacto,
+                animal:animaltacto,
+                categoria:categoriatacto,
+                prenada:prenadatacto,
+                tipo:tipotacto,
+                nombreveterinario:"",
+                cab:cab.id,
+                active:true
+                }
+                const record = await pb.collection('tactos').create(data);
+                await pb.collection('animales').update(animaltacto,{
+                    prenada:prenadatacto
+                })
+                await guardarHistorial(pb,animaltacto)
+                Swal.fire("Éxito guardar","Se pudo guardar el tacto","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar el tacto","error")
+            }
         }
+        
     }
     async function guardarNacimiento(){
         try{
@@ -288,68 +384,144 @@
         }
     }
     async function guardarTrat(){
-        try{
-            let data = {
-                animal:animaltrat,
-                categoria:categoriatrat,
-                tipo:tipotrat,
-                fecha:fechatrat +" 03:00:00",
-                active : true,
-                cab:cab.id
+        if(agregaranimal){
+            if(caravana == ""){
+                Swal.fire("Error guardar","No se pudo guardar el tacto porque el animal no tiene caravana","error")
+                return
             }
-            
-            const  record = await pb.collection("tratamientos").create(data)
-            
-            
-            Swal.fire("Éxito guardar","Se pudo guardar el tratamiento con exito","success")
+            try{
+                
+                let a = await guardarAnimal(false,false)
+                let data = {
+                    animal:a.id,
+                    categoria:a.categoria,
+                    tipo:tipotrat,
+                    fecha:fechatrat +" 03:00:00",
+                    active : true,
+                    cab:cab.id
+                }
+                const  record = await pb.collection("tratamientos").create(data)
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar el tratamiento con exito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar el tratamiento","error")
+            }
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","Hubo un error para guardar el tratamiento","error")
+        else{
+            try{
+                let data = {
+                    animal:animaltrat,
+                    categoria:categoriatrat,
+                    tipo:tipotrat,
+                    fecha:fechatrat +" 03:00:00",
+                    active : true,
+                    cab:cab.id
+                }
+                const  record = await pb.collection("tratamientos").create(data)
+                Swal.fire("Éxito guardar","Se pudo guardar el tratamiento con exito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar el tratamiento","error")
+            }
         }
+        
     }
     async function guardarInseminacion(){
-        let caravana = madres.filter(a=>a.id==idanimalins)[0].caravana
-        let data = {
-            cab:cab.id,
-            animal: idanimalins,
-            fechaparto: fechapartoins +' 03:00:00',
-            fechainseminacion: fechainseminacion + ' 03:00:00',
-            active:true,
-            padre:padreins,
-            pajuela:pajuelains,
-            categoria:categoriains,
+        if(agregaranimal){
+            if(caravana == ""){
+                Swal.fire("Error guardar","No se pudo guardar el tacto porque el animal no tiene caravana","error")
+                return
+            }
+            let a = await guardarAnimal(false,true)
+            let data = {
+                cab:cab.id,
+                animal: a.id,
+                fechaparto: fechapartoins +' 03:00:00',
+                fechainseminacion: fechainseminacion + ' 03:00:00',
+                active:true,
+                padre:padreins,
+                pajuela:pajuelains,
+                categoria:a.categoria,
+            }
+            try{
+                const record = await pb.collection('inseminacion').create(data);
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar la inseminación","error")
+            }
         }
-        try{
-            const record = await pb.collection('inseminacion').create(data);
-            await pb.collection('animales').update(idanimalins,{
-                prenada:3
-            })
-            await guardarHistorial(pb,idanimalins)
-            Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
+        else{
+            let data = {
+                cab:cab.id,
+                animal: idanimalins,
+                fechaparto: fechapartoins +' 03:00:00',
+                fechainseminacion: fechainseminacion + ' 03:00:00',
+                active:true,
+                padre:padreins,
+                pajuela:pajuelains,
+                categoria:categoriains,
+            }
+            try{
+                const record = await pb.collection('inseminacion').create(data);
+                await pb.collection('animales').update(idanimalins,{
+                    prenada:3
+                })
+                await guardarHistorial(pb,idanimalins)
+                Swal.fire("Éxito guardar","Se pudo guardar la inseminación con exito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar la inseminación","error")
+            }
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","Hubo un error para guardar la inseminación","error")
-        }
+        
     }
     async function guardarObs(){
-        try{
-            let data = {
-                animal:animalobs,
-                fecha:fechaobs +" 03:00:00",
-                categoria:categoriaobs,
-                cab:cab.id,
-                observacion:observacionobs,
-                active:true
+        if(agregaranimal){
+            try{
+                let a = await guardarAnimal(false,false)
+                let data = {
+                    animal:a.id,
+                    categoria:a.categoria,
+                    fecha:fechaobs +" 03:00:00",
+                    cab:cab.id,
+                    observacion:observacionobs,
+                    active:true
+                }
+                const record = await pb.collection('observaciones').create(data);
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
             }
-            const record = await pb.collection('observaciones').create(data);
-            Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar la observación","error")
+            }
         }
-        catch(err){
-            console.error(err)
-            Swal.fire("Error guardar","No se pudo guardar la observación","error")
+        else{
+            try{
+                let data = {
+                    animal:animalobs,
+                    fecha:fechaobs +" 03:00:00",
+                    categoria:categoriaobs,
+                    cab:cab.id,
+                    observacion:observacionobs,
+                    active:true
+                }
+                const record = await pb.collection('observaciones').create(data);
+                Swal.fire("Éxito guardar","Se pudo guardar la observación","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","No se pudo guardar la observación","error")
+            }
         }
+        
     }
     function validarBotonNacimiento(){
         botonhabilitadonac = true
@@ -378,7 +550,7 @@
     }
     function validarBotonTacto(){
         botonhabilitadotacto = true
-        if(isEmpty(animaltacto)){
+        if(!agregaranimal && isEmpty(animaltacto)){
             botonhabilitadotacto=false
         }
         if(isEmpty(fechatacto)){
@@ -387,22 +559,20 @@
     }
     function validarBotonTrat(){
         botonhabilitadotrat = true
-        if(isEmpty(animaltrat)){
+        if(!agregaranimal && isEmpty(animaltrat)){
             botonhabilitadotrat = false
         }
-        if(isEmpty(categoriatrat)){
-            botonhabilitadotrat = false
-        }
+        
         if(isEmpty(tipotrat)){
             botonhabilitadotrat = false
         }
-        if(isEmpty(fecha)){
+        if(isEmpty(fechatrat)){
             botonhabilitadotrat = false
         }
     }
     function validarBotonIns(){
         botonhabilitadoins = true
-        if(isEmpty(idanimalins)){
+        if(!agregaranimal && isEmpty(idanimalins)){
             botonhabilitadoins = false
         }
         if(isEmpty(pajuelains)){
@@ -415,7 +585,7 @@
     }
     function validarBotonObs(){
         botonhabilitadoobs = true
-        if(isEmpty(animalobs)){
+        if(!agregaranimal && isEmpty(animalobs)){
             botonhabilitadoobs=false
         }
         if(isEmpty(fechaobs)){
@@ -460,7 +630,7 @@
     }
     function oninputTacto(inputName){
         validarBotonTacto()
-        if(inputName == "ANIMAL"){
+        if(!agregaranimal && inputName == "ANIMAL"){
             if(isEmpty(animaltacto)){
                 malanimaltacto = true
             }
@@ -536,7 +706,7 @@
     }
     function oninputTrat(campo){
         validarBotonTrat()
-        if(campo=="ANIMAL"){
+        if(!agregaranimal && campo=="ANIMAL"){
             
             if(isEmpty(animaltrat)){
                 malanimaltrat = true
@@ -554,14 +724,7 @@
                 malfechatrat = false
             }
         }
-        else if(campo == "CATEGORIA"){
-            if(isEmpty(categoriatrat)){
-                malcategoriatrat = true
-            }
-            else{
-                malcategoriatrat = false
-            }
-        }
+        
         else if(campo == "TIPO"){
             if(isEmpty(tipotrat)){
                 maltipotrat = true
@@ -573,7 +736,7 @@
     }
     function oninputIns(campo){
         validarBotonIns()
-        if(campo == "ANIMAL"){
+        if(!agregaranimal && campo == "ANIMAL"){
             if(isEmpty(idanimalins)){
                 malanimalins = true
             }
@@ -611,7 +774,7 @@
     }
     function oninputObs(inputName){
         validarBotonObs()
-        if(inputName == "ANIMAL"){
+        if(!agregaranimal && inputName == "ANIMAL"){
             if(isEmpty(animalobs)){
                 malanimalobs = true
             }
@@ -792,49 +955,54 @@
         </form>
         <h3 class="text-lg font-bold">Nuevo tacto</h3>
         <div class="form-control">
-            <div>
-            <label for = "animal" class="label">
-                <span class={estilos.labelForm}>Animal</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={animaltacto}
-                    onchange={()=>oninputTacto("ANIMAL")}
-                >
-                    {#each madres as a}
-                        <option value={a.id}>{a.caravana}</option>    
-                    {/each}
-                  </select>
-            </label>
-            </div>
-            <label for = "tipo" class="label">
-                <span class={estilos.labelForm}>Categoria</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={categoriatacto}
-                >
-                    {#each tiposanimal as t}
-                        <option value={t.id}>{t.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento/>
+            {#if !agregaranimal}
+                
+                <label for = "animal" class="label">
+                    <span class={estilos.labelForm}>Animal</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        
+                        bind:value={animaltacto}
+                        onchange={()=>oninputTacto("ANIMAL")}
+                    >
+                        {#each madres as a}
+                            <option value={a.id}>{a.caravana}</option>    
+                        {/each}
+                    </select>
+                </label>
+                
+                <label for = "tipo" class="label">
+                    <span class={estilos.labelForm}>Categoria</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        disabled
+                        bind:value={categoriatacto}
+                    >
+                        {#each tiposanimal as t}
+                            <option value={t.id}>{t.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
+            {/if}
             <div class="form-group mt-2">
                 <label for = "prenada" class="label ">
                     <span class={estilos.labelForm}>Estado</span>
@@ -857,7 +1025,7 @@
                 </label>
             </div>
             <label for = "fecha" class="label">
-                <span class={estilos.labelForm}>Fecha </span>
+                <span class={estilos.labelForm}>Fecha tacto</span>
             </label>
             <label class="input-group ">
                 <input id ="fecha" type="date" max={HOY}  
@@ -936,13 +1104,12 @@
                     bind:value={observaciontacto}
                 />
             </label>
-            
-            
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
               <!-- if there is a button, it will close the modal -->              
                 <button class="btn btn-success text-white" disabled='{!botonhabilitadotacto}' onclick={guardarTacto} >Guardar</button>              
+                
             </form>
         </div>
     </div>
@@ -1198,34 +1365,58 @@
         <h3 class="text-lg font-bold">Nuevo tratamiento</h3>  
         
         <div class="form-control">
-            <label for = "madre" class="label">
-                <span class={estilos.labelForm}>Animal</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento/>
+            {#if !agregaranimal}
+                <label for = "madre" class="label">
+                    <span class={estilos.labelForm}>Animal</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
 
-                        ${estilos.bgdark2} 
-                        ${malanimaltrat?"input-error":""}
-                    `}
-                    onchange={()=>oninputTrat("ANIMAL")}
-                    bind:value={animaltrat}
-                    
-                >
-                    {#each animales as a}
-                        <option value={a.id}>{a.caravana}</option>    
-                    {/each}
-                </select>
-                <div class={`label ${malanimaltrat?"":"hidden"}`}>
-                    <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
-                </div>
-            </label>
+                            ${estilos.bgdark2} 
+                            ${malanimaltrat?"input-error":""}
+                        `}
+                        onchange={()=>oninputTrat("ANIMAL")}
+                        bind:value={animaltrat}
+                        
+                    >
+                        {#each animales as a}
+                            <option value={a.id}>{a.caravana}</option>    
+                        {/each}
+                    </select>
+                    <div class={`label ${malanimaltrat?"":"hidden"}`}>
+                        <span class="label-text-alt text-red-400">Debe seleccionar el animal</span>
+                    </div>
+                </label>
+                <label for = "categoria" class="label">
+                    <span class="label-text text-base">Categoria</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={categoriatrat} read
+                        onchange={()=>oninputTrat("CATEGORIA")}
+                    >
+                        {#each categorias as c}
+                            <option value={c.id}>{c.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
+            {/if}
             <label for = "fecha" class="label">
-                <span class="label-text text-base">Fecha</span>
+                <span class="label-text text-base">Fecha tratamiento</span>
             </label>
             <label class="input-group ">
                 <input id ="fecha" type="date" max={HOY}  
@@ -1244,30 +1435,7 @@
                     <span class="label-text-alt text-red-400">Debe seleccionar la fecha</span>
                 </div>
             </label>
-            <label for = "categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={categoriatrat} read
-                    onchange={()=>oninputTrat("CATEGORIA")}
-                >
-                    {#each categorias as c}
-                        <option value={c.id}>{c.nombre}</option>    
-                    {/each}
-                </select>
-                <div class={`label ${malcategoriatrat?"":"hidden"}`}>
-                    <span class="label-text-alt text-red-400">Debe seleccionar la categoria</span>
-                </div>
-            </label>
+            
             
             <label for = "tipo" class="label">
                 <span class="label-text text-base">Tipo tratamiento</span>
@@ -1315,100 +1483,56 @@
         <h3 class="text-lg font-bold">Nueva inseminación</h3>  
         
         <div class="form-control">
-            <label for = "nombre" class="label">
-                <span class="label-text text-base">Caravana</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={idanimalins}
-                    onchange={()=>oninputIns("ANIMAL")}
-                >
-                    {#each madres as m}
-                        <option value={m.id}>{m.caravana}</option>    
-                    {/each}
-                </select>
-                {#if malanimalins}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
-                    </div>
-                {/if}
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento/>
+            {#if !agregaranimal}
+                <label for = "nombre" class="label">
+                    <span class="label-text text-base">Caravana</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={idanimalins}
+                        onchange={()=>oninputIns("ANIMAL")}
+                    >
+                        {#each madres as m}
+                            <option value={m.id}>{m.caravana}</option>    
+                        {/each}
+                    </select>
+                    {#if malanimalins}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                        </div>
+                    {/if}
 
-            </label>
-            <label for = "tipo" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={categoriains}
-                >
-                    {#each tiposanimal as t}
-                        <option value={t.id}>{t.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
-            <div class="hidden">
-            <label for = "nombrepadreins" class="label">
-                <span class="label-text text-base">Pajuela</span>
-            </label>
-            <label class="input-group">
-                <input 
-                    id ="nombrepadreins" 
-                    type="text"  
-                    class={`
-                        input 
-                        input-bordered 
-                        border border-gray-300 rounded-md
-                        focus:outline-none 
-                        focus:ring-2 focus:ring-green-500 
-                        focus:border-green-500
-                        w-full 
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={pajuelains}
-                    oninput={()=>oninputIns("PADRE")}
-                />
-                {#if malpadreins}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500">Debe escribir el nombre del padre</span>                    
-                    </div>
-                {/if}
-            </label>
-            <label for = "padre" class="label">
-                <span class="label-text text-base">Padre</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={padreins}
-                    onchange={()=>oninputIns("PADRE")}
-                >
-                    {#each padres as p}
-                        <option value={p.id}>{p.caravana}</option>    
-                    {/each}
-                  </select>
-            </label>
-            </div>
+                </label>
+                <label for = "tipo" class="label">
+                    <span class="label-text text-base">Categoria</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        disabled
+                        bind:value={categoriains}
+                    >
+                        {#each tiposanimal as t}
+                            <option value={t.id}>{t.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
+            {/if}
             {#if cargadoanimales}
                 <PredictSelect bind:valor={padreins} etiqueta = {"Padre"} bind:cadena={pajuelains} lista = {listapadres}/>
             {/if}
@@ -1480,54 +1604,58 @@
         <h3 class="text-lg font-bold">Nueva observación</h3>  
         
         <div class="form-control">
-            <label for = "animal" class="label">
-                <span class="label-text text-base">Animal</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={animalobs}
-                    onchange={()=>oninputObs("ANIMAL")}
-                >   
-                    {#each animales as a}
-                        <option value={a.id}>{a.caravana}</option>    
-                    {/each}
-                </select>
-                {#if malanimalobs}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
-                    </div>
-                {/if}
-            </label>
-            <label for = "categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2}
-                    `}
-                    bind:value={categoriaobs}
-                >
-                    {#each categorias as c}
-                        <option value={c.id}>{c.nombre}</option>    
-                    {/each}
-                  </select>
-            </label>
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento/>
+            {#if !agregaranimal}
+                <label for = "animal" class="label">
+                    <span class="label-text text-base">Animal</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={animalobs}
+                        onchange={()=>oninputObs("ANIMAL")}
+                    >   
+                        {#each animales as a}
+                            <option value={a.id}>{a.caravana}</option>    
+                        {/each}
+                    </select>
+                    {#if malanimalobs}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                        </div>
+                    {/if}
+                </label>
+                <label for = "categoria" class="label">
+                    <span class="label-text text-base">Categoria</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={categoriaobs}
+                    >
+                        {#each categorias as c}
+                            <option value={c.id}>{c.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
+            {/if}
+           
             <label for = "fecha" class="label">
-                <span class="label-text text-base">Fecha </span>
+                <span class="label-text text-base">Fecha observacion</span>
             </label>
             <label class="input-group ">
                 <input id ="fecha" type="date" max={HOY}  
