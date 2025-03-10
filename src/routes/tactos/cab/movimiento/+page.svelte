@@ -98,6 +98,7 @@
     }
 
     function clickAnimal(id){
+        
         if(selecthashmap[id]){
             if(todos){
                 todos = false
@@ -115,6 +116,7 @@
                 ...a
             }
         }
+        
     }
     function clickTodos(){
         if(todos){
@@ -175,12 +177,14 @@
         }
         selectanimales = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({
+            if(value != null){
+                selectanimales.push({
                 ...value,
                 estadonuevo:0,
                 tipotacto:"tacto",
                 observacion:""})
+            }
+            
         }
         tactoMasivo.showModal()
     }

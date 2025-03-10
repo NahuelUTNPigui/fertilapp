@@ -203,11 +203,12 @@
         }
         selectanimales = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({
-                ...value,
-                padre:"",
-                pajuela:""})
+            if(value != null){
+                selectanimales.push({
+                    ...value,
+                    padre:"",
+                    pajuela:""})
+            }
         }
         pajuela = ""
         fechainseminacion = ""

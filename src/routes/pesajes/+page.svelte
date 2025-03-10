@@ -186,8 +186,9 @@
         }
         selectanimales = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({...value,pesonuevo:value.peso})
+            if(value != null){
+                selectanimales.push({...value,pesonuevo:value.peso})
+            }
         }
         if(selectanimales.length==0){
             Swal.fire("Error pesaje","No hay animales seleccionados","error")

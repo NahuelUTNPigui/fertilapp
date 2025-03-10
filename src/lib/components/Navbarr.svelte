@@ -43,6 +43,7 @@
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
       usuarioid = pb_json.model.id
       nombreusuario = pb_json.model.username
+      
       let hab = $enabled
       if(hab==="no"){
         goto("/")

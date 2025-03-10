@@ -189,11 +189,12 @@
         }
         selectanimales = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            
-            selectanimales.push({
-                ...value,
-                tipotratamiento:"",
-                observacionnuevo:""})
+            if(value != null){
+                selectanimales.push({
+                    ...value,
+                    tipotratamiento:"",
+                    observacionnuevo:""})
+            }
         }
         tratamientoMasivo.showModal()
     }

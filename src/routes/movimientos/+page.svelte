@@ -212,7 +212,9 @@
         }
         let lista = []
         for (const [key, value ] of Object.entries(selecthashmap)) {
-            lista.push(value)
+            if(value != null){
+                lista.push(value)
+            }
         }
         if(lista.length==0){
             Swal.fire("Error movimiento","No hay animales seleccionados","error")

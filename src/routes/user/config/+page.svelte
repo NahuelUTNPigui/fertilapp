@@ -41,7 +41,15 @@
             apellido
         };
         try{
+            
             const record = await pb.collection("users").update(usuarioid, data);
+            const colabs = await pb.collection("colaboradores").getList(1,1,{
+                filter:`user = '${usuarioid}'`,
+                skipTotal:false
+            })
+            if(colabs.items.length > 0){
+                await pb.collection("colaboradores").update(colabs.items[0].id,{nombre,apellido})
+            }   
             Swal.fire("Exito modificar","Se pudo modificar el usuario con éxito","success")
             
         }
