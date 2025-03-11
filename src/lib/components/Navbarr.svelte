@@ -21,8 +21,6 @@
         nombre:"",
         id:""
     })
-    let concab = false
-    let textColorClass = '';
     
     let nombreusuario = $state('')
     let usuarioid = $state('')
@@ -37,7 +35,6 @@
       nombreestablecimiento = caber.cab.nombre
       if (window.innerWidth <= 600) { // Pantallas pequeñas
         nombreestablecimiento= nombreestablecimiento.slice(0,15)
-        
       }
       
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
@@ -54,11 +51,9 @@
     })
     
     function salir(){
-        
         pb.authStore.clear();
         usuario.set('')
         enabled.set("no")
-        
         goto("/")
     }
     function editarUser(){
