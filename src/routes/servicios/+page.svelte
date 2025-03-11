@@ -29,6 +29,8 @@
     let usuarioid = userer.userid
     let caravana = $state("")
     let cargado = $state(false)
+    let esservicio = $state(false)
+    let esinseminacion = $state(false)
     let filtroservicio = $state(0)
     let opcionservicio = [{id:0,nombre:"Todos"},{id:1,nombre:"Solo servicios"},{id:2,nombre:"Solo inseminaciones"}]
     // Datos para mostrar
@@ -36,6 +38,7 @@
     let totalInseminacionesEncontradas = $state(0)
     //Datos inseminaciones
     let idins = $state("")
+    let listapadres = $state([])
     // La inseminacion es a un animal hembra que luego sera un nacimiento
     let padre = $state("")
     let pajuela = $state("")
@@ -83,6 +86,7 @@
         isOpenFilter = !isOpenFilter
     }
     function openEditModal(id){
+        esservicio = true
         idserv = id
         let ser = servicios.filter(s=>s.id == id)[0]
         if(ser){
@@ -95,25 +99,72 @@
             nuevoModal.showModal()
         }
     }
+    function openEditModalIns(id){
+        esinseminacion = true
+        idserv = id
+        
+        
+        let ser = serviciosrow.filter(s=>s.id == id)[0]
+        
+        if(ser){
+            idanimal = ser.animal
+            fechainseminacion = ser.fechainseminacion.split(" ")[0]
+            padre = ser.padre
+            pajuela = ser.pajuela
+            fechaparto = ser.fechaparto.split(" ")[0]
+            observacion = ser.observacion
+            categoria = ser.categoria
+            nuevoModalIns.showModal()
+        }
+    }
     async function editar(){
-        try{
-            let dataser = {
-                fechadesde : fechadesdeserv + " 03:00:00",
-                fechaparto: fechaparto + " 03:00:00",
-                observacion: observacion,
-                madre:madre,
-                padres:padreslist.join()
+        if(esservicio){
+            try{
+                let dataser = {
+                    fechadesde : fechadesdeserv + " 03:00:00",
+                    fechaparto: fechaparto + " 03:00:00",
+                    observacion: observacion,
+                    madre:madre,
+                    padres:padreslist.join()
+                }
+                if(fechahastaserv != ""){
+                    dataser.fechahasta = fechahastaserv + " 03:00:00"
+                }
+                await pb.collection("servicios").update(idserv,dataser)
+                await getServicios()
+                esservicio = false
+                filterUpdate()
             }
-            if(fechahastaserv != ""){
-                dataser.fechahasta = fechahastaserv + " 03:00:00"
+            catch(err){
+                esservicio = false
+                console.error(err)
             }
-            await pb.collection("servicios").update(idserv,dataser)
-            await getServicios()
-            filterUpdate()
         }
-        catch(err){
-            console.error(err)
+        if(esinseminacion){
+            try {
+                let data = {
+                    fechaparto: fechaparto +' 03:00:00',
+                    fechainseminacion: fechainseminacion + ' 03:00:00',
+                    padre,
+                    pajuela,
+                    observacion,
+                    categoria
+                }
+                const record = await pb.collection('inseminacion').update(idserv, data);
+                await getInseminaciones()
+                
+                
+                
+                filterUpdate()
+                Swal.fire("Éxito editar","Se pudo editar la inseminación con exito","success")
+                esinseminacion = false
+            }catch(err){
+                console.error(err)
+                esinseminacion = false
+                Swal.fire("Error editar","Hubo un error para editar la inseminación","error")
+            }
         }
+        
     }
     async function eliminar(id){
         try{
@@ -159,6 +210,12 @@
         })
         madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
         padres = recordsa.filter(a=>a.sexo == "M")
+        listapadres = padres.map(item=>{
+            return {
+                id:item.id,
+                nombre:item.caravana
+            }
+        })
         cargado = true
 
     }
@@ -168,20 +225,10 @@
         
     }
     function onelegir(id){
-        let p = padres.filter(pa=>pa.id == id)[0]
-        for(let i = 0;i<selectanimales.length;i++){
-            selectanimales[i].pajuela = p.caravana
-            selectanimales[i].padre = id
-        }
-        pajuela  = p.caravana
-        oninput("PAJUELA")
+        
     }
     function onwrite(){
         
-        for(let i = 0;i<selectanimales.length;i++){
-            selectanimales[i].pajuela = pajuela
-        }
-        oninput("PAJUELA")
     }
     function filterUpdate(){
         serviciosrow = []
@@ -395,7 +442,7 @@
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha desde</th>
+                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Hasta</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Parto</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Madre</th>
@@ -405,7 +452,7 @@
             </thead>
             <tbody>
                 {#each serviciosrow as s}
-                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>s.fechadesde?openEditModal(s.id):console.log("inseminacion")}>
+                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>s.fechadesde?openEditModal(s.id):openEditModalIns(s.id)}>
                     <td 
                         class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600"
                     >
@@ -677,6 +724,24 @@
                         <span class="label-text-alt text-red-500">Debe seleccionar la fecha aproximada de parto</span>                    
                     </div>
                 {/if}
+            </label>
+            <label class="form-control">
+                <div class="label">
+                    <span class="label-text">Observacion</span>                    
+                </div>
+                <input 
+                    id ="observacion" 
+                    type="text"  
+                    class={`
+                        input 
+                        input-bordered 
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                        w-full
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={observacion}
+                />
             </label>
         </div>
         <div class="modal-action justify-start ">
