@@ -10,6 +10,7 @@
     onMount(()=>{
         let light = !darker.dark
         if(light){
+            
             document.querySelector("html").setAttribute("data-theme","light")     
             document.documentElement.classList.remove('dark');
         }

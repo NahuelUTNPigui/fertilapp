@@ -7,6 +7,7 @@
     import { quintOut } from 'svelte/easing';
     let ruta = import.meta.env.VITE_RUTA
     let usuariomail=''
+    let logooscuro = true
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
@@ -49,7 +50,12 @@
             out:fade
         >
         
-            <h1 class="text-3xl font-bold text-green-700 dark:text-green-400 mb-6 text-center">Bienvenido a Fertil</h1>
+            <h1 class="hidden text-3xl font-bold text-green-700 dark:text-green-400 mb-6 text-center">Bienvenido a Fertil</h1>
+            {#if logooscuro}
+                <img src="/darkcres.png" alt="">
+            {:else}
+                <img src="/cres.png" alt="">
+            {/if}
             <div class="space-y-6">
                 <div>
                     <label for="username" 

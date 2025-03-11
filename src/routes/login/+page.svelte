@@ -9,12 +9,16 @@
     import PocketBase from 'pocketbase'
     import { fade, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
-    
-    
+    import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+
+
     let ruta = import.meta.env.VITE_RUTA
     let usuarioname= $state('')
     let contra = $state('')
     let showpass = $state(false)
+    let logooscuro = $state(true)
+    
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
@@ -96,6 +100,7 @@
             }
         }
     }
+    
 </script>
 <svelte:window on:keydown={keyEvent}></svelte:window>
 <div class="min-h-screen bg-gradient-to-br from-green-400 to-green-700  dark:from-gray-900 dark:to-gray-800 p-4">
@@ -109,7 +114,14 @@
             out:fade
         >
         
-            <h1 class="text-3xl font-bold text-green-700 dark:text-green-400 mb-6 text-center">Bienvenido a Fertil</h1>
+            <h1 class="hidden text-3xl font-bold text-green-700 dark:text-green-400 mb-6 text-center">Bienvenido a Fertil</h1>
+            {#if logooscuro}
+                <img src="/darkcres.png" alt="">
+            {:else}
+                <img src="/cres.png" alt="">
+            {/if}
+            
+            
             <div class="space-y-6">
                 <div>
                     <label for="username" 
