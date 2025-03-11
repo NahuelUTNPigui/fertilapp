@@ -161,11 +161,11 @@
             type="file"
             accept=".xlsx, .xls"  
             class="sr-only"
-            id="pesaje-upload"
+            id="inseminacion-upload"
             onchange={(e)=>importarArchivo(e)}
         />
         <label
-            for="pesaje-upload"
+            for="inseminacion-upload"
             class={`
                 w-full flex items-center justify-center px-4 py-4 
                 border border-green-300 dark:border-green-600 rounded-md shadow-sm text-lg

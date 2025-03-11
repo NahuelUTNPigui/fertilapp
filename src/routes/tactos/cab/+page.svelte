@@ -220,6 +220,9 @@
             tactosrow = tactosrow.filter(t=>t.prenada == buscarestado)
             totalTactosEncontrados = tactosrow.length
         }
+        tactosrow.sort((t1,t2)=>{
+            return new Date(t1.fecha)>new Date(t2.fecha)?-1:1
+        })
     }
     onMount(async ()=>{
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
@@ -560,15 +563,6 @@
         {/if}
     </div>
     
-
-    <!--<div class="grid grid-cols-1 gap-1 lg:grid-cols-3 mb-2 mt-1 mx-1 lg:mx-10" >
-        <div>
-            <button class={`w-full btn btn-primary flex ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">Nuevo tacto</span>
-            </button>
-        </div>
-        
-    </div>-->
     <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
@@ -838,6 +832,5 @@
                 </form>
             </div>
         </div>
-
     </dialog>
 </Navbarr>

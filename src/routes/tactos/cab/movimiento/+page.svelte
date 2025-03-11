@@ -192,6 +192,53 @@
         let estado = estados.filter(e=>e.id==est)[0]
         return estado.nombre
     }
+    async function crearBulkTactos() {
+        if(fecha == ""){
+            Swal.fire("Error tactos","Debe seleccionar una fecha","error")
+            return 
+        }
+        let errores = false
+        let bulkdata = []
+        for(let i = 0;i<selectanimales.length;i++){
+            let tactoanimal = selectanimales[i]
+            let dataupdate = {
+                prenada:tactoanimal.estadonuevo
+            }
+            let datatacto={
+                fecha:fecha +" 03:00:00" ,
+                observacion:tactoanimal.observacion,
+                animal:tactoanimal.id,
+                categoria:tactoanimal.categoria,
+                prenada:tactoanimal.estadonuevo,
+                tipo:tactoanimal.tipotacto,
+                nombreveterinario:"",
+                cab:cab.id,
+                active:true
+            }
+            let fila = {
+                dataupdate,
+                datatacto
+            }
+            bulkdata.push(fila)
+        }
+        console.log(JSON.stringify(bulkdata))
+        let token = JSON.parse(localStorage["pocketbase_auth"]).token
+        let bulkdatos = await fetch(`${ruta}/api/bulk/tactos`,{
+            method:'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token
+            },
+            body:JSON.stringify({data:bulkdata})
+        })
+        let resp = await bulkdatos.json()
+        console.log(resp)
+        fecha = ""
+        botonhabilitado = false
+        malfecha = false
+        selecthashmap = {}
+        selectanimales = []
+    }
     async function crearTactos() {
         if(fecha == ""){
             Swal.fire("Error tactos","Debe seleccionar una fecha","error")
@@ -634,7 +681,7 @@
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
-                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={crearTactos} >Crear Tactos</button>
+                <button class="btn btn-success text-white" disabled={!botonhabilitado} onclick={crearBulkTactos} >Crear Tactos</button>
                 <button class="btn btn-error text-white" >Cancelar</button>
             </form>
         </div>

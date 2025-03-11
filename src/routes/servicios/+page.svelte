@@ -15,6 +15,7 @@
     import { guardarHistorial } from '$lib/historial/lib';
     import { isEmpty,getWholeWordButLastLetter,addDays } from '$lib/stringutil/lib';
     import MultipleToros from "$lib/components/MultipleToros.svelte";
+    import PredictSelect from "$lib/components/PredictSelect.svelte";
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -28,13 +29,32 @@
     let usuarioid = userer.userid
     let caravana = $state("")
     let cargado = $state(false)
+    let filtroservicio = $state(0)
+    let opcionservicio = [{id:0,nombre:"Todos"},{id:1,nombre:"Solo servicios"},{id:2,nombre:"Solo inseminaciones"}]
+    // Datos para mostrar
+    let inseminaciones = $state([])
+    let totalInseminacionesEncontradas = $state(0)
+    //Datos inseminaciones
+    let idins = $state("")
+    // La inseminacion es a un animal hembra que luego sera un nacimiento
+    let padre = $state("")
+    let pajuela = $state("")
+    //Seria la fecha del parto
+    //Datos de la inseminacion
+    let categoria = $state("")
+    let fechainseminacion = $state("")
     // Datos para mostrar
     let servicios = $state([])
     let serviciosrow = $state([])
     let buscar = $state("")
     let isOpenFilter = $state(false)
     let totalServicios = $state(0)
-    
+    //Validaciones
+    let malanimal = $state(false) 
+    let malpadre = $state(false)
+    let malfechainseminacion = $state(false)
+    let malfechaparto = $state(false)
+    //SERVICIO
     //Datos servicios
     let idserv = $state("")
     let padreslist = $state([])
@@ -57,6 +77,7 @@
     let idanimal = $state("")
     //Validaciones
     let botonhabilitado = $state(true)
+    
     //No se que poner
     function clickFilter(){
         isOpenFilter = !isOpenFilter
@@ -104,13 +125,24 @@
         }
     }
     function cerrarModal(){
-        madre = ser.madre
+        
+        madre = ""
         fechadesdeserv = ""
         fechahastaserv = ""
         fechaparto = ""
         observacion = ""
         padreslist = []
         nuevoModal.close()
+    }
+    async function getInseminaciones(){
+        // you can also fetch all records at once via getFullList
+        const records = await pb.collection('inseminacion').getFullList({
+            sort: '-fechainseminacion ',
+            filter :`cab = '${cab.id}' && active = true`,
+            expand:"animal"
+        });
+        inseminaciones = records
+        //inseminacionesrow = inseminaciones
     }
     async function getServicios(){
         const records = await pb.collection('servicios').getFullList({
@@ -119,6 +151,7 @@
             expand:"madre"
         });
         servicios = records
+        serviciosrow = servicios
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
@@ -131,8 +164,42 @@
     }
     function validarBoton(){
     }
+    function oninput(campo){
+        
+    }
+    function onelegir(id){
+        let p = padres.filter(pa=>pa.id == id)[0]
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].pajuela = p.caravana
+            selectanimales[i].padre = id
+        }
+        pajuela  = p.caravana
+        oninput("PAJUELA")
+    }
+    function onwrite(){
+        
+        for(let i = 0;i<selectanimales.length;i++){
+            selectanimales[i].pajuela = pajuela
+        }
+        oninput("PAJUELA")
+    }
     function filterUpdate(){
-        serviciosrow = servicios
+        serviciosrow = []
+        if(filtroservicio == 0){
+            serviciosrow = servicios
+            serviciosrow = serviciosrow.concat(inseminaciones)
+        }
+        else if(filtroservicio == 1){
+            serviciosrow = servicios
+            
+        }
+        else{
+            serviciosrow = inseminaciones
+            
+        }
+        serviciosrow = serviciosrow.sort((s1,s2)=>new Date(s1.fechaparto)>new Date(s2.fechaparto)?-1:1)
+        
+        
         totalServicios = serviciosrow.length
     }
     function prepararData(item){
@@ -160,6 +227,7 @@
     onMount(async ()=>{
         await getAnimales()
         await getServicios()
+        await getInseminaciones()
         filterUpdate()
     })
 </script>
@@ -267,8 +335,34 @@
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
-                            bind:value={fechapartohasta} onchange={filterUpdate}
+                            onchange={filterUpdate}
+                            bind:value={fechapartohasta} 
                         />
+                    </div>
+                    <div class="">
+                        <label for = "tiposer" class="tracking-wide label">
+                            <span class="label-text text-base">Tipo servicio</span>
+                        </label>
+                        <label class="input-group ">
+                            <select 
+                                class={`
+                                    select select-bordered
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                bind:value={filtroservicio}
+                                onchange={filterUpdate}
+                                
+                            >
+                                
+                                    {#each opcionservicio as s}
+                                        <option value={s.id}>{s.nombre}</option>
+                                    {/each}
+                              </select>
+                        </label>  
                     </div>
                     <div class="">
                         <label for = "nombrepadre" class="label">
@@ -306,16 +400,43 @@
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Parto</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Madre</th>
                     <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Padres</th>
+                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Tipo</th>
                 </tr>
             </thead>
             <tbody>
                 {#each serviciosrow as s}
-                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>openEditModal(s.id)}>
-                    <td class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">{s.fechadesde?new Date(s.fechadesde).toLocaleDateString():""}</td>
+                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>s.fechadesde?openEditModal(s.id):console.log("inseminacion")}>
+                    <td 
+                        class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600"
+                    >
+                        {
+                            s.fechadesde?new Date(s.fechadesde).toLocaleDateString():
+                            s.fechainseminacion?new Date(s.fechainseminacion).toLocaleDateString():
+                            ""
+                        }
+                    </td>
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{s.fechahasta?new Date(s.fechahasta).toLocaleDateString():""}</td>
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{s.fechaparto?new Date(s.fechaparto).toLocaleDateString():"   "}</td>
-                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{`${s.expand.madre.caravana}`}</td>
-                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{getNombrePadres(s.padres)}</td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">
+                        {   s.fechadesde?
+                            s.expand.madre.caravana:
+                            s.expand.animal.caravana
+                        }
+                    </td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">
+                        {
+                            s.fechadesde?
+                            getNombrePadres(s.padres):
+                            s.pajuela
+                        }
+                    </td>
+                    <td class="text-base mx-1 px-1 border-b dark:border-gray-600">
+                        {
+                            s.fechadesde?
+                            "Natural":
+                            "Artificial"
+                        }
+                    </td>
                 </tr>
                 {/each}
             </tbody>
@@ -446,6 +567,122 @@
             <form method="dialog" >
                 <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
                 <button class="btn btn-error text-white" onclick={()=>eliminar(idserv)}>Eliminar</button>
+                <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
+            </form>
+        </div>
+    </div>
+</dialog>
+<dialog id="nuevoModalIns" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div class="
+            modal-box w-11/12 max-w-xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Ver inseminación</h3>  
+        <div class="form-control">
+            <label for = "nombre" class="label">
+                <span class="label-text text-base">Caravana</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={idanimal}
+                    onchange={()=>oninput("ANIMAL")}
+                >
+                    <option value="agregar">Agregar</option>
+                    {#each madres as m}
+                        <option value={m.id}>{m.caravana}</option>    
+                    {/each}
+                </select>
+                {#if malanimal}
+                    <div class="label">
+                        <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                    </div>
+                {/if}
+            </label>
+            <label for = "tipo" class="label">
+                <span class="label-text text-base">Categoria</span>
+            </label>
+            <label class="input-group ">
+                <select 
+                    class={`
+                        select select-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2}
+                    `}
+                    disabled
+                    bind:value={categoria}
+                >
+                    {#each tiposanimal as t}
+                        <option value={t.id}>{t.nombre}</option>    
+                    {/each}
+                  </select>
+            </label>
+            {#if cargado}
+                <PredictSelect {onwrite} {onelegir} bind:valor={padre} etiqueta = {"Padre"} bind:cadena={pajuela} lista = {listapadres}  size="w-1/2"/>
+            {/if}
+            <label for = "fechainseminacion" class="label">
+                <span class="label-text text-base">Fecha de inseminacion</span>
+            </label>
+            <label class="input-group ">
+                <input id ="fechainseminacion" type="date" 
+                    class={`
+                        input input-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={fechainseminacion}
+                    onchange={()=>oninput("FECHAINSEMINACION")}
+                />
+                {#if malfechainseminacion}
+                    <div class="label">
+                        <span class="label-text-alt text-red-500">Debe seleccionar la fecha de inseminacion</span>                    
+                    </div>
+                {/if}
+            </label>
+            <label for = "fechaparto" class="label">
+                <span class="label-text text-base">Fecha estimada de parto</span>
+            </label>
+            <label class="input-group ">
+                <input disabled id="fechaparto" type="date" 
+                    class={`
+                        input input-bordered w-full
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 
+                        focus:ring-green-500 
+                        focus:border-green-500
+                        ${estilos.bgdark2} 
+                    `}
+                    bind:value={fechaparto}
+                    onchange={()=>oninput("FECHAPARTO")}
+                />
+                {#if malfechaparto}
+                    <div class="label">
+                        <span class="label-text-alt text-red-500">Debe seleccionar la fecha aproximada de parto</span>                    
+                    </div>
+                {/if}
+            </label>
+        </div>
+        <div class="modal-action justify-start ">
+            <form method="dialog" >
+                <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
+                <button class="btn btn-error text-white" onclick={()=>eliminar(idins)}>Eliminar</button>
                 <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
             </form>
         </div>
