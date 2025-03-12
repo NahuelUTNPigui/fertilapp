@@ -230,7 +230,7 @@
                 let datahistorial = {
                     animal:tactoanimal.id,
                     caravana:tactoanimal.caravana,
-                    user:tactoanimal.expand.cab.user,
+                    user:tactoanimal.user,
                     active:true,
                     delete:false,
                     fechanacimiento:tactoanimal.fechanacimiento,

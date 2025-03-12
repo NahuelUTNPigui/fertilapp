@@ -256,7 +256,8 @@
             MADRE:item.fechadesde?item.expand.madre.caravana:item.expand.animal.caravana,
             PADRES:item.fechadesde?getNombrePadres(item.padres):item.pajuela,
             FECHA_PARTO:item.fechaparto?new Date(item.fechaparto).toLocaleDateString():"",
-            OBSERVACION:item.observacion
+            OBSERVACION:item.observacion,
+            TIPO:item.fechadesde?"Servicio":"Artificial"
 
         }
     }

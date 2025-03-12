@@ -349,7 +349,7 @@
                     let datahistorial = {
                         animal:servicio.id,
                         caravana:servicio.caravana,
-                        user:servicio.expand.cab.user,
+                        user:servicio.user,
                         active:true,
                         delete:false,
                         fechanacimiento:servicio.fechanacimiento,
@@ -440,7 +440,7 @@
                     let datahistorial = {
                         animal:inseminacion.id,
                         caravana:inseminacion.caravana,
-                        user:inseminacion.expand.cab.user,
+                        user:inseminacion.user,
                         active:true,
                         delete:false,
                         fechanacimiento:inseminacion.fechanacimiento,
