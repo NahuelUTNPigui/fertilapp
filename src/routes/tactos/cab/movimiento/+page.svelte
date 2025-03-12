@@ -104,7 +104,7 @@
                 todos = false
                 algunos = true
             }
-            selecthashmap[id] = null
+            delete selecthashmap[id] 
         }
         else{
             if(ninguno){
@@ -197,10 +197,10 @@
             Swal.fire("Error tactos","Debe seleccionar una fecha","error")
             return 
         }
-        let errores = false
-        let bulkdata = []
+        
         let bulktactos = []
         let bulkcambios = []
+        let bulkhistoriales = []
         for(let i = 0;i<selectanimales.length;i++){
             let tactoanimal = selectanimales[i]
             
@@ -227,6 +227,22 @@
                     id:tactoanimal.id
                 }
                 bulkcambios.push(dataupdate)
+                let datahistorial = {
+                    animal:tactoanimal.id,
+                    caravana:tactoanimal.caravana,
+                    user:tactoanimal.expand.cab.user,
+                    active:true,
+                    delete:false,
+                    fechanacimiento:tactoanimal.fechanacimiento,
+                    sexo:tactoanimal.sexo,
+                    peso:tactoanimal.peso,
+                    lote:tactoanimal.lote,
+                    rodeo:tactoanimal.rodeo,
+                    categoria:tactoanimal.categoria,
+                    prenada:tactoanimal.prenada
+                }
+                bulkhistoriales.push(datahistorial)
+                
             }
             
 
@@ -252,8 +268,11 @@
             }
             for(let i = 0 ; i<bulkcambios.length;i++){
                 let bc = bulkcambios[i]
-                batch.collection('animales').update(bc.id,{prenada:bc.prenada});
-                
+                batch.collection('animales').update(bc.id,{prenada:bc.prenada});   
+            }
+            for(let i = 0 ; i<bulkhistoriales.length;i++){
+                let bh = bulkhistoriales[i]
+                batch.collection('historialanimales').create(bh);
             }
             
             const result = await batch.send();

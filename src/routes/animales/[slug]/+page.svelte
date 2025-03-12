@@ -88,6 +88,7 @@
         try{
             const data = {
                 delete: true,
+                active:false
             };
 
             const record = await pb.collection('animales').update(slug, data);  
@@ -116,7 +117,7 @@
 
             let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
         
-            let origenusuarioid =  pb_json.model.id
+            let origenusuarioid =  pb_json.record.id
             let datatrans = {
                 texto:"Se transfirió a "+caravana,
                 titulo:"Transferencia de 1 animal",

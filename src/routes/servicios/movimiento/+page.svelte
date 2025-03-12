@@ -139,7 +139,7 @@
                 todos = false
                 algunos = true
             }
-            selecthashmap[id] = null
+            delete selecthashmap[id]
         }
         else{
             if(ninguno){
@@ -197,9 +197,9 @@
         //ordenarNombre(rodeos)
     }
     async function getAnimales(){
-        const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && delete=false && cab='${cab.id}'`,
-            expand:"rodeo,lote"
+        const recordsa = await pb.collection("Animalestacto").getFullList({
+            filter:`active=true && cab='${cab.id}'`,
+            expand:"rodeo,lote,cab"
         })
         
         animales = recordsa
@@ -304,6 +304,190 @@
     function onInput(campo){
         input(campo)
     }
+    async function guardarBulk() {
+       if(esservicio){
+            if(listapadres.length == 0){
+                Swal.fire("Sin padres","No hay padres seleccionados","error")
+            }
+            let bulksers = []
+            let bulkcambios = []
+            for(let i = 0;i<selectanimales.length;i++){
+                let servicio = selectanimales[i]
+                let dataser = {
+                        fechadesde : fechadesdeserv + " 03:00:00",
+                        fechaparto: fechaparto + " 03:00:00",
+                        observacion: servicio.observacion,
+                        madre:servicio.id,
+                        padres:padreslist.join(),
+                        active:true,
+                        cab:cab.id
+                }
+                if(fechahastaserv != ""){
+                    dataser.fechahasta = fechahastaserv + " 03:00:00"
+                }
+                bulksers.push(dataser)
+                let ft = servicio.fechatacto
+                let fi = servicio.fechains
+                let fs = servicio.fechaser
+                let maximafecha = null
+                const valor1 = ft || "";
+                const valor2 = fi || "";
+                const valor3 = fs || "";
+                if (valor1 >= valor2 && valor1 >= valor3) {
+                    maximafecha = ft;
+                } else if (valor2 >= valor1 && valor2 >= valor3) {
+                    maximafecha = fi;
+                } else {
+                    maximafecha = fs;
+                }
+                if(maximafecha == null || fechadesdeserv > maximafecha){
+                    let dataupdate = {
+                        prenada:3,
+                        id:servicio.id
+                    }
+                    bulkcambios.push(dataupdate)
+                    let datahistorial = {
+                        animal:servicio.id,
+                        caravana:servicio.caravana,
+                        user:servicio.expand.cab.user,
+                        active:true,
+                        delete:false,
+                        fechanacimiento:servicio.fechanacimiento,
+                        sexo:servicio.sexo,
+                        peso:servicio.peso,
+                        lote:servicio.lote,
+                        rodeo:servicio.rodeo,
+                        categoria:servicio.categoria,
+                        prenada:servicio.prenada
+                    }
+                    bulkhistoriales.push(datahistorial)
+                }
+            }
+            try{
+                const batch = pb.createBatch();
+                for(let i = 0 ; i<bulksers.length;i++){
+                    let bs = bulksers[i]
+                    batch.collection('servicios').create(bs);
+                }
+                for(let i = 0 ; i<bulkcambios.length;i++){
+                    let bc = bulkcambios[i]
+                    batch.collection('animales').update(bc.id,{prenada:bc.prenada});
+                    
+                }
+                for(let i = 0 ; i<bulkhistoriales.length;i++){
+                    let bh = bulkhistoriales[i]
+                    batch.collection('historialanimales').create(bh);
+                }
+                const result = await batch.send();
+                
+            }
+            catch(err){
+                console.error(err)
+            }
+            await getAnimales()
+            selectanimales = []
+            selecthashmap = {}
+            fechadesdeserv = ""
+            fechahastaserv = ""
+            padreslist = []
+            padresserv = ""
+            esservicio = false
+            servicioMasivo.close()
+       }
+       if(esinseminacion){
+            if(fechainseminacion == ""){
+                Swal.fire("Error inseminaciones","Debe seleccionar una fecha","error")
+                esinseminacion = false
+                return 
+            }
+            let bulkins = []
+            let bulkcambios = []
+            let bulkhistoriales = []
+            for(let i = 0;i<selectanimales.length;i++){
+                let inseminacion = selectanimales[i]
+                let data = {
+                    cab:cab.id,
+                    animal: inseminacion.id,
+                    fechaparto: fechaparto +' 03:00:00',
+                    fechainseminacion: fechainseminacion + ' 03:00:00',
+                    active:true,
+                    padre:inseminacion.padre,
+                    pajuela:inseminacion.pajuela,
+                    categoria:inseminacion.categoria,
+                    observacion:inseminacion.observacion
+                }
+                bulkins.push(data)
+                let ft = servicio.fechatacto
+                let fi = servicio.fechains
+                let fs = servicio.fechaser
+                let maximafecha = null
+                const valor1 = ft || "";
+                const valor2 = fi || "";
+                const valor3 = fs || "";
+                if (valor1 >= valor2 && valor1 >= valor3) {
+                    maximafecha = ft;
+                } else if (valor2 >= valor1 && valor2 >= valor3) {
+                    maximafecha = fi;
+                } else {
+                    maximafecha = fs;
+                }
+                if(maximafecha == null || fechainseminacion > maximafecha){
+                    let dataupdate = {
+                        prenada:3,
+                        id:tactoanimal.id
+                    }
+                    bulkcambios.push(dataupdate)
+                    let datahistorial = {
+                        animal:inseminacion.id,
+                        caravana:inseminacion.caravana,
+                        user:inseminacion.expand.cab.user,
+                        active:true,
+                        delete:false,
+                        fechanacimiento:inseminacion.fechanacimiento,
+                        sexo:inseminacion.sexo,
+                        peso:inseminacion.peso,
+                        lote:inseminacion.lote,
+                        rodeo:inseminacion.rodeo,
+                        categoria:inseminacion.categoria,
+                        prenada:inseminacion.prenada
+                    }
+                    bulkhistoriales.push(datahistorial)
+                }
+            }
+            try{
+                const batch = pb.createBatch();
+                for(let i = 0 ; i<bulkins.length;i++){
+                    let bi = bulkins[i]
+                    batch.collection('inseminaciones').create(bi);
+                }
+                for(let i = 0 ; i<bulkhistoriales.length;i++){
+                    let bh = bulkhistoriales[i]
+                    batch.collection('historialanimales').create(bh);
+                }
+                for(let i = 0 ; i<bulkcambios.length;i++){
+                    let bc = bulkcambios[i]
+                    batch.collection('animales').update(bc.id,{prenada:bc.prenada});
+                }
+                
+                const result = await batch.send();
+                
+            }
+            catch(err){
+                console.error(err)
+            }
+            await getAnimales()
+            fechainseminacion = ""
+            fechaparto = ""
+            pajuela = ""
+            padre = ""
+            botonhabilitado = false
+            malfecha = false
+            malpadre = false
+            selecthashmap = {}
+            selectanimales = []
+            esinseminacion = false
+       } 
+    }
     async function guardar() {
         if(esservicio){
             if(listapadres.length == 0){
@@ -398,8 +582,6 @@
             selectanimales = []
             esinseminacion = false
         }
-        
-
     }
     function validarBoton(){
         botonhabilitado = true

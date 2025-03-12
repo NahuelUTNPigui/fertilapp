@@ -43,8 +43,8 @@
       let caber = createCaber()
       nombreestablecimiento = caber.cab.nombre
       let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-      usuarioid = pb_json.model.id
-      nombreusuario = pb_json.model.username
+      usuarioid = pb_json.record.id
+      nombreusuario = pb_json.record.username
       let hab = $enabled
       if(hab==="no"){
         goto("/")

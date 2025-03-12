@@ -131,14 +131,14 @@
     onMount(async ()=>{
         let caber = createCaber()
         let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-        usuarioid = pb_json.model.id
-        usermail = pb_json.model.email
-        username = pb_json.model.username
-        nombre = pb_json.model.nombre
-        apellido = pb_json.model.apellido
-        nivel = pb_json.model.nivel
+        usuarioid = pb_json.record.id
+        usermail = pb_json.record.email
+        username = pb_json.record.username
+        nombre = pb_json.record.nombre
+        apellido = pb_json.record.apellido
+        nivel = pb_json.record.nivel
         let light = !darker.dark
-        tokencolab = pb_json.model.codigo
+        tokencolab = pb_json.record.codigo
         cab = caber.cab
     })
 </script>

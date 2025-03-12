@@ -835,8 +835,9 @@
     }
     onMount(async ()=>{
         cab = caber.cab
-        let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
-        usuarioid = pb_json.model.id
+        let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        
+        usuarioid = pb_json.record.id
         if(cab.exist){
             await getAnimales()
             await getTiposTratamientos()

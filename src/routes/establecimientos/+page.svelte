@@ -93,7 +93,7 @@
     }
     onMount(async ()=>{
         let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-        usuarioid = pb_json.model.id
+        usuarioid = pb_json.record.id
         cab = caber.cab
         const records = await pb.collection("cabs").getFullList({
             filter: `active = True && user = '${usuarioid}'` 

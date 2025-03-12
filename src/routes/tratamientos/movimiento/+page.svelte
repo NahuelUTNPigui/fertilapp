@@ -204,10 +204,10 @@
             return 
         }
         let errores = false
+        let bulkdata = []
         for(let i = 0;i<selectanimales.length;i++){
             let tratamientoanimal = selectanimales[i]
-            try{
-                let datatratamiento = {
+            let datatratamiento = {
                     fecha : fecha+ " 03:00:00",
                     observacion:tratamientoanimal.observacionnuevo,
                     categoria:tratamientoanimal.categoria,
@@ -215,19 +215,26 @@
                     tipo:tipotratamientoselect,
                     active : true,
                     cab:cab.id
-                }
-                const  record = await pb.collection("tratamientos").create(datatratamiento)
-            }catch(err){
-                console.error(err)
-                errores = true
             }
+            bulkdata.push(datatratamiento)
+            
         }
-        if(errores){
-            Swal.fire("Error tratamientos","Hubo algun error en algun tratamiento","error")
-        }
-        else{
+        try{
+            const batch = pb.createBatch();
+            for(let i = 0;i<bulkdata.length;i++){
+                let t = bulkdata[i]
+                batch.collection('tratamientos').create(t);
+            }
+            
+
+            const result = await batch.send();
+
             Swal.fire("Éxito tratamientos","Se lograron registrar todos los tratamientos","success")
         }
+        catch(err){
+            Swal.fire("Error tratamientos","Hubo algun error en algun tratamiento","error")
+        }
+        
         fecha = ""
         malfecha = false
         maltipo = false

@@ -232,7 +232,7 @@
         
         cab = caber.cab
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
-        usuarioid = pb_json.model.id
+        usuarioid = pb_json.record.id
         if(cab.exist){
            await getCabaña()
            await getColabs()

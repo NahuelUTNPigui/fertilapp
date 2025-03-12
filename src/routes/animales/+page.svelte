@@ -335,7 +335,7 @@
     }
     onMount(async()=>{
         let pb_json =  JSON.parse(localStorage.getItem('pocketbase_auth'))
-        usuarioid = pb_json.model.id
+        usuarioid = pb_json.record.id
         await getAnimales()
         await getRodeos()
         await getLotes()

@@ -121,7 +121,7 @@
                 todos = false
                 algunos = true
             }
-            selecthashmap[id] = null
+            delete selecthashmap[id] 
         }
         else{
             if(ninguno){
@@ -186,7 +186,7 @@
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
             filter:`active=true && delete=false && cab='${cab.id}'`,
-            expand:"rodeo,lote"
+            expand:"rodeo,lote,cab"
         })
         
         animales = recordsa
@@ -224,110 +224,140 @@
             return
         }
 
-        try{
-            let data = {}
-            let nombrelote = ""
-            let nombrerodeo = ""
-            if(selectcategoria){
-                data.categoria = nuevacategoria
-                
-            }
-            if(selectlote){
-                data.lote = nuevolote
-                nombrelote = lotes.filter(l =>l.id==nuevolote)[0]
-            }
-            if(selectrodeo){
-                data.rodeo = nuevorodeo
-                nombrerodeo = rodeos.filter(r =>r.id==nuevorodeo)[0]
-            }
-            if(selecttratamiento){
-                data.fecha = fecha + " 03:00:00"
-                data.tipo = tipotratamiento
-                data.active = true
-                data.cab = cab.id
-            }
-            if(selectbaja){
-                data.active = false
-                data.motivobaja = motivo
-                data.fechafallecimiento = fechabaja + " 03:00:00" 
-            }
-            if(selecttransfer){
-                const resultList = await pb.collection('cabs').getList(1, 1, {
-                    filter: `active = true && codigo = '${codigo}'`,
-                });
-                if(resultList.items.length == 0){
-                    malcodigo = true
-                    return
-                }
-                data.cab = resultList.items[0].id
-                try{
-                    let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        
+        let data = {}
+        let nombrelote = ""
+        let nombrerodeo = ""
+        if(selectcategoria){
+            data.categoria = nuevacategoria
             
-                    let origenusuarioid =  pb_json.model.id
-                    let data = {
-                        texto:`Se transfirieron ${lista.length} animales`,
-                        titulo:`Transferencia de ${lista.length} animales`,
-                        tipo:tiponoti[1].id,
-                        origen:origenusuarioid,
-                        destino:resultList.items[0].user,
-                        leido:false
-                    }
-                    const record = await pb.collection('notificaciones').create(data);
-                }
-                catch(err){
-                    console.error(err)
-                }
+        }
+        if(selectlote){
+            data.lote = nuevolote
+            nombrelote = lotes.filter(l =>l.id==nuevolote)[0]
+        }
+        if(selectrodeo){
+            data.rodeo = nuevorodeo
+            nombrerodeo = rodeos.filter(r =>r.id==nuevorodeo)[0]
+        }
+        if(selecttratamiento){
+            data.fecha = fecha + " 03:00:00"
+            data.tipo = tipotratamiento
+            data.active = true
+            data.cab = cab.id
+        }
+        if(selectbaja){
+            data.active = false
+            data.motivobaja = motivo
+            data.fechafallecimiento = fechabaja + " 03:00:00" 
+        }
+        if(selecttransfer){
+            const resultList = await pb.collection('cabs').getList(1, 1, {
+                filter: `active = true && codigo = '${codigo}'`,
+            });
+            if(resultList.items.length == 0){
+                malcodigo = true
+                return
             }
+            data.cab = resultList.items[0].id
+            try{
+                let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
+        
+                let origenusuarioid =  pb_json.record.id
+                let datanoti = {
+                    texto:`Se transfirieron ${lista.length} animales`,
+                    titulo:`Transferencia de ${lista.length} animales`,
+                    tipo:tiponoti[1].id,
+                    origen:origenusuarioid,
+                    destino:resultList.items[0].user,
+                    leido:false
+                }
+                const record = await pb.collection('notificaciones').create(datanoti);
+            }
+            catch(err){
+                console.error(err)
+            }
+        }
+        let bulkcambios = []
+        let bulkhistoriales = []
+        let bulktratamientos = []
+        for(let i = 0;i<lista.length;i++){
+            let a = lista[i]
+            if(!selecttratamiento){
+                let datacambio={
+                    ...data
+                }
+                bulkcambios.push(datacambio)
+                let datahistorial = {
+                    animal:a.id,
+                    caravana:a.caravana,
+                    user:a.expand.cab.user,
+                    active:true,
+                    delete:false,
+                    fechanacimiento:a.fechanacimiento,
+                    sexo:a.sexo,
+                    peso:a.peso,
+                    lote:a.lote,
+                    rodeo:a.rodeo,
+                    categoria:a.categoria,
+                    prenada:a.prenada
+                }
+                bulkhistoriales.push(datahistorial)
+                //await guardarHistorial(pb,lista[i].id)
+                //await pb.collection('animales').update(lista[i].id, data);
+            }
+            else{
+                let a = lista[i]
+                let datatratamiento = {
+                    ...data,
+                    animal:a.id,
+                    categoria:a.categoria
+                }
+                bulktratamientos.push(datatratamiento)
+            }
+        }
+        try{
+            const batch = pb.createBatch();
             for(let i = 0;i<lista.length;i++){
-                
                 if(!selecttratamiento){
-                    await guardarHistorial(pb,lista[i].id)
-                    await pb.collection('animales').update(lista[i].id, data);
+                    batch.collection('animales').update(lista[i].id,bulkcambios[i]);
+                    batch.collection('historialanimales').create(bulkhistoriales[i]);
                 }
                 else{
-                    let a = lista[i]
-                    await pb.collection("tratamientos").create({
-                        ...data,
-                        animal:a.id,
-                        categoria:a.categoria
-
-                    })
+                    batch.collection('tratamientos').create(bulktratamientos[i]);
                 }
-                
-                
             }
-            for(let i = 0;i<lista.length;i++){
-                selecthashmap[lista[i].id] = null
-            }
-            algunos = false
-            todos = false
-            ninguno = true
-            selectcategoria = true
-            selectlote = false
-            selectrodeo = false
-            selecttratamiento = false
-            selectbaja = false
-            selecttransfer
-            nuevacategoria = ""
-            nuevolote = ""
-            nuevorodeo = ""
-            fecha = ""
-            tipotratamiento = ""
-            fechabaja = ""
-            motivo = ""
-            codigo = ""
-            habilitarboton = false
+            const result = await batch.send();
             Swal.fire("Éxito movimiento","Movimiento exitoso","success")
-            await getAnimales()
-            filterUpdate()
         }
         catch(err){
-            console.error(err)
-            Swal.fire("Error movimiento","Movimiento sin éxito","error")
+            Swal.fire("Error movimiento","No se logró hacer el movimiento","error")
         }
-        nuevorodeo = ""
-        nuevolote = ""
+        for(let i = 0;i<lista.length;i++){
+            delete selecthashmap[lista[i].id] 
+        }
+            
+        algunos = false
+        todos = false
+        ninguno = true
+        selectcategoria = true
+        selectlote = false
+        selectrodeo = false
+        selecttratamiento = false
+        selectbaja = false
+        selecttransfer
         nuevacategoria = ""
+        nuevolote = ""
+        nuevorodeo = ""
+        fecha = ""
+        tipotratamiento = ""
+        fechabaja = ""
+        motivo = ""
+        codigo = ""
+        habilitarboton = false
+        
+        await getAnimales()
+        filterUpdate()
 
     }
     function onChangeCollapse(seccion){
@@ -548,9 +578,7 @@
         <div class="flex justify-between items-center px-1">
             <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
         </div>
-        <div class="flex justify-between items-center px-1">
-            <h3 class="font-semibold text-lg py-2">Animales seleccionados: {Object.keys(selecthashmap)}</h3>
-        </div>
+        
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
                 <div>
