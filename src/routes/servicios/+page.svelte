@@ -251,10 +251,10 @@
     }
     function prepararData(item){
         return {
-            MADRE:item.expand.madre.caravana,
-            PADRES:getNombrePadres(item.padres),
-            FECHA_DESDE:item.fechadesde?new Date(item.fechadesde).toLocaleDateString():"",
+            FECHA:item.fechadesde?new Date(item.fechadesde).toLocaleDateString():item.fechainseminacion?new Date(item.fechainseminacion).toLocaleDateString():"",
             FECHA_HASTA:item.fechahasta?new Date(item.fechahasta).toLocaleDateString():"",
+            MADRE:item.fechadesde?item.expand.madre.caravana:item.expand.animal.caravana,
+            PADRES:item.fechadesde?getNombrePadres(item.padres):item.pajuela,
             FECHA_PARTO:item.fechaparto?new Date(item.fechaparto).toLocaleDateString():"",
             OBSERVACION:item.observacion
 

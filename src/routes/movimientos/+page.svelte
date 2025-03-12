@@ -546,6 +546,9 @@
             </div> 
         </button>
         <div class="flex justify-between items-center px-1">
+            <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
+        </div>
+        <div class="flex justify-between items-center px-1">
             <h3 class="font-semibold text-lg py-2">Animales seleccionados: {Object.keys(selecthashmap)}</h3>
         </div>
         {#if isOpenFilter}

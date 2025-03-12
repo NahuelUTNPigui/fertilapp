@@ -160,8 +160,8 @@
         //ordenarNombre(rodeos)
     }
     async function getAnimales(){
-        const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && delete=false && cab='${cab.id}' && sexo = 'H'`,
+        const recordsa = await pb.collection("Animalestacto").getFullList({
+            filter:`active=true && cab='${cab.id}' && sexo = 'H'`,
             expand:"rodeo,lote"
         })
         
@@ -199,11 +199,37 @@
         }
         let errores = false
         let bulkdata = []
+        let bulktactos = []
+        let bulkcambios = []
         for(let i = 0;i<selectanimales.length;i++){
             let tactoanimal = selectanimales[i]
-            let dataupdate = {
-                prenada:tactoanimal.estadonuevo
+            
+            let ft = tactoanimal.fechatacto
+            let fi = tactoanimal.fechains
+            let fs = tactoanimal.fechaser
+            let maximafecha = null
+            const valor1 = ft || "";
+            const valor2 = fi || "";
+            const valor3 = fs || "";
+
+            // Comparar los strings
+            if (valor1 >= valor2 && valor1 >= valor3) {
+                maximafecha = ft;
+            } else if (valor2 >= valor1 && valor2 >= valor3) {
+                maximafecha = fi;
+            } else {
+                maximafecha = fs;
             }
+            
+            if(maximafecha == null || fecha > maximafecha){
+                let dataupdate = {
+                    prenada:tactoanimal.estadonuevo,
+                    id:tactoanimal.id
+                }
+                bulkcambios.push(dataupdate)
+            }
+            
+
             let datatacto={
                 fecha:fecha +" 03:00:00" ,
                 observacion:tactoanimal.observacion,
@@ -215,24 +241,30 @@
                 cab:cab.id,
                 active:true
             }
-            let fila = {
-                dataupdate,
-                datatacto
-            }
-            bulkdata.push(fila)
+            bulktactos.push(datatacto)
         }
-        console.log(JSON.stringify(bulkdata))
-        let token = JSON.parse(localStorage["pocketbase_auth"]).token
-        let bulkdatos = await fetch(`${ruta}/api/bulk/tactos`,{
-            method:'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            },
-            body:JSON.stringify({data:bulkdata})
-        })
-        let resp = await bulkdatos.json()
-        console.log(resp)
+        
+        try{
+            const batch = pb.createBatch();
+            for(let i = 0 ; i<bulktactos.length;i++){
+                let bt = bulktactos[i]
+                batch.collection('tactos').create(bt);
+            }
+            for(let i = 0 ; i<bulkcambios.length;i++){
+                let bc = bulkcambios[i]
+                batch.collection('animales').update(bc.id,{prenada:bc.prenada});
+                
+            }
+            
+            const result = await batch.send();
+            
+        }
+        catch(err){
+            console.error(err)
+        }
+        
+        await getAnimales()
+        filterUpdate()
         fecha = ""
         botonhabilitado = false
         malfecha = false
@@ -314,7 +346,7 @@
                     <h1 class="text-2xl">
                         Tactos
                     </h1>
-                
+                    
                 </button>
             
         </div>
@@ -362,6 +394,9 @@
                 </svg>
             </div> 
         </button>
+        <div class="flex justify-between items-center px-1">
+            <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
+        </div>
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
                 
