@@ -360,11 +360,11 @@
 
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
+    <div class="grid grid-cols-2 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
             <h1 class="text-2xl">Observaciones</h1>  
         </div>
-        <div class="flex col-span-2 gap-1 justify-end">
+        <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
                 <button class={` btn btn-primary rounded-lg ${estilos.btntext} px-2 mx-1`} data-theme="forest" onclick={()=>openNewModal()}>
                     <span  class="text-lg m-1">Nuevo</span>
