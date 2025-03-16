@@ -3,16 +3,16 @@
     
     let options = [
         {id:0,nombre:"Vacia"},
-        {id:1,nombre:"Dudosa"},
         {id:2,nombre:"Preñada"},
         {id:3,nombre:"En servicio"}
     ]
     function select(id){
+        
         option = id
     }
     
 </script>
-<div class="bg-transparent grid grid-cols-2 lg:grid-cols-4 ">
+<div class="bg-transparent grid grid-cols-3 lg:grid-cols-4 ">
     {#each options as op}
         
         <button id={op.id} onclick={()=>select(op.id)} 

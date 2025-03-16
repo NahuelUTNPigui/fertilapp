@@ -13,6 +13,7 @@
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
     import tipostacto from '$lib/stores/tipostacto';
+    import { getEstadoNombre } from "$lib/components/estadosutils/lib";
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -570,7 +571,7 @@
                         </button>
                     </td>
                     <td class="text-base mx-1 px-1">{a.caravana}</td>
-                    <td class="text-base mx-1 px-1">{getEstadoName(a.prenada)}</td>
+                    <td class="text-base mx-1 px-1">{getEstadoNombre(a.prenada)}</td>
                     <td class="text-base mx-1 px-1">{a.categoria}</td>
                     <td class="text-base mx-1 px-1">{a.peso}</td>
                     <td class="text-base mx-1 px-1">{a.expand?.rodeo?.nombre||''}</td>

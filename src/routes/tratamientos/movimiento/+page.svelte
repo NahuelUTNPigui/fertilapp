@@ -13,6 +13,7 @@
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
     import MultiSelect from "$lib/components/MultiSelect.svelte";
+    
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]

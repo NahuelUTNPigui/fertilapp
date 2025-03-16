@@ -158,7 +158,7 @@
                 rodeo = recorda.rodeo
                 lote = recorda.lote
                 categoria = recorda.categoria
-                prenada = recorda.prenada
+                prenada = recorda.prenada==1?0:recorda.prenada
                 if(recorda.fechafallecimiento != ""){
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
                     motivobaja = recorda.motivobaja

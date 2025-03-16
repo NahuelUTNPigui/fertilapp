@@ -13,6 +13,7 @@
     import estilos from '$lib/stores/estilos';
     import { goto } from "$app/navigation";
     
+    
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
