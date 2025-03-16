@@ -20,6 +20,7 @@
     import StatCard from "$lib/components/StatCard.svelte";
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
     import cuentas from '$lib/stores/cuentas';
+    import MultipleToros from '$lib/components/MultipleToros.svelte';
     
 
     let ruta = import.meta.env.VITE_RUTA
@@ -80,15 +81,10 @@
     let etiquetamadre = "Madre"
     let madrenac = $state("")
     let nombremadrenac = $state("")
-    
-    
     //
     //Padre
     let padrenac = $state("")
     let nombrepadrenac = $state("")
-    //let lista = $state([])
-    
-    //
     //Validacion
     let malmadrenac = $state(false)
     let malpadrenac = $state(false)
@@ -108,6 +104,22 @@
     let malfechatrat = $state(false)
     let maltipotrat = $state(false)
     let botonhabilitadotrat=$state(false)
+    //Servicio
+    let idanimalser = $state("")
+    let categoriaser = $state("")
+    let esServicio = $state(true)
+    let padreser = $state("")
+    let padreserlista = $state([])
+    let fechapartoser = $state("")
+    let fechadesdeserv = $state("")
+    let fechahastaserv = $state("")
+    let madreser = $state("")
+    let observacionser = $state("")
+    //validacion
+    let malanimalser = $state(false)
+    let malfechadesdeser = $state(false)
+    let malpadreser = $state(false)
+    let botonhabilitadoser = $state(false)
     //Inseminacion
     let padreins = $state("")
     let pajuelains = $state("")
@@ -225,6 +237,27 @@
         tipotrat = ""
         categoriatrat = ""
         nuevoModalTratamiento.showModal()
+    }
+    function openNewModalServicio(){
+        agregaranimal = false
+        caravana = ""
+        sexo = ""
+        peso = ""
+        fechanacimiento = ""
+        //Servicio
+        esServicio = true
+        padreser = ""
+        padreserlista = []
+        fechapartoser = ""
+        fechadesdeserv = ""
+        fechahastaserv = ""
+        madreser = ""
+        observacionser = ""
+        malfechadesdeser = false
+        malpadreser = false
+        botonhabilitadoser = false
+        
+        nuevoModalServicio.showModal()
     }
     function openNewModalInseminacion(){
         agregaranimal = false
@@ -482,6 +515,67 @@
         }
         
     }
+    async function guardarServicio() {
+        if(agregaranimal){
+            if(caravana == ""){
+                Swal.fire("Error guardar","No se pudo guardar el tacto porque el animal no tiene caravana","error")
+                return
+            }
+            let a = await guardarAnimal(false,true)
+            let dataser = {
+                fechadesde : fechadesdeserv + " 03:00:00",
+                fechaparto: fechapartoser + " 03:00:00",
+                observacion: observacionser,
+                madre:a.id,
+                padres:padreserlista.join(),
+                active:true,
+                cab:cab.id
+            }
+            if(fechahastaserv != ""){
+                dataser.fechahasta = fechahastaserv + " 03:00:00"
+            }
+            try{
+                await pb.collection("servicios").create(dataser)
+                
+                await getAnimales()
+                Swal.fire("Éxito guardar","Se pudo guardar el servicio con éxito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar el servicio","error")
+
+            }
+        }
+        else{
+            let dataser = {
+                fechadesde : fechadesdeserv + " 03:00:00",
+                fechaparto: fechapartoser + " 03:00:00",
+                observacion: observacionser,
+                madre:idanimalser,
+                padres:padreserlista.join(),
+                active:true,
+                cab:cab.id
+            }
+            if(fechahastaserv != ""){
+                dataser.fechahasta = fechahastaserv + " 03:00:00"
+            }
+            try{
+                await pb.collection("servicios").create(dataser)
+                
+                await pb.collection('animales').update(idanimalser,{
+                    prenada:3
+                })
+                await guardarHistorial(pb,idanimalser)
+                Swal.fire("Éxito guardar","Se pudo guardar el servicio con éxito","success")
+            }
+            catch(err){
+                console.error(err)
+                Swal.fire("Error guardar","Hubo un error para guardar el servicio","error")
+
+            }
+            
+        }
+    }
     async function guardarObs(){
         if(agregaranimal){
             try{
@@ -583,6 +677,15 @@
         }
     
     }
+    function validarBotonSer(){
+        botonhabilitadoser = true
+        if(fechadesdeserv==""){
+            botonhabilitadoser = false
+        }
+        if(idanimalser==""){
+            botonhabilitadoser = false
+        }
+    }
     function validarBotonObs(){
         botonhabilitadoobs = true
         if(!agregaranimal && isEmpty(animalobs)){
@@ -599,15 +702,43 @@
     }
     function onSelectAnimalTacto(){
         let a = animales.filter(an=>an.id==animaltacto)[0]
-        categoriatacto = a.categoria
+        if(a){
+            categoriatacto = a.categoria
+        }
+        else{
+            categoriatacto = ""
+        }
+        
     }
     function onSelectAnimalTrat(){
         let a = animales.filter(an=>an.id==animaltrat)[0]
-        categoriatrat = a.categoria
+        if(a){
+            categoriatrat = a.categoria
+        }
+        else{
+            categoriatrat = ""
+        }
+        
     }
     function onSelectAnimalIns(){
         let a = madres.filter(an=>an.id==idanimalins)[0]
-        categoriains = a.categoria
+        if(a){
+            categoriains = a.categoria
+        }
+        else{
+            categoriains = ""
+        }
+        
+    }
+    function onSelectAnimalSer(){
+        let a = madres.filter(an=>an.id==idanimalser)[0]
+        if(a){
+            categoriaser = a.categoria
+        }
+        else{
+            categoriaser = ""
+        }
+        
     }
     function onSelectPadreIns(){
         let p = padres.filter(item=>item.id == padreins)[0]
@@ -626,7 +757,13 @@
     }
     function onSelectAnimalObs(){
         let a = animales.filter(an=>an.id==animalobs)[0]
-        categoriaobs = a.categoria
+        if(a){
+            categoriaobs = a.categorias
+        }
+        else{
+            categoriaobs = ""
+        }
+        
     }
     function oninputTacto(inputName){
         validarBotonTacto()
@@ -772,6 +909,27 @@
             }
         }
     }
+    function oninputSer(campo){
+        validarBotonSer()
+        if(campo == "ANIMAL"){
+            if(idanimalser==""){
+                malanimalser = true
+            }
+            else{
+                malanimalser = false
+                onSelectAnimalSer()
+            }
+        }
+        if(campo == "DESDE"){
+            if(fechadesdeserv == ""){
+                malfechadesdeser = true
+            }
+            else{
+                malfechadesdeser = false
+                fechapartoser = addDays(fechadesdeserv, 280).toISOString().split("T")[0]
+            }
+        }
+    }
     function oninputObs(inputName){
         validarBotonObs()
         if(!agregaranimal && inputName == "ANIMAL"){
@@ -848,6 +1006,7 @@
  
 </script>
 <Navbarr>
+    
     {#if cab.exist}
     
         <CardBase titulo="Bienvenido a fertil" cardsize="max-w-5xl">
@@ -913,6 +1072,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
                           </svg>
                         Nueva inseminación
+                    </button> 
+                </div>
+                <div>
+                    <button class={classbutton}
+                    onclick={openNewModalServicio}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mx-2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" />
+                          </svg>
+                        Nuevo servicio
                     </button> 
                 </div>
                 <div>
@@ -1704,4 +1873,171 @@
         </div>
     </div>
 </dialog>
+<dialog id="nuevoModalServicio" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
+    <div 
+        class="
+            modal-box w-11/12 max-w-xl
+            bg-gradient-to-br from-white to-gray-100 
+            dark:from-gray-900 dark:to-gray-800
+        "
+    >
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+        </form>
+        <h3 class="text-lg font-bold">Nuevo servicio</h3>  
+        
+        <div class="form-control">
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento/>
+            {#if !agregaranimal}
+                <label for = "animal" class="label">
+                    <span class="label-text text-base">Animal</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={idanimalser}
+                        onchange={()=>oninputSer("ANIMAL")}
+                    >   
+                        {#each madres as a}
+                            <option value={a.id}>{a.caravana}</option>    
+                        {/each}
+                    </select>
+                    {#if malanimalser}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                        </div>
+                    {/if}
+                </label>
+                <label for = "categoria" class="label">
+                    <span class="label-text text-base">Categoria</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2}
+                        `}
+                        bind:value={categoriaser}
+                    >
+                        {#each categorias as c}
+                            <option value={c.id}>{c.nombre}</option>    
+                        {/each}
+                    </select>
+                </label>
+            {/if}
+            <div >
+                <label for = "toros" class="label">
+                    <span class="label-text text-base">Toros</span>
+                </label>
+                <label class="input-group ">
+                    {#if cargadoanimales}
+                        <MultipleToros toros={padres} bind:valor={padreser} bind:listavalores={padreserlista} />
+                    {/if}
+                </label>
+            </div>
+            <div>
+                <label for = "fechadesde" class="label">
+                    <span class="label-text text-base">Fecha desde</span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechadesde" type="date"   
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fechadesdeserv}
+                        onchange={()=>oninputSer("DESDE")}
+                    />
+                    {#if malfechadesdeser}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe seleccionar la fecha inicial del servicio</span>                    
+                        </div>
+                    {/if}
+                </label>
+            </div>
+            <div>
+                <label for = "fechahasta" class="label">
+                    <span class="label-text text-base">Fecha hasta</span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechahasta" type="date"   
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fechahastaserv}
+                    />
+                </label>
+            </div>
+            <div>
+                <label for = "fechaparto" class="label">
+                    <span class="label-text text-base">Fecha parto</span>
+                </label>
+                <label class="input-group ">
+                    <input id ="fechaparto" type="date"   
+                        class={`
+                            input input-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 
+                            focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={fechapartoser}
+                        
+                    />
+                    
+                </label>
+
+            </div>
+            
+            <div >
+                <label for = "observacion" class="label">
+                    <span class="label-text text-base">Observación</span>
+                </label>
+                <input 
+                    id ="obs" 
+                    type="text"  
+                    class={`
+                        input 
+                        input-bordered 
+                        border border-gray-300 rounded-md
+                        focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                        w-full
+                        ${estilos.bgdark2}
+                    `}
+                    bind:value={observacionser}
+                    
+                />
+            </div>
+            <div class="modal-action justify-start ">
+                <form method="dialog" >
+                    <!-- if there is a button, it will close the modal -->
+                    <button class="btn btn-success text-white" disabled='{!botonhabilitadoser}' onclick={guardarServicio} >Guardar</button>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</dialog>
+
 
