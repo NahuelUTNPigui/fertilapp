@@ -35,6 +35,7 @@
     }
     function getNombre(id){
         let a = toros.filter(t=>t.id==id)[0]
+
         return a.caravana
     }
     function quitar(tid){

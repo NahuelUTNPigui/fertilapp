@@ -13,6 +13,8 @@
     import {capitalize} from "$lib/stringutil/lib"
     import {guardarHistorial} from "$lib/historial/lib"
     import { isEmpty,addDays } from "$lib/stringutil/lib";
+    import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
+    import { getSexoNombre } from '$lib/stringutil/lib';
     import MultipleToros from "$lib/components/MultipleToros.svelte";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
 
@@ -251,10 +253,7 @@
         fechainseminacion = ""
         inseminacionMasiva.showModal()
     }
-    function getEstadoName(est) {
-        let estado = estados.filter(e=>e.id==est)[0]
-        return estado.nombre
-    }
+    
     function seleccionarPadre(){
         validarBoton()
         if(padreslist.length == 0){
@@ -521,10 +520,10 @@
                 }
             }
             if(errores){
-                Swal.fire("Error tratamientos","Hubo algun error en algun tratamiento","error")
+                Swal.fire("Error servicios","Hubo algun error en algun servico","error")
             }
             else{
-                Swal.fire("Éxito tratamientos","Se lograron registrar todos los tratamientos","success")
+                Swal.fire("Éxito servicios","Se lograron registrar todos los servicios","success")
             }
             selectanimales = []
             selecthashmap = {}
@@ -760,7 +759,7 @@
             </div>
         {/if}
     </div>
-    <div class="w-full grid justify-items-center mx-1  lg:w-3/4 overflow-x-auto">
+    <div class="hidden w-full md:grid justify-items-center mx-1  lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full " >
             <thead>
                 <tr>
@@ -826,7 +825,7 @@
                         </button>
                     </td>
                     <td class="text-base">{a.caravana}</td>
-                    <td class="text-base">{getEstadoName(a.prenada)}</td>
+                    <td class="text-base">{getEstadoNombre(a.prenada)}</td>
                     <td class="text-base">{a.categoria}</td>
                     <td class="text-base">{a.peso}</td>
                     <td class="text-base">{a.expand?.rodeo?.nombre||''}</td>
@@ -836,6 +835,115 @@
                 {/each}
             </tbody>
         </table>
+    </div>
+    <div class="block  md:hidden justify-items-center mx-1">
+        <div class="w-full flex justify-start">
+            <button    
+                aria-label="Todos"
+                onclick={clickTodos}
+                class={`
+                    text-base bg-transparent rounded-lg
+                    p-1 text-base flex flex-row
+                    ${estilos.secundario}
+                `}
+            >
+                {#if todos}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                {/if}
+                {#if ninguno}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                {/if}
+                {#if algunos}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>      
+                {/if}
+                                 
+                <span class="mt-1">
+                    Seleccionar todos 
+                </span>
+            </button>
+            
+           
+        </div>
+        
+        {#each animalesrows as a}
+        <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
+            <div class="block p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-medium">
+                        <button
+                            aria-label="fila"
+                            onclick={()=>clickAnimal(a.id)}
+                            class={`
+                                font-medium bg-transparent rounded-lg
+                                px-3 py-3 text-base
+                                ${selecthashmap[a.id]?estilos.danger:estilos.primario}
+                            `}
+                        >
+                            {#if selecthashmap[a.id]}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>                                  
+                            {:else}             
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                            {/if}
+                        </button>
+                        {a.caravana}
+                    </h3>
+                    {#if a.sexo == "H" && a.prenada != 1}
+                        <div class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}>{getEstadoNombre(a.prenada)}</div>
+                    {/if}
+                </div>
+                <div class="grid grid-cols-2 gap-y-2">
+                    <div class="flex items-start">
+                      <span class="font-semibold">{getSexoNombre(a.sexo)}</span>
+                    </div>
+                    <div class="flex items-start">
+                      <span >Categoría:</span> 
+                      <span class="font-semibold">
+                        {a.categoria}
+                      </span>
+                      
+                    </div>
+                    <div class="flex items-start">
+                      <span >Lote:</span>
+                      <span class="font-semibold">
+                        {
+                            a.expand?
+                            a.expand.lote?
+                            a.expand.lote.nombre
+                            :""
+                            :""
+
+                        }
+                      </span> 
+                    </div>
+                    <div class="flex items-start">
+                        
+                      <span >Rodeo:</span> 
+                      <span class="font-semibold">
+                        {
+                            a.expand?
+                            a.expand.rodeo?
+                            a.expand.rodeo.nombre
+                            :""
+                            :""
+
+                        }
+                      </span>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+        {/each}
     </div>
 </Navbarr>
 <dialog id="servicioMasivo" class="modal modal-middle rounded-xl">

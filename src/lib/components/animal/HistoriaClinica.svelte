@@ -8,6 +8,7 @@
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
     import {capitalize} from "$lib/stringutil/lib"
+    import { getEstadoNombre } from "../estadosutils/lib";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let id = $state("")
@@ -127,34 +128,7 @@
                 }
             }))
         }
-        /*
-        for (let i = 0; i < historialeventos.length; i++) {
-            if (inseminaciones.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Inseminación"
-            }
-            if (pariciones.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Parición"
-            }
-            if (tactos.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Tacto"
-            }
-            if (tratamientos.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Tratamiento"
-            }
-            if (pesajes.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Pesaje"
-            }
-            if (observaciones.includes(historialeventos[i])) {
-                historialeventos[i].nombre = "Observación"
-            }
-        }
-            */
         historialeventos.sort((h1,h2)=>new Date(h1.fecha)< new Date(h2.fecha)?1:-1)
-    }
-
-    function getEstadoNombre(estado){
-        let e = estados.filter(est=>est.id==estado)[0]
-        return e.nombre
     }
 
     function prepararData(item){

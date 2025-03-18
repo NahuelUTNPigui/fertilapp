@@ -7,6 +7,7 @@
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
     import {capitalize} from "$lib/stringutil/lib"
+    import { getEstadoNombre } from "../estadosutils/lib";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let id = $state("")
@@ -20,10 +21,7 @@
         })
 
     }
-    function getEstadoNombre(estado){
-        let e = estados.filter(est=>est.id==estado)[0]
-        return e.nombre
-    }
+    
     onMount(async ()=>{
         id = $page.params.slug
         await getHistorial()
