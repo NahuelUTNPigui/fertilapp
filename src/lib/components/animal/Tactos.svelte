@@ -86,7 +86,7 @@
     }
     async function getTactos(){
         const recordst = await pb.collection('tactos').getFullList({
-            filter:`animal='${id}'`,
+            filter:`animal='${id}' && active = true`,
             sort: '-created'
         });
         tactos = recordst

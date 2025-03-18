@@ -46,7 +46,7 @@
         }
 
         let sheetrodeos = wkbk.Sheets.Rodeos
-        console.log(wkbk.Sheets.Rodeos)
+        
         if(!sheetrodeos){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
@@ -95,11 +95,11 @@
 
             try{
                 const record = await pb.collection('rodeos').getFirstListItem(`nombre="${ro.nombre}"`,{});
-                console.log("mod")
+                
                 await pb.collection('rodeos').update(record.id, datamod);               
             }
             catch(err){
-                console.log("Add")
+                
                 await pb.collection('rodeos').create(dataadd);
 
             }

@@ -173,10 +173,10 @@
             try{
                 //Agregar Tacto si no existe
                 
-                console.log(ta.fecha)
+                
                 
                 let fecha = ta.fecha.toISOString().split("T")[0] + " 03:00:00"
-                console.log(fecha)
+                
                 dataadd.fecha = fecha
             }
             catch(err){

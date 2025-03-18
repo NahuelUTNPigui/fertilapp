@@ -20,7 +20,9 @@
     import { getEstadoNombre,getEstadoColor } from '$lib/components/estadosutils/lib';
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     import cuentas from '$lib/stores/cuentas';
-    import { getSexoNombre } from '$lib/stringutil/lib';
+    import { getSexoNombre,capitalize } from '$lib/stringutil/lib';
+
+    
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -385,12 +387,12 @@
                 "":
                 "",
             LOTE:item.expand?
-                item.expand.rodeo?
-                item.expand.rodeo.nombre:
+                item.expand.lote?
+                item.expand.lote.nombre:
                 "":
                 "",
-            CATEGORIA:item.categoria,
-            ESTADO:item.prenada == 2?"Preñada":item.prenada==1?"Dudosa":"Vacía",
+            CATEGORIA:capitalize(item.categoria),
+            ESTADO:getEstadoNombre(item.prenada),
             FALLECIMIENTO:item.fechafallecimiento?new Date(item.fechafallecimiento).toLocaleDateString():""
 
         }

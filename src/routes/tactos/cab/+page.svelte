@@ -75,7 +75,7 @@
     }
     async function getTactos(){
         const recordst = await pb.collection('tactos').getFullList({
-            filter:`cab='${cab.id}' && active=true`,
+            filter:`cab='${cab.id}' && active=True`,
             sort: '-fecha',
             expand:"animal"
         });
