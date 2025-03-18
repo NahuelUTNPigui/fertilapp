@@ -86,7 +86,7 @@
             }
         }
         catch(e){
-            console.log(e)
+            console.error(e)
             Swal.fire('Error login', 'No se puede logear, puede que esten mal escritas las credenciales', 'error');
         }
         

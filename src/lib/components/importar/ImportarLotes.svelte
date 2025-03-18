@@ -104,11 +104,11 @@
 
             try{
                 const record = await pb.collection('lotes').getFirstListItem(`nombre="${lo.nombre}"`,{});
-                console.log("mod")
+                
                 await pb.collection('lotes').update(record.id, datamod);               
             }
             catch(err){
-                console.log("Add")
+                
                 await pb.collection('lotes').create(dataadd);
 
             }

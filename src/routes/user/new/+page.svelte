@@ -133,7 +133,7 @@
             Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario. Ingrese a la aplicación', 'success');
             goto("/")
         }catch(e){
-            console.log(e)
+            console.error(e)
             Swal.fire('Error guardar', 'No se puede crear el nuevo usuario', 'error');
         }
         

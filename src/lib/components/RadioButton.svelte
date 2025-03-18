@@ -18,7 +18,7 @@
         <button id={op.id} onclick={()=>select(op.id)} 
             disabled={deshabilitado}
             class={`
-                flex-1 m-1 py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 ease-in-out
+                flex-1 m-1 py-2 px-2 rounded-lg font-medium text-sm transition-all duration-200 ease-in-out
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
                 ${option==op.id?
                     "bg-green-600 text-white shadow-lg transform scale-105":

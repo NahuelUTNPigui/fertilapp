@@ -514,6 +514,13 @@
                       
                     </div>
                     <div class="flex items-start">
+                        <span >Peso:</span> 
+                        <span class="font-semibold">
+                          {a.peso}
+                        </span>
+                        
+                      </div>
+                    <div class="flex items-start">
                       <span >Lote:</span>
                       <span class="font-semibold">
                         {
@@ -577,7 +584,7 @@
             />
             
         </label>
-        <div class="w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
+        <div class="hidden w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
             <table class="table table-lg w-full " >
                 <thead>
                     <tr>
@@ -593,19 +600,71 @@
                             <td class="text-base p-0">{a.caravana}</td>
                             <td class="text-base p-0">{a.peso}</td>
                             <td class="">
-                                <input
-                                  
-                                  bind:value={selectanimales[i].pesonuevo}
-                                  
-                                  class="w-20 px-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  
-                                />
+                                <label class="input-group">
+
+                                
+                                    <input
+                                    
+                                    bind:value={selectanimales[i].pesonuevo}
+                                    
+                                    class={`
+                                        input input-bordered w-full
+                                        border border-gray-300 rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 focus:border-green-500
+                                        ${estilos.bgdark2}
+                                    `}
+                                    
+                                    />
+                                </label>
                               </td>
                             
                         </tr>
                     {/each}
                 </tbody>
             </table>
+        </div>
+        <div class="block  justify-items-center mx-1">
+            {#each selectanimales as a,i}
+            <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
+                <div class="block p-4">
+                    <div class="grid grid-cols-2 gap-y-2">
+                        <div class="flex items-start col-span-2">
+                            <span >Caravana:</span> 
+                            <span class="font-semibold">
+                              {a.caravana}
+                            </span>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            <span >Peso:</span> 
+                            <span class="font-semibold">
+                              {a.peso}
+                            </span>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            <label class="input-group">
+
+                                
+                                <input
+                                
+                                bind:value={selectanimales[i].pesonuevo}
+                                
+                                class={`
+                                    input input-bordered w-full
+                                    border border-gray-300 rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                                
+                                />
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {/each}
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >

@@ -15,6 +15,7 @@
     import tipostacto from '$lib/stores/tipostacto';
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
     import { getSexoNombre } from '$lib/stringutil/lib';
+    import RadioButton from "$lib/components/RadioButton.svelte";
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -190,10 +191,7 @@
         }
         tactoMasivo.showModal()
     }
-    function getEstadoName(est) {
-        let estado = estados.filter(e=>e.id==est)[0]
-        return estado.nombre
-    }
+    
     async function crearBulkTactos() {
         if(fecha == ""){
             Swal.fire("Error tactos","Debe seleccionar una fecha","error")
@@ -657,7 +655,6 @@
                       <span class="font-semibold">
                         {a.categoria}
                       </span>
-                      
                     </div>
                     <div class="flex items-start">
                       <span >Lote:</span>
@@ -785,7 +782,7 @@
                     />
             </div>
         </div>
-        <div class="w-full grid grid-cols-1 justify-items-start " >
+        <div class="hidden w-full grid grid-cols-1 justify-items-start " >
             <div class="flex overflow-x-auto">
                 <table class="table table-lg w-full w-11/12" >
                     <thead>
@@ -801,7 +798,7 @@
                         {#each selectanimales as a,i}
                             <tr>
                                 <td class="text-base">{a.caravana}</td>
-                                <td class="text-base ">{getEstadoName(a.prenada)}</td>
+                                <td class="text-base ">{getEstadoNombre(a.prenada)}</td>
                                 <td>
                                     <label class="input-group ">
                                         <select 
@@ -843,6 +840,49 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="block  justify-items-center mx-1">
+            {#each selectanimales as a,i}
+            <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
+                <div class="block p-4">
+                    <div class="grid grid-cols-2 gap-y-2">
+                        <div class="flex items-start col-span-2">
+                            <span >Caravana:</span> 
+                            <span class="font-semibold">
+                              {a.caravana}
+                            </span>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            <span >Estado actual:</span> 
+                            <span class="font-semibold">
+                                {getEstadoNombre(a.prenada)}
+                            </span>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            
+                            <RadioButton class="m-1 my-3" bind:option={selectanimales[i].estadonuevo} deshabilitado={false}/>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            
+                            <input
+                                bind:value={selectanimales[i].observacion}
+                                placeholder="Observación"
+                                class={`
+                                    h-12 border border-gray-300
+                                    px-2 
+                                    w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/each}
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >

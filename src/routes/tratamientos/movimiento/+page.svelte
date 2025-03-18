@@ -719,7 +719,7 @@
                 />
             </div>
         </div>
-        <div class="w-full grid grid-cols-1 justify-items-start " >
+        <div class="hidden w-full grid grid-cols-1 justify-items-start " >
             <div class="flex overflow-x-auto">
                 <table class="table table-lg w-full" >
                     <thead>
@@ -755,6 +755,40 @@
                     </tbody>
                 </table> 
             </div>
+        </div>
+        <div class="block  justify-items-center mx-1">
+            {#each selectanimales as a,i}
+            <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
+                <div class="block p-4">
+                    <div class="grid grid-cols-2 gap-y-2">
+                        <div class="flex items-start col-span-2">
+                            <span >Caravana:</span> 
+                            <span class="font-semibold">
+                              {a.caravana}
+                            </span>
+                        </div>
+                        <div class="flex items-start col-span-2">
+                            
+                            
+                            <input
+                                bind:value={selectanimales[i].observacion}
+                                placeholder="Observación"
+                                class={`
+                                    h-12 border border-gray-300
+                                    px-2 
+                                    w-full
+                                    rounded-md
+                                    focus:outline-none focus:ring-2 
+                                    focus:ring-green-500 
+                                    focus:border-green-500
+                                    ${estilos.bgdark2}
+                                `}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/each}
         </div>
         <div class="modal-action justify-start ">
             <form method="dialog" >
