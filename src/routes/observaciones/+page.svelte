@@ -377,6 +377,8 @@
                     filtros = {[]}
                     confiltros = {false}
                     data = {observacionesrow}
+                    sheetname = {"Observaciones"}
+                    establecimiento = {cab.nombre}
                     {prepararData}
                 />
             </div>

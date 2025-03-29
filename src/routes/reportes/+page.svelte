@@ -73,7 +73,8 @@
         {nombre: "Ternera", total: 0, pesoProm: 0},
         {nombre: "Novillo", total: 0, pesoProm: 0},
         {nombre: "Torito", total: 0, pesoProm: 0},
-        {nombre: "Toro", total: 0, pesoProm: 0}
+        {nombre: "Toro", total: 0, pesoProm: 0},
+        {nombre: "Sin categoria", total: 0, pesoProm: 0}
     ])
     
     let categoriasrodeosrows = $state([])
@@ -93,17 +94,24 @@
                 categoriasrows[2].nombre,
                 categoriasrows[3].nombre,
                 categoriasrows[4].nombre,
-                categoriasrows[5].nombre],
+                categoriasrows[5].nombre,
+                categoriasrows[6].nombre,
+                categoriasrows[7].nombre
+            ],
+                
                 datasets: [
                     {
                         label: "Pesos promedios por categoria",
                         
-                        data: [categoriasrows[0].pesoProm,
-                        categoriasrows[1].pesoProm,
-                        categoriasrows[2].pesoProm,
-                        categoriasrows[3].pesoProm,
-                        categoriasrows[4].pesoProm,
-                        categoriasrows[5].pesoProm
+                        data: [
+                            categoriasrows[0].pesoProm,
+                            categoriasrows[1].pesoProm,
+                            categoriasrows[2].pesoProm,
+                            categoriasrows[3].pesoProm,
+                            categoriasrows[4].pesoProm,
+                            categoriasrows[5].pesoProm,
+                            categoriasrows[6].pesoProm,
+                            categoriasrows[7].pesoProm
                         ]
                     }
                 ]
@@ -126,7 +134,9 @@
                             rodeos[i].categoriasrodeos[2].pesoProm,
                             rodeos[i].categoriasrodeos[3].pesoProm,
                             rodeos[i].categoriasrodeos[4].pesoProm,
-                            rodeos[i].categoriasrodeos[5].pesoProm
+                            rodeos[i].categoriasrodeos[5].pesoProm,
+                            rodeos[i].categoriasrodeos[6].pesoProm,
+                            rodeos[i].categoriasrodeos[7].pesoProm
                         ]
             }
             ds.push(d)
@@ -140,7 +150,9 @@
                     categoriasrows[2].nombre,
                     categoriasrows[3].nombre,
                     categoriasrows[4].nombre,
-                    categoriasrows[5].nombre
+                    categoriasrows[5].nombre,
+                    categoriasrows[6].nombre,
+                    categoriasrows[7].nombre
                 ],
                 datasets: ds
             }            
@@ -162,9 +174,12 @@
                             lotes[i].categoriaslotes[2].pesoProm,
                             lotes[i].categoriaslotes[3].pesoProm,
                             lotes[i].categoriaslotes[4].pesoProm,
-                            lotes[i].categoriaslotes[5].pesoProm
+                            lotes[i].categoriaslotes[5].pesoProm,
+                            lotes[i].categoriaslotes[6].pesoProm,
+                            lotes[i].categoriaslotes[7].pesoProm
                         ]
             }
+
             ds.push(d)
         }
         chartPersonalizadoLotes = new Chart(ctxPersonalizadoLotes, {
@@ -175,48 +190,14 @@
                 categoriasrows[2].nombre,
                 categoriasrows[3].nombre,
                 categoriasrows[4].nombre,
-                categoriasrows[5].nombre],
+                categoriasrows[5].nombre,
+                categoriasrows[6].nombre,
+                categoriasrows[7].nombre],
                 datasets: ds
             }            
         });
     }
 
-    function createChartTest(){
-        ctxTest = canvasTest.getContext('2d');
-        if (chartTest) {
-            chartTest.destroy();
-        }
-        let ds = []
-        for(let i = 0;i<rodeos.length;i++){
-            let d = {
-                label: "Pesos promedios por categoria "+rodeos[i].nombre,
-                data: [
-                            rodeos[i].categoriasrodeos[0].pesoProm,
-                            rodeos[i].categoriasrodeos[1].pesoProm,
-                            rodeos[i].categoriasrodeos[2].pesoProm,
-                            rodeos[i].categoriasrodeos[3].pesoProm,
-                            rodeos[i].categoriasrodeos[4].pesoProm,
-                            rodeos[i].categoriasrodeos[5].pesoProm
-                        ]
-            }
-            ds.push(d)
-        }
-
-        chartTest = new Chart(ctxTest, {
-            type:"bar",
-            data:{
-                labels: [
-                    categoriasrows[0].nombre,
-                    categoriasrows[1].nombre,
-                    categoriasrows[2].nombre,
-                    categoriasrows[3].nombre,
-                    categoriasrows[4].nombre,
-                    categoriasrows[5].nombre
-                ],
-                datasets:ds
-            }
-        })
-    }
 
     function openNewModal(){
         nuevoModal.showModal()
@@ -255,6 +236,7 @@
         let pesoNovillo = 0
         let pesoTorito = 0
         let pesoToro = 0
+        let pesoSin = 0
 
         for (let i = 0; i < animales.length; i++) {
             if (animales[i].categoria == "vaca"){
@@ -285,6 +267,10 @@
                 categoriasrows[6].total += 1
                 pesoToro += animales[i].peso
             }
+            if (animales[i].categoria == ""){
+                categoriasrows[7].total += 1
+                pesoSin += animales[i].peso
+            }
         }
 
         categoriasrows[0].pesoProm = categoriasrows[0].total==0? 0 : Number((pesoVaca / categoriasrows[0].total).toFixed(2))
@@ -294,6 +280,7 @@
         categoriasrows[4].pesoProm = categoriasrows[4].total==0? 0 :Number((pesoNovillo / categoriasrows[4].total).toFixed(2))
         categoriasrows[5].pesoProm = categoriasrows[5].total==0? 0 :Number((pesoTorito / categoriasrows[5].total).toFixed(2))
         categoriasrows[6].pesoProm = categoriasrows[6].total==0? 0 :Number((pesoToro / categoriasrows[6].total).toFixed(2))
+        categoriasrows[7].pesoProm = categoriasrows[7].total==0? 0 :Number((pesoSin / categoriasrows[7].total).toFixed(2))
 
         createChart()
     }
@@ -307,6 +294,7 @@
         lotes = records
         ordenar(lotes)
         lotesrows = lotes
+        
         for(let i = 0;i<lotes.length;i++){
             opensFilterlotes.push(false)
             let total = await getAnimalesTotalLotes(lotes[i].id)
@@ -319,7 +307,8 @@
                 {nombre: "Ternera", total: 0, pesoProm: 0},
                 {nombre: "Novillo", total: 0, pesoProm: 0},
                 {nombre: "Torito", total: 0, pesoProm: 0},
-                {nombre: "Toro", total: 0, pesoProm: 0}
+                {nombre: "Toro", total: 0, pesoProm: 0},
+                {nombre: "Sin categoria", total: 0, pesoProm: 0},
             ]
 
             let pesoVaca = 0
@@ -330,7 +319,9 @@
             let pesoTorito = 0
             let pesoToro = 0
             let pesoLote = 0
+            let pesoSin = 0
             for (let j = 0;j<animales.length;j++){
+                
                 pesoLote += animales[j].peso
                 if (animales[j].categoria == "vaca" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[0].total += 1
@@ -359,6 +350,10 @@
                 if (animales[j].categoria == "toro" && animales[j].lote == lotes[i].id){
                     lotes[i].categoriaslotes[6].total += 1
                     pesoToro += animales[j].peso
+                }
+                if (animales[j].categoria == "" && animales[j].lote == lotes[i].id){
+                    lotes[i].categoriaslotes[7].total += 1
+                    pesoSin += animales[j].peso
                 }
             }
 
@@ -403,8 +398,15 @@
             } else {
                 lotes[i].categoriaslotes[6].pesoProm = Number((pesoToro / lotes[i].categoriaslotes[6].total).toFixed(2))
             }
+            
+            if (pesoSin == 0) {
+                lotes[i].categoriaslotes[7].pesoProm = 0  
+            } else {
+                lotes[i].categoriaslotes[7].pesoProm = Number((pesoSin / lotes[i].categoriaslotes[7].total).toFixed(2))
+            }
+
             lotes[i].pesoProm = lotes[i].total == 0? 0 : Number((pesoLote / lotes[i].total).toFixed(2))
-            //lotes[i].chart = createChartPersonalizadoLotes(i)
+
         }
         createChartPersonalizadoLotes()
         
@@ -433,6 +435,7 @@
             let pesoTorito = 0
             let pesoToro = 0
             let pesoRodeo = 0
+            let pesoSin = 0
             rodeos[i].categoriasrodeos = [
                 {nombre: "Vaca", total: 0, pesoProm: 0},
                 {nombre: "Vaquillona", total: 0, pesoProm: 0},
@@ -440,7 +443,8 @@
                 {nombre: "Ternera", total: 0, pesoProm: 0},
                 {nombre: "Novillo", total: 0, pesoProm: 0},
                 {nombre: "Torito", total: 0, pesoProm: 0},
-                {nombre: "Toro", total: 0, pesoProm: 0}
+                {nombre: "Toro", total: 0, pesoProm: 0},
+                {nombre: "Sin categoria", total: 0, pesoProm: 0}
             ]
 
             for (let j = 0;j<animales.length;j++){
@@ -472,6 +476,11 @@
                 if (animales[j].categoria == "toro" && animales[j].rodeo == rodeos[i].id){
                     rodeos[i].categoriasrodeos[6].total += 1
                     pesoToro += animales[j].peso
+                }
+
+                if (animales[j].categoria == "" && animales[j].rodeo == rodeos[i].id){
+                    rodeos[i].categoriasrodeos[7].total += 1
+                    pesoSin += animales[j].peso
                 }
             }
 
@@ -516,6 +525,11 @@
             } else {
                 rodeos[i].categoriasrodeos[6].pesoProm = Number((pesoToro / rodeos[i].categoriasrodeos[6].total).toFixed(2))
             }
+            if (pesoSin == 0) {
+                rodeos[i].categoriasrodeos[7].pesoProm = 0  
+            } else {
+                rodeos[i].categoriasrodeos[7].pesoProm = Number((pesoSin / rodeos[i].categoriasrodeos[7].total).toFixed(2))
+            }
             rodeos[i].pesoProm = rodeos[i].total == 0? 0: Number((pesoRodeo / rodeos[i].total).toFixed(2))
             
         }     
@@ -532,14 +546,14 @@
 
     async function getAnimalesTotalRodeos(id){
         const results = await pb.collection('animales').getList(1, 10, {
-            filter: `active = true && delete = false && rodeo='${id}' `,
+            filter: `active = true && delete = false && rodeo='${id}' && cab = '${cab.id}'`,
         });
         return results.totalItems
     }
 
     async function getAnimalesTotalLotes(id){
         const results = await pb.collection('animales').getList(1, 10, {
-            filter: `active = true && delete = false && lote='${id}'`,
+            filter: `active = True && delete = false && lote='${id}' && cab = '${cab.id}'`,
         });
         return results.totalItems
     }

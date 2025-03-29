@@ -26,7 +26,6 @@
     let caber = createCaber()
     let userer = createUserer()
     let cab = caber.cab
-    let usuarioid = userer.userid
     let caravana = $state("")
     let cargado = $state(false)
     let esservicio = $state(false)
@@ -296,6 +295,8 @@
                     filtros={[]}
                     confiltros={false}
                     data = {serviciosrow}
+                    sheetname = {"Servicios"}
+                    establecimiento = {cab.nombre}
                     {prepararData}
                 />
             </div>

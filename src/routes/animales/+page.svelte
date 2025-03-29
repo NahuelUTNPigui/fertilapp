@@ -32,7 +32,7 @@
     let per = createPer()
     let cab = caber.cab
     let userpermisos = getPermisosList(per.per.permisos)
-    let usuarioid = userer.userid
+    let usuarioid = $state("")
     let filtros = false
 
 
@@ -188,10 +188,9 @@
         let user = await pb.collection("users").getOne(usuarioid)
         
         let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        
         let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
         let verificar = true
-        if(nivel.animales != -1 && animals.totalItems > nivel.animales){
+        if(nivel.animales != -1 && animals.totalItems >= nivel.animales){
             verificar =  false
         }
         
@@ -279,20 +278,41 @@
         }
         
         if(rodeoseleccion.length != 0){
-            animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
-            totalAnimalesEncontrados = animalesrows.length
+            if(rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.rodeo)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
         }
         if(loteseleccion.length != 0){
-            animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
-            totalAnimalesEncontrados = animalesrows.length
+            if(loteseleccion.length == 1 && loteseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.lote)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
         }
         if(estadobuscar != ""){
             animalesrows = animalesrows.filter(a=>a.prenada == estadobuscar)
             totalAnimalesEncontrados = animalesrows.length
         }
         if(categoriaseleccion.length != 0){
-            animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
-            totalAnimalesEncontrados = animalesrows.length
+            if(categoriaseleccion.length == 1 && categoriaseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.categoria)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
         }
         if(activosbuscar == "activos"){
             animalesrows = animalesrows.filter(a=>a.active == true)
@@ -417,7 +437,9 @@
             </div>
             <div>
                 <Exportar
-                titulo = {"Animales"}
+                titulo = {`${cab.nombre}_${new Date().toLocaleDateString().replace("/","-")}_Animales`}
+                sheetname = {"Animales"}
+                establecimiento={cab.nombre}
                 filtros = {[]}
                 confiltros = {false}
                 data = {animalesrows}
@@ -475,17 +497,17 @@
         </div>
         {#if isOpenFilter}
                 <div transition:slide>
-                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
-                        <div class="mt-2">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
+                        <div class="mt-0">
                             <MultiSelect
-                                opciones={rodeos}
+                                opciones={[{id:"-1",nombre:"Sin rodeo"}].concat(rodeos)}
                                 bind:valores={rodeoseleccion}
                                 etiqueta="Rodeos"
                                 filterUpdate = {filterUpdate}
                             />
                         </div>
-                        <div class="mt-2">
-                            <label for = "sexo" class="label mb-2">
+                        <div class="my-0 py-0">
+                            <label for = "sexo" class="label mb-0">
                                 <span class="label-text text-base">Sexo</span>
                             </label>
                             <label class="input-group ">
@@ -509,93 +531,22 @@
                                   </select>
                             </label>
                         </div>
-                        <div class="hidden">
-                            <label for = "rodeos" class="label">
-                                <span class="label-text text-base">Rodeo</span>
-                            </label>
-                            <label class="input-group ">
-                                <select 
-                                    class={`
-                                        select select-bordered w-full
-                                        rounded-md
-                                        focus:outline-none 
-                                        focus:ring-2 
-                                        focus:ring-green-500 focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `} 
-                                    bind:value={rodeobuscar}
-                                    onchange={filterUpdate}
-                                >
-                                        <option value="">Todos</option>
-                                        {#each rodeos as r}
-                                            <option value={r.id}>{r.nombre}</option>    
-                                        {/each}
-                                  </select>
-                            </label>
-                        </div>
-                        <div class="mt-2">
+                        <div class="mt-0">
                             <MultiSelect
-                                opciones={lotes}
+                                opciones={[{id:"-1",nombre:"Sin lote"}].concat(lotes)}
                                 bind:valores={loteseleccion}
                                 etiqueta="Lotes"
                                 filterUpdate = {filterUpdate}
                             />
                         </div>
-                        <div class="hidden">
-                            <label for = "lote" class="label">
-                                <span class="label-text text-base">Lote</span>
-                            </label>
-                            <label class="input-group ">
-                                <select 
-                                    class={`
-                                        select select-bordered w-full
-                                        rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `}
-                                    bind:value={lotebuscar}
-                                    onchange={filterUpdate}
-                                >
-                                        <option value="">Todos</option>
-                                        {#each lotes as s}
-                                            <option value={s.id}>{s.nombre}</option>
-                                        {/each}
-                                  </select>
-                            </label>
-                        </div>
-                        <div class="mt-2">
+                        <div class="">
                             <MultiSelect
-                                opciones={categorias}
+                                opciones={[{id:"-1",nombre:"Sin categoria"}].concat(categorias)}
                                 bind:valores={categoriaseleccion}
                                 etiqueta="Categorias"
+                                margintop="mt-0"
                                 filterUpdate = {filterUpdate}
                             />
-                        </div>
-                        <div class="hidden">
-                            <label for = "categoria" class="label">
-                                <span class="label-text text-base">Categoria</span>
-                            </label>
-                            <label class="input-group ">
-                                <select 
-                                    class={`
-                                        select select-bordered w-full
-                                        rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `}
-                                    bind:value={categoriabuscar}
-                                    onchange={filterUpdate}
-                                >
-                                        <option value="">Todos</option>
-                                        {#each categorias as s}
-                                            <option value={s.id}>{s.nombre}</option>
-                                        {/each}
-                                  </select>
-                            </label>
                         </div>
                         <div>
                             <label for = "estado" class="label">
@@ -622,7 +573,7 @@
                             </label>
                         </div>
                         <div>
-                            <label for = "rodeos" class="label">
+                            <label for = "activos" class="label">
                                 <span class="label-text text-base">Activos</span>
                             </label>
                             <label class="input-group ">

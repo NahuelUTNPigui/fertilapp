@@ -14,6 +14,8 @@
     let tokencolab = $state("")
     let username = $state("")
     let usermail = $state("")
+    let totalanimales = $state(0)
+    let totalesta = $state(0)
     let nombre = $state("")
     let nivel = $state("")
     let apellido = $state("")
@@ -140,6 +142,12 @@
         let light = !darker.dark
         tokencolab = pb_json.record.codigo
         cab = caber.cab
+        const resans = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}' && active = true`})
+        const rescab = await pb.collection('cabs').getList(1, 1, {
+            filter: `user = '${usuarioid}' && active = true`,
+        });
+        totalanimales = resans.totalItems
+        totalesta = rescab.totalItems
     })
 </script>
 <Navbarr>
@@ -297,15 +305,35 @@
             {tokencolab}
         </label>
         <h2 class="mt-3 text-xl font-semibold">Plan </h2>
-        <label for="codigo " 
+        <label for="nivel " 
             class={`mt-2 block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
         >
             Nivel:
         </label>
-        <label for="codigo" 
+        <label for="nivel" 
             class={`mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
         >
             {nivel}
+        </label>
+        <label for="animales " 
+            class={`mt-2 block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            Animales en la cuenta:
+        </label>
+        <label for="animales" 
+            class={`mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            {totalanimales}
+        </label>
+        <label for="esta " 
+            class={`mt-2 block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            Establecimientos en la cuenta:
+        </label>
+        <label for="esta" 
+            class={`mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1`}
+        >
+            {totalesta}
         </label>
         <div class="mt-2 flex justify-start">
             <button

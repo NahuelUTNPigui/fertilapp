@@ -34,6 +34,8 @@
     let rodeo = $state("")
     let loteseleccion = $state([])
     let rodeoseleccion = $state([])
+    let categoriaseleccion = $state([])
+
     let categoria = $state("")
     let sexo = $state("H")
 
@@ -92,6 +94,39 @@
         }
         if(categoria != ""){
             animalesrows = animalesrows.filter(a=>a.categoria == categoria)
+        }
+        if(rodeoseleccion.length != 0){
+            if(rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.rodeo)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
+        }
+        if(loteseleccion.length != 0){
+            if(loteseleccion.length == 1 && loteseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.lote)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
+        }
+        if(categoriaseleccion.length != 0){
+            if(categoriaseleccion.length == 1 && categoriaseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.categoria)
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
+                totalAnimalesEncontrados = animalesrows.length
+            }
+            
         }
 
     }
@@ -320,7 +355,7 @@
             <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
         </div>
         {#if isOpenFilter}
-        <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
+        <div transition:slide class="grid grid-cols-1 lg:grid-cols-4  m-1 gap-2 w-11/12" >
             <div>
                 <label for = "sexo" class="label">
                     <span class="label-text text-base">Sexo</span>
@@ -345,7 +380,32 @@
                     </select>
                 </label>
             </div>
-            <div>
+            <div class="mt-0">
+                <MultiSelect
+                    opciones={[{id:"-1",nombre:"Sin rodeo"}].concat(rodeos)}
+                    bind:valores={rodeoseleccion}
+                    etiqueta="Rodeos"
+                    filterUpdate = {filterUpdate}
+                />
+            </div>
+            <div class="mt-0">
+                <MultiSelect
+                    opciones={[{id:"-1",nombre:"Sin lote"}].concat(lotes)}
+                    bind:valores={loteseleccion}
+                    etiqueta="Lotes"
+                    filterUpdate = {filterUpdate}
+                />
+            </div>
+            <div class="">
+                <MultiSelect
+                    opciones={[{id:"-1",nombre:"Sin categoria"}].concat(categorias)}
+                    bind:valores={categoriaseleccion}
+                    etiqueta="Categorias"
+                    
+                    filterUpdate = {filterUpdate}
+                />
+            </div>
+            <div class="hidden">
                 <label for = "rodeos" class="label">
                     <span class="label-text text-base">Rodeos</span>
                 </label>
@@ -369,7 +429,7 @@
                     </select>
                 </label>
             </div>
-            <div>
+            <div class="hidden">
                 <label for = "rodeos" class="label">
                     <span class="label-text text-base">Lotes</span>
                 </label>
@@ -393,7 +453,7 @@
                     </select>
                 </label>
             </div>
-            <div>
+            <div class="hidden">
                 <label for = "rodeos" class="label">
                     <span class="label-text text-base">Categorias</span>
                 </label>

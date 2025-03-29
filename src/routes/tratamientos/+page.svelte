@@ -458,6 +458,8 @@
                     filtros = {[]}
                     confiltros = {false}
                     data = {tratamientosrow}
+                    sheetname = {"Tratamientos"}
+                    establecimiento = {cab.nombre}
                     {prepararData}
                 />
             </div>

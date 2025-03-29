@@ -16,6 +16,7 @@
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
     import { getSexoNombre } from '$lib/stringutil/lib';
     import RadioButton from "$lib/components/RadioButton.svelte";
+    import MultiSelect from '$lib/components/MultiSelect.svelte';
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -34,6 +35,9 @@
     let rodeo = $state("")
     let categoria = $state("")
     let sexo = $state("H")
+    let rodeoseleccion = $state([])
+    let loteseleccion = $state([])
+    let categoriaseleccion = $state([])
 
     let lotes = $state([])
     let rodeos = $state([])
@@ -93,6 +97,33 @@
         }
         if(categoria != ""){
             animalesrows = animalesrows.filter(a=>a.categoria == categoria)
+        }
+        if(rodeoseleccion.length != 0){
+            if(rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.rodeo)
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
+                
+            }
+        }
+        if(loteseleccion.length != 0){
+            if(loteseleccion.length == 1 && loteseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.lote)
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
+            }
+            
+        }
+        if(categoriaseleccion.length != 0){
+            if(categoriaseleccion.length == 1 && categoriaseleccion[0] == "-1"){
+                animalesrows = animalesrows.filter(a=>!a.categoria)
+            }
+            else{
+                animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
+            }
+            
         }
 
     }
@@ -417,9 +448,33 @@
             <h3 class=" text-md py-2">Animales seleccionados: {Object.keys(selecthashmap).length}</h3>
         </div>
         {#if isOpenFilter}
-            <div transition:slide class="grid grid-cols-2 lg:grid-cols-4  m-1 gap-2 w-11/12" >
-                
-                <div>
+            <div transition:slide class="grid grid-cols-1 lg:grid-cols-4  m-1 gap-2 w-11/12" >
+                <div class="mt-0">
+                    <MultiSelect
+                        opciones={[{id:"-1",nombre:"Sin rodeo"}].concat(rodeos)}
+                        bind:valores={rodeoseleccion}
+                        etiqueta="Rodeos"
+                        filterUpdate = {filterUpdate}
+                    />
+                </div>
+                <div class="mt-0">
+                    <MultiSelect
+                        opciones={[{id:"-1",nombre:"Sin lote"}].concat(lotes)}
+                        bind:valores={loteseleccion}
+                        etiqueta="Lotes"
+                        filterUpdate = {filterUpdate}
+                    />
+                </div>
+                <div class="">
+                    <MultiSelect
+                        opciones={[{id:"-1",nombre:"Sin categoria"}].concat(categorias)}
+                        bind:valores={categoriaseleccion}
+                        etiqueta="Categorias"
+                        
+                        filterUpdate = {filterUpdate}
+                    />
+                </div>
+                <div class="hidden">
                     <label for = "rodeos" class="label">
                         <span class="label-text text-base">Rodeos</span>
                     </label>
@@ -443,7 +498,7 @@
                         </select>
                     </label>
                 </div>
-                <div>
+                <div class="hidden">
                     <label for = "lotes" class="label">
                         <span class="label-text text-base">Lotes</span>
                     </label>
@@ -467,7 +522,7 @@
                         </select>
                     </label>
                 </div>
-                <div>
+                <div class="hidden">
                     <label for = "categorias" class="label">
                         <span class="label-text text-base">Categorias</span>
                     </label>
@@ -491,15 +546,9 @@
                         </select>
                     </label>
                 </div>
-                <div class="mt-3">
-                    <br>
-                    <button
-                        class=" btn btn-neutral"
-                        onclick={limpiar}
-                    >
-                        Limpiar
-                    </button>
-                </div>
+                <button class="btn btn-neutral" onclick={limpiar}>
+                    Limpiar
+                </button>
                 
             </div>
         {/if}

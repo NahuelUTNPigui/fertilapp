@@ -68,6 +68,8 @@
         try{
             const data = {
                 active: false,
+                lote:"",
+                rodeo:"",
                 fechafallecimiento: fechafallecimiento +  " 03:00:00",
                 motivobaja:motivo
 
@@ -89,7 +91,9 @@
         try{
             const data = {
                 delete: true,
-                active:false
+                active:false,
+                lote:"",
+                rodeo:""
             };
 
             const record = await pb.collection('animales').update(slug, data);  
@@ -103,15 +107,14 @@
     }
     async function transferir(codigo){
         const resultcab = await pb.collection('cabs').getList(1, 1, {
-            filter: `active = true && codigo = '${codigo}'`,
-            
+            filter: `active = true && codigo = '${codigo}'`,    
         });
-        
-
         try{
             
             let data = {
                 cab:resultcab.items[0].id,
+                lote:"",
+                rodeo:""
             }
             
             const record = await pb.collection('animales').update(slug, data);

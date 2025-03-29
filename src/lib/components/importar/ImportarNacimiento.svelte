@@ -5,9 +5,11 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    let {animales,animalesusuario} = $props()
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
     let cab = caber.cab
+    let usuarioid = $state("")
     let loading = $state(false)
 
     const pb = new PocketBase(ruta);
@@ -15,7 +17,7 @@
     let wkbk = $state(null)
     let lotes = $state([])
     let rodeos = $state([])
-    let animales = $state([])
+    let nacimientos = $state([])
     let padres = $state([])
     let madres = $state([])
 
@@ -70,7 +72,7 @@
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
         
-        let animales = []
+        let nacimientos = []
         let animaleshashmap = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetanimales)) {
@@ -141,8 +143,23 @@
                 }          
             }
         }
+        let nuevoanimales = 0
+        let errornuevoanimales = false
         for (const [key, value ] of Object.entries(animaleshashmap)) {
-            animales.push(value)
+            nacimientos.push(value)
+            let conocido = animales.filter(a=>a.caravana == value.caravana).length == 0
+            if(! conocido ){
+                nuevoanimales += 1
+            }
+        }
+        if(nivel.animales != -1 && animalesusuario + nuevoanimales >= nivel.animales){
+            errornuevoanimales = true
+            filename = ""
+            loading = false
+            wkbk = null
+            Swal.fire("Error importar","No tienes el plan para agregar mas animales","error")
+            return 
+            
         }
         for(let i = 0;i<animales.length;i++){
             let an = animales[i]
@@ -215,9 +232,13 @@
                 }
             }
             catch(err){
-                const recordnacimiento = await pb.collection('nacimientos').create( datanacimiento);
-                dataadd.nacimiento = recordnacimiento.id
-                await pb.collection('animales').create(dataadd);
+                
+                if(!errornuevoanimales){
+                    const recordnacimiento = await pb.collection('nacimientos').create( datanacimiento);
+                    dataadd.nacimiento = recordnacimiento.id
+                    await pb.collection('animales').create(dataadd);
+                }
+                
             }
         }
         filename = ""
@@ -227,6 +248,8 @@
         
     }
     onMount(async ()=>{
+        let pb_json =  JSON.parse(localStorage.getItem('pocketbase_auth'))
+        usuarioid = pb_json.record.id
         rodeos = await pb.collection('rodeos').getFullList({
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
