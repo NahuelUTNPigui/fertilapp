@@ -10,6 +10,7 @@
     import { randomString } from '$lib/stringutil/lib';
 
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let usuarioemail=''
     let contra = ''
@@ -131,7 +132,7 @@
             };
             const record = await pb.collection('users').create(data);
             Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario. Ingrese a la aplicación', 'success');
-            goto("/")
+            goto(pre+"/")
         }catch(e){
             console.error(e)
             Swal.fire('Error guardar', 'No se puede crear el nuevo usuario', 'error');
@@ -139,7 +140,7 @@
         
     }
     function volver(){
-        goto("/")
+        goto(pre+"/")
     }
     function keyEvent(e){
         if(e.code=="Enter"){
@@ -288,7 +289,7 @@
             <div class="mt-6 text-center">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     Ya tienes cuenta?
-                    <a href="/" 
+                    <a href={pre+"/" }
                     class="font-medium text-green-600 dark:text-green-400  hover:text-green-800 dark:hover:text-green-300 transition"
                     >
                         Volver

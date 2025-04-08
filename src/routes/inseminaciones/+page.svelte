@@ -14,7 +14,7 @@
     import estilos from '$lib/stores/estilos';
     import { guardarHistorial } from '$lib/historial/lib';
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
@@ -394,7 +394,7 @@
         </div>
         <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
-                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto("/inseminaciones/movimiento")}>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto(pre+"/inseminaciones/movimiento")}>
                     <span  class="text-lg">Nuevas</span>
                 </button>
             </div>
@@ -409,7 +409,7 @@
             </div>
             <div class="hidden">
                 <button
-                    onclick={()=>goto("/inseminaciones/movimiento")}
+                    onclick={()=>goto(pre+"/inseminaciones/movimiento")}
                     class={`
                         bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
                         ${estilos.btnsecondary}

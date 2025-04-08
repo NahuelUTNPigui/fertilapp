@@ -16,6 +16,7 @@
     import localidades from '$lib/stores/geo/localidades';
     import estilos from '$lib/stores/estilos';
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const regexRenspa = /^\d{2}\.\d{3}\.\d\.\d{5}\.\d{2}$/;
     let usuarioid = $state("")
@@ -73,7 +74,7 @@
             provincia=""
             telefono=""
             mail=""
-            goto("/")
+            goto(pre+"/")
         }
         
     }
@@ -147,7 +148,7 @@
             Swal.fire("Exito guadar","Se pudo guardar la cabaña con éxito","success")
             caber.setCab(nombre,record.id)
             per.setPer("0,1,2,3,4,5",usuarioid)
-            goto("/")
+            goto(pre+"/")
         }
         catch(err){
             console.error(err)
@@ -205,7 +206,7 @@
             }
             
         }
-        goto('/')
+        goto(pre+'/')
     }
     function mostrarcolab(data){
         console.log("padre: "+data)

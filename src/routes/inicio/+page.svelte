@@ -4,7 +4,6 @@
     import PocketBase from 'pocketbase'
     import { createRoler } from '$lib/stores/defaultrol.svelte';
     import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
     import { createCaber } from "$lib/stores/cab.svelte";
     import CardBase from '$lib/components/CardBase.svelte';
     import categorias from '$lib/stores/categorias';
@@ -24,6 +23,7 @@
     
 
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let usuarioid = $state("")
@@ -1055,7 +1055,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div>
                     <a class={classbutton}
-                        href="/establecimiento"
+                        href={pre+"/establecimiento"}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 10000 10000" class="size-10 fill-current mx-2" >
                             <g id="Capa_x0020_1">
@@ -1337,7 +1337,7 @@
         <CardBase titulo="Bienvenido a Creciente Fertil">
             <div class="grid grid-cols-1 gap-6">
                 <a class={classbutton}
-                    href="/establecimiento"
+                    href={pre+"/establecimiento"}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mx-1">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-2.25-1.313M21 7.5v2.25m0-2.25-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3 2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75 2.25-1.313M12 21.75V19.5m0 2.25-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25" />

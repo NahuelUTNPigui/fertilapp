@@ -10,7 +10,7 @@
     import {createPer} from "$lib/stores/permisos.svelte"
     import { usuario } from "$lib/stores/usuario";
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let establecimientos = $state([])
     let establecimientoscolab = $state([])
@@ -26,7 +26,7 @@
         
         caber.setCab(est.expand.cab.nombre,est.expand.cab.id)
         per.setPer("0,1,2,3,4,5",usuarioid)
-        goto("/")
+        goto(pre+"/")
     }
     function irEstablecimiento(id){
         
@@ -36,11 +36,11 @@
         
         caber.setCab(est.nombre,est.id)
         per.setPer("0,1,2,3,4,5",usuarioid)
-        goto("/")
+        goto(pre+"/")
 
     }
     function crearEstablecimiento() {
-        goto("nuevo")
+        goto(pre+"nuevo")
     }
     async function getTotalAnimales(cabid){
         const record = await pb.collection("animales").getList(1,2,{

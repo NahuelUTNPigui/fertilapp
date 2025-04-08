@@ -24,6 +24,7 @@
     import tiponoti from "$lib/stores/tiponoti";
     import Servicios from "$lib/components/animal/Servicios.svelte";    
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let caber = createCaber()
     let cab = caber.cab
@@ -78,7 +79,7 @@
             await guardarHistorial(pb,slug)
             const record = await pb.collection('animales').update(slug, data);  
             Swal.fire("Éxito dar de baja","Se pudo dar de baja al animal","success")
-            goto("/animales")  
+            goto(pre+"/animales")  
         }
         catch(err){
             Swal.fire("Error dar de baja","No se pudo dar de baja al animal","error")
@@ -99,7 +100,7 @@
 
             const record = await pb.collection('animales').update(slug, data);  
             Swal.fire("Éxito eliminar","Se pudo eliminar al animal","success")
-            goto("/animales")  
+            goto(pre+"/animales")  
         }
         catch(err){
             Swal.fire("Error eliminar","No se eliminar al animal","error")
@@ -133,7 +134,7 @@
             }
             await pb.collection('notificaciones').create(datatrans);
             
-            goto("/animales")
+            goto(pre+"/animales")
             Swal.fire("Éxito transferencia","Se pudo transferir al animal","success")
         }catch(err){
             console.error(err)

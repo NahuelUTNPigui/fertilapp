@@ -3,8 +3,9 @@
     import {isEmpty} from "$lib/stringutil/lib"
     import { goto } from "$app/navigation";
     let {colabs = $bindable()} = $props()
+    let pre = import.meta.env.VITE_PRE
     function getColab(id){
-        goto("/colaboradores/"+id)
+        goto(pre+"/colaboradores/"+id)
     }
 </script>
 <div class="w-full grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">

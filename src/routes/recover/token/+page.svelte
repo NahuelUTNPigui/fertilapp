@@ -6,6 +6,7 @@
     import { fade, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let token = $state('')
     let nuevacontra = $state("")
     let confcontra = $state("")
@@ -14,7 +15,7 @@
         return (!str || str.length === 0 );
     }
     function volver(){
-        goto("/recover")
+        goto(pre+"/recover")
     }
     async function cambiar(){
         if(isEmpty(token)){
@@ -33,12 +34,12 @@
             );
             Swal.fire("Éxito cambiar","Se pudo cambiar la contraseña","success")
 
-            goto("/login")
+            goto(pre+"/login")
         }
         catch(err){
             console.error(err)
             Swal.fire("Error cambiar","NO se pudo cambiar la contraseña","success")
-            goto("/login")
+            goto(pre+"/login")
         }
 
     }
@@ -126,7 +127,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     Quiere ir a la pagina anterior?
                     <a 
-                        href="/recover" 
+                        href={pre+"/recover" }
                         class="font-medium text-green-600 dark:text-green-400  hover:text-green-800 dark:hover:text-green-300 transition"
                     >
                         Volver

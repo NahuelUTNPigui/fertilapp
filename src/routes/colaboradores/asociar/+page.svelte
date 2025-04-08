@@ -10,13 +10,14 @@
     import CardBase from '$lib/components/CardBase.svelte';
     import tiponoti from '$lib/stores/tiponoti';
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let caber = createCaber()
     let cab = caber.cab
     let tokencolab = $state("")
     
     function volver(){
-        goto("/establecimiento")
+        goto(pre+"/establecimiento")
     }
     async function asociar() {
         const resultList = await pb.collection('users').getList(1, 1, {

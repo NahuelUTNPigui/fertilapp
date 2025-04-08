@@ -9,6 +9,7 @@
     import { goto } from '$app/navigation';
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
+    let pre = import.meta.env.VITE_PRE
     let id=$state("")
     let idpermiso = $state("")
     let nombre = $state("")
@@ -74,7 +75,7 @@
                     let recordper = await pb.collection('permisos').getFirstListItem(`estxcolab='${id}'`)
                     await pb.collection("permisos").delete(recordper.id)
                     await pb.collection("estxcolabs").delete(id)
-                    goto("/establecimiento")
+                    goto(pre+"/establecimiento")
                 }
                 catch(err){
                     console.error(err)
@@ -86,7 +87,7 @@
         })
     }
     function volver(){
-        goto("/establecimiento")
+        goto(pre+"/establecimiento")
     }
     onMount(async ()=>{
         id = $page.params.id

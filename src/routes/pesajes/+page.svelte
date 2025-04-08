@@ -14,7 +14,7 @@
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
     import { getSexoNombre } from '$lib/stringutil/lib';
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
@@ -274,7 +274,7 @@
             <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
-            <a class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" href="/pesajes/lista">
+            <a class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" href={pre+"/pesajes/lista"}>
                 <span  class="text-xl">Historia</span>
             </a>
         </div>

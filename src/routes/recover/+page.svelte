@@ -6,13 +6,14 @@
     import { fade, fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let usuariomail=''
     let logooscuro = true
     function isEmpty(str) {
         return (!str || str.length === 0 );
     }
     function volver(){
-        goto("/login")
+        goto(pre+"/login")
     }
     async function reset(){
         if(isEmpty(usuariomail)){
@@ -103,7 +104,7 @@
                     </button>
                     <button 
                         class="hidden mt-2 w-full bg-green-600 text-white rounded-md py-2 px-4 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition" 
-                        onclick={()=>goto("/recover/token")}
+                        onclick={()=>goto(pre+"/recover/token")}
                     >
                         Escribir token
                     </button>
@@ -122,7 +123,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     Quiere ir a la pagina principal?
                     <a 
-                        href="/login" 
+                        href={pre+"/login" }
                         class="font-medium text-green-600 dark:text-green-400  hover:text-green-800 dark:hover:text-green-300 transition"
                     >
                         Volver

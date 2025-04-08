@@ -16,6 +16,7 @@
     import Swal from 'sweetalert2';
     let pageurl = $page.url.pathname  
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let darker = createDarker()
     
@@ -47,7 +48,7 @@
       nombreusuario = pb_json.record.username
       let hab = $enabled
       if(hab==="no"){
-        goto("/")
+        goto(pre+"/")
       }
       let light = !darker.dark
       cab = caber.cab      
@@ -59,16 +60,16 @@
         usuario.set('')
         enabled.set("no")
         
-        goto("/")
+        goto(pre+"/")
     }
     function editarUser(){
-      goto("/user/config")
+      goto(pre+"/user/config")
     }
     function cambiarEstablecimiento(){
-      goto("/establecimientos")
+      goto(pre+"/establecimientos")
     }
     function volver(){
-        goto("/establecimientos")
+        goto(pre+"/establecimientos")
     }
     async function guardarEstablecimiento(){
         let user = await pb.collection("users").getOne(usuarioid)
@@ -110,7 +111,7 @@
     <div class="drawer-content w-full">
         <div class={classnavbarr}>
             <div class="flex-1">
-              <a href="/inicio" 
+              <a href={pre+"/inicio" }
               class={`pl-0 pr-1 btn btn-ghost text-2xl ${classtextnavbar}`}
               >{nombreestablecimiento}</a>
             </div>

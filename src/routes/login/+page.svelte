@@ -14,6 +14,7 @@
 
 
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let usuarioname= $state('')
     let contra = $state('')
     let showpass = $state(false)
@@ -23,7 +24,7 @@
         return (!str || str.length === 0 );
     }
     function nuevo(){
-        goto("/user/new")
+        goto(pre+"/user/new")
     }
     async function ingresar(){
         if(isEmpty(usuarioname)){
@@ -74,7 +75,7 @@
                         }
                         
                     }
-                    goto('/')
+                    goto(pre+'/')
                 }
                 else{
                     Swal.fire('Error login', 'El usuario esta eliminado', 'error');
@@ -191,7 +192,7 @@
                 
             </div>
             <div class="mt-6 text-center">
-                <a href="/recover" 
+                <a href={pre+"/recover" }
                     class="text-sm text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition"
                 >
                     ¿Olvidaste la contraseña?
@@ -202,7 +203,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     ¿No tienes una cuenta?
                     <a 
-                        href="/user/new" 
+                        href={pre+"/user/new" }
                         class="font-medium text-green-600 dark:text-green-400  hover:text-green-800 dark:hover:text-green-300 transition"
                     >
                         Crear una

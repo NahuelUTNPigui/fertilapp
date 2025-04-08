@@ -18,7 +18,7 @@
     import RadioButton from "$lib/components/RadioButton.svelte";
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
@@ -388,7 +388,7 @@
             <button
                     class="bg-transparent border-none flex"
                     aria-label="volver"
-                    onclick={()=>goto("/tactos/cab")}
+                    onclick={()=>goto(pre+"/tactos/cab")}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mt-1">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -405,7 +405,7 @@
                 <span  class="text-xl">{capitalize("nuevo")}</span>
             </button>
             <button
-                onclick={()=>goto("/tactos/cab")}
+                onclick={()=>goto(pre+"/tactos/cab")}
                 class={`
                     hidden
                     bg-transparent border rounded-lg focus:outline-none transition-colors duration-200

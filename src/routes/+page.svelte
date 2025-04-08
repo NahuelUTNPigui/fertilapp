@@ -4,6 +4,7 @@
     //import {oscuro} from '$lib/oscuro'
     import {createDarker} from "$lib/stores/dark.svelte.js"
     import { goto } from '$app/navigation';
+    let pre = import.meta.env.VITE_PRE
     let hab = $enabled
     onMount(()=>{        
         
@@ -15,10 +16,10 @@
             document.querySelector("html").setAttribute("data-theme","dark") 
         }
         if(hab==="si"){
-            goto("/inicio")
+            goto(pre+"/inicio")
         }
         else{
-            goto("/login")
+            goto(pre+"/login")
         }
     })
     let bgnav = "bg-green-500"

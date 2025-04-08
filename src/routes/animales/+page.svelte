@@ -24,7 +24,7 @@
 
     
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     let caber = createCaber()
@@ -750,7 +750,7 @@
             
             <tbody>
                 {#each animalesrows as a}
-                <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`/animales/${a.id}`)}>
+                <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`${pre}/animales/${a.id}`)}>
                     <td class="text-base p-3 ">
                         <div class="flex gap-1">
                             {`${a.caravana}`}
@@ -799,7 +799,7 @@
     <div class="block  md:hidden justify-items-center mx-1">
         {#each animalesrows as a}
         <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
-            <button  onclick={()=>goto(`/animales/${a.id}`)}>
+            <button  onclick={()=>goto(`${pre}/animales/${a.id}`)}>
                 <div class="block p-4">
                     <div class="flex justify-between items-start mb-2">
                         <h3 class="font-medium">{a.caravana}</h3>

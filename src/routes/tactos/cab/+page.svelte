@@ -26,7 +26,7 @@
     let per = createPer()
     let userpermisos = getPermisosList(per.per.permisos)
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
@@ -390,7 +390,7 @@
                 <button 
                     class={` btn btn-primary rounded-lg ${estilos.btntext}`} 
                     data-theme="forest" 
-                    onclick={()=>goto("/tactos/cab/movimiento")}
+                    onclick={()=>goto(pre+"/tactos/cab/movimiento")}
                 >
                     <span  class="text-xl">Nuevo</span>
                 </button>
@@ -408,7 +408,7 @@
             </div>
             <div class="hidden">
                 <button
-                    onclick={()=>goto("/tactos/cab/movimiento")}
+                    onclick={()=>goto(pre+"/tactos/cab/movimiento")}
                     class={`
                         bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
                         ${estilos.btnsecondary}

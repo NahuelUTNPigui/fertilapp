@@ -11,6 +11,7 @@
     import {usuario} from '$lib/stores/usuario'
     import {enabled} from '$lib/stores/enabled'
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let usuarioid = $state("")
     let tokencolab = $state("")
@@ -156,7 +157,7 @@
                 pb.authStore.clear();
                 usuario.set('')
                 enabled.set("no")
-                goto("/")
+                goto(pre+"/")
             } else if (result.isDenied) {
                 
             }
@@ -371,7 +372,7 @@
         </label>
         <div class="mt-2 flex justify-start">
             <button
-                    onclick={()=>goto("/user/nivel")}
+                    onclick={()=>goto(pre+"/user/nivel")}
                     class=" 
                         btn px-6 py-2 bg-green-600 hover:bg-green-700 rounded-md 
                         text-white font-bold font-lg focus:outline-none 

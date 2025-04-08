@@ -17,7 +17,7 @@
     import MultipleToros from "$lib/components/MultipleToros.svelte";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
     let ruta = import.meta.env.VITE_RUTA
-
+    let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
     const today = new Date();
@@ -286,7 +286,7 @@
         </div>
         <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
-                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto("/servicios/movimiento")}>
+                <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>goto(pre+"/servicios/movimiento")}>
                     <span  class="text-lg">Nuevos</span>
                 </button>
             </div>

@@ -5,7 +5,7 @@
     import { randomString } from "$lib/stringutil/lib";
     import { PenBox } from "lucide-svelte";
     import Swal from "sweetalert2";
-    
+    let pre = import.meta.env.VITE_PRE
     let {colabs = $bindable(),mostrarcolab,guardarColab,desasociar,asociado} = $props()
     let titulo = $state("Colaboradores")
     
@@ -134,7 +134,7 @@
         </button>
     </div>
     <div>
-        <button class={estilos.mediumsolidgreen} onclick={()=>goto("/colaboradores/asociar")}>
+        <button class={estilos.mediumsolidgreen} onclick={()=>goto(pre+"/colaboradores/asociar")}>
             Asociar
         </button>
     </div>
