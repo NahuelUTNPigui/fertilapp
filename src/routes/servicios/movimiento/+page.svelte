@@ -173,6 +173,11 @@
                 algunos = true
             }
             delete selecthashmap[id]
+            if(Object.keys(selecthashmap).length == 0){
+                todos = false
+                algunos = false
+                ninguno = true
+            }
         }
         else{
             if(ninguno){

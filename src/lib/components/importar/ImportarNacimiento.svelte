@@ -5,6 +5,7 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import cuentas from '$lib/stores/cuentas';
     let {animales,animalesusuario} = $props()
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
@@ -63,6 +64,7 @@
         reader.readAsBinaryString(file);
     }
     async function procesarArchivo(){
+        
         if(filename == ""){
             Swal.fire("Error","Seleccione un archivo","error")
         }
@@ -71,7 +73,9 @@
         if(!sheetanimales){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
+        let user = await pb.collection("users").getOne(usuarioid)
         
+        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
         let nacimientos = []
         let animaleshashmap = {}
         loading = true
@@ -148,7 +152,7 @@
         for (const [key, value ] of Object.entries(animaleshashmap)) {
             nacimientos.push(value)
             let conocido = animales.filter(a=>a.caravana == value.caravana).length == 0
-            if(! conocido ){
+            if(!conocido ){
                 nuevoanimales += 1
             }
         }
@@ -161,13 +165,13 @@
             return 
             
         }
-        for(let i = 0;i<animales.length;i++){
-            let an = animales[i]
+        for(let i = 0;i<nacimientos.length;i++){
+            let an = nacimientos[i]
             let conlote = false
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
-            let padre = animales.filter(p=>p.caravana==an.nombrepadre)[0]
-            let madre = animales.filter(m=>m.caravana==an.nombremadre)[0]
+            let padre = animales.filter(p=>p.caravana==an.nombrepadre)
+            let madre = animales.filter(m=>m.caravana==an.nombremadre)
             
             // Agregar animal si no existe y nacimiento
             let dataadd = {
@@ -177,15 +181,15 @@
                 sexo:an.sexo,
                 peso:an.peso,
                 fechanacimiento: an.fechanacimiento?an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00":"",
-                nombremadre: an.nombremadre,
-                nombrepadre: an.nombrepadre,
+                nombremadre:madre.length>0?madre[0].caravana:an.nombremadre,
+                nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
                 cab:cab.id
             }
             //Modificar nacimiento cuando existe
             let datanacimiento = {
-                fecha:an.fechanacimiento + " 03:00:00",
-                nombremadre: an.nombremadre,
-                nombrepadre: an.nombrepadre,
+                fecha:an.fechanacimiento?an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00":"",
+                nombremadre:madre.length>0?madre[0].caravana:an.nombremadre,
+                nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
                 observacion:an.observaciones,
                 cab:cab.id
             }

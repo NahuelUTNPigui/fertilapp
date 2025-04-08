@@ -8,6 +8,8 @@
     import { createDarker } from "$lib/stores/dark.svelte";
     import CardBase from '$lib/components/CardBase.svelte';
     import estilos from "$lib/stores/estilos";
+    import {usuario} from '$lib/stores/usuario'
+    import {enabled} from '$lib/stores/enabled'
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let usuarioid = $state("")
@@ -128,6 +130,38 @@
             Swal.fire("Error cambio de contraseña","No se pudo cambiar la contraseña","error")
 
         }
+        
+    }
+    async function eliminarCuenta() {
+        let html= `
+            Estas apunto de eliminar la cuenta y sus datos,
+            <br>
+            Solo se mantendra los datos de animales transferidos a otro establecimiento.
+            <br>
+            Ante la duda comunicarse con aplicacionfertil@gmail.com
+        `;
+        Swal.fire({
+            title: "¿Seguro que deseas eliminar la cuenta?",
+            html,
+            showDenyButton: true,
+            showCancelButton: false,
+            confirmButtonText: "Confirmación",
+            denyButtonText: `Cancelar`
+            }).then(async (result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Swal.fire("Eliminada!", "", "success");
+                let data = {active:false}
+                const record = await pb.collection('users').update(usuarioid, data);
+                pb.authStore.clear();
+                usuario.set('')
+                enabled.set("no")
+                goto("/")
+            } else if (result.isDenied) {
+                
+            }
+        });
+        
         
     }
     onMount(async ()=>{
@@ -348,7 +382,18 @@
             </button> 
             
         </div>
+        <h2 class="text-xl font-semibold">Eliminar cuenta</h2>
+        <button 
+            onclick={eliminarCuenta}
+            class="
+                btn btn-error 
+                text-white 
+                font-bold font-lg
+            "
+        >
 
+            Eliminar
+        </button>   
     </CardBase>
     
 </Navbarr>

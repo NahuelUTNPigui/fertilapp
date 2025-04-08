@@ -552,7 +552,7 @@
             let a = await guardarAnimal(false,true)
             if(a.id == -1){
                     return
-                }
+            }
             let dataser = {
                 fechadesde : fechadesdeserv + " 03:00:00",
                 fechaparto: fechapartoser + " 03:00:00",

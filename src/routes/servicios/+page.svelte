@@ -76,6 +76,7 @@
     let buscarpadre = $state("")
     let madres = $state([])
     let padres = $state([])
+    let borrados = $state([])
     let idanimal = $state("")
     //Validaciones
     let botonhabilitado = $state(true)
@@ -205,10 +206,11 @@
     }
     async function getAnimales(){
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}' && delete=False`
+            filter:`cab='${cab.id}'`
         })
-        madres = recordsa.filter(a=>a.sexo == "H" || a.sexo == "F")
-        padres = recordsa.filter(a=>a.sexo == "M")
+        borrados = recordsa
+        madres = recordsa.filter(a=>(a.sexo == "H" || a.sexo == "F") && a.active)
+        padres = recordsa.filter(a=>a.sexo == "M" && a.active )
         listapadres = padres.map(item=>{
             return {
                 id:item.id,
@@ -262,9 +264,8 @@
     }
     function getNombrePadres(p_padres){
         let ids = p_padres.split(",")
-        
         let nombres = ids.reduce(
-            (acc,valor)=>padres.filter(p=>p.id==valor)[0].caravana + " , " +acc,
+            (acc,valor)=>borrados.filter(p=>p.id==valor)[0].caravana + " , " +acc,
             ""
         )
 

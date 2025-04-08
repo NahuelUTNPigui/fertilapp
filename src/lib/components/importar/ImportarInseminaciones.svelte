@@ -128,6 +128,7 @@
                     }
                     
                     const record = await pb.collection("inseminacion").create(datains)
+                    //Debo comprobar que tan cierto es. Depende de la fecha de tacot
                     await guardarHistorial(pb,recordmadre.id)
                     await pb.collection("animales").update(recordmadre.id,{prenada:3})
 

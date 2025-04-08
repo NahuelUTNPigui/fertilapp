@@ -39,6 +39,7 @@
     let rodeo = $state("")
     let lote = $state("")
     let peso = $state(0)
+    let rp = $state("")
     let categoria = $state("")
     let pariciones = $state([])
     let fechafall = $state("")
@@ -163,6 +164,7 @@
                 lote = recorda.lote
                 categoria = recorda.categoria
                 prenada = recorda.prenada==1?0:recorda.prenada
+                rp = recorda.rp
                 if(recorda.fechafallecimiento != ""){
                     fechafall = recorda.fechafallecimiento.split(" ")[0]
                     motivobaja = recorda.motivobaja
@@ -181,7 +183,7 @@
 </script>
 <Navbarr>
     <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos {peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
+        <DatosBasicos {rp} {peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
     </CardAnimal>
     {#if !modohistoria}
         <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">

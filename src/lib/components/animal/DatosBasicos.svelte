@@ -26,6 +26,7 @@
         fechanacimiento,
         categoria,
         prenada,
+        rp,
         modohistoria=$bindable()
     } = $props()
     let ruta = import.meta.env.VITE_RUTA
@@ -50,6 +51,7 @@
     let loteviejo = $state("")
     let categoriavieja = $state("")
     let prenadaviejo = $state(false)
+    let rpviejo = $state("")
 
     //Nacimiento
     let fechaviejo = $state("")
@@ -157,6 +159,7 @@
             caravanavieja = caravana
             categoriavieja = categoria
             prenadaviejo  = prenada
+            rpviejo = rp
         }
         else{
             Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
@@ -172,6 +175,7 @@
         lote = loteviejo
         categoria = categoriavieja
         prenada = prenadaviejo
+        rp = rpviejo
         if(rodeo != ""){
             nombrerodeo = rodeos.filter(t=>t.id==rodeo)[0].nombre
         }
@@ -196,14 +200,14 @@
     }
     function openEditModal(){
         if(userpermisos[5]){
-        fechaviejo =  fecha
-        nombremadreviejo = nombremadre
-        nombrepadreviejo = nombrepadre
-        madreviejo = madre
-        padreviejo = padre
-        observacionviejo = observacion
-        
-        nuevoModal.showModal()
+            fechaviejo =  fecha
+            nombremadreviejo = nombremadre
+            nombrepadreviejo = nombrepadre
+            madreviejo = madre
+            padreviejo = padre
+            observacionviejo = observacion
+            
+            nuevoModal.showModal()
         }
         else{
             Swal.fire("Sin permisos","No tienes permisos para administrar animales","error")
@@ -313,7 +317,8 @@
             rodeo:rodeo,
             lote,
             prenada,
-            categoria
+            categoria,
+            rp
         }
         let datahistorial = {
             prenada:prenadaviejo,
@@ -327,6 +332,7 @@
             rodeo:rodeovieja,
             user:userid,
             categoria:categoriavieja,
+            rp:rpviejo,
             animal:id
         }
         try{
@@ -431,6 +437,25 @@
 </div>
 
 <div class="grid grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
+    <div class="mb-1 lg:mb-0 col-span-2 lg:col-span-1" >
+        <label for = "peso" class="label">
+            <span class="label-text text-base">RP</span>
+        </label>
+        {#if modoedicion}
+            <label class="input-group">
+                <input id ="rp" type="text"  
+                    class={`input input-bordered w-full ${estilos.bgdark2}`}
+                    bind:value={rp}
+                />
+            </label>
+        {:else}
+            <label for="rp" 
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+            >
+                {rp}
+            </label>
+        {/if}
+    </div>
     <div class="mb-1 lg:mb-0">
         <label for = "peso" class="label">
             <span class="label-text text-base">Peso(KG)</span>
@@ -552,7 +577,7 @@
                         focus:ring-green-500 focus:border-green-500
                         ${estilos.bgdark2}
                     `} bind:value={categoria}>
-                    {#each categorias as l}
+                    {#each categorias.filter(c=>c.sexo == sexo) as l}
                         <option value={l.id}>{l.nombre}</option>    
                     {/each}
                 </select>

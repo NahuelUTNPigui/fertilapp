@@ -38,6 +38,7 @@
     let fecha = $state("")
     let observacion = $state("")
     let totalObservacionesEncontradas = $state(0)
+    let nombreanimal = $state("")
     //Validacioones
     let malanimal = $state(false)
     let malfecha = $state(false)
@@ -67,7 +68,7 @@
     async function getAnimales(){
         //Estaria joya que el animal venga con todos los chiches
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && cab='${cab.id}' && (sexo='H' || sexo ='M')`,
+            filter:`cab='${cab.id}'`,
             expand:"nacimiento"
         })
         animales = recordsa
@@ -90,6 +91,7 @@
         botonhabilitado = false
         malanimal = false
         malfecha = false
+        nombreanimal = ""
         nuevoModal.showModal()
     }
 
@@ -115,6 +117,7 @@
         categoria = obs.categoria
         fecha = obs.fecha.split(" ")[0]
         animal = obs.animal
+        nombreanimal = obs.expand.animal.caravana
         nuevoModal.showModal()
     }
     function eliminar(id){
@@ -275,7 +278,6 @@
     async function editar(){
         try{
             let data = {
-                animal,
                 fecha:fecha +" 03:00:00",
                 categoria,
                 observacion
@@ -564,30 +566,36 @@
                 <label for = "animal" class="label">
                     <span class="label-text text-base">Animal</span>
                 </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={animal}
-                        onchange={()=>oninput("ANIMAL")}
-                    >
+                {#if idobservacion == ""}
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                border border-gray-300 rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={animal}
+                            onchange={()=>oninput("ANIMAL")}
+                        >
+                            {#each animales.filter(an=>an.active) as a}
+                                <option value={a.id}>{a.caravana}</option>    
+                            {/each}
                         
-                        {#each animales as a}
-                            <option value={a.id}>{a.caravana}</option>    
-                        {/each}
-                    </select>
-                    {#if malanimal}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
-                        </div>
-                    {/if}
-                </label>
+                        </select>
+                        {#if malanimal}
+                            <div class="label">
+                                <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
+                            </div>
+                        {/if}
+                    </label>
+                {:else}
+                    <label for = "animal" class="label">
+                        <span class="label-text text-base">{nombreanimal}</span>
+                    </label>
+                {/if}
                 <label for = "categoria" class="label">
                     <span class="label-text text-base">Categoria</span>
                 </label>
@@ -608,71 +616,6 @@
                         {/each}
                     </select>
                 </label>
-            {/if}
-            {#if false && animal == "agregar"}
-                <form method="dialog">
-                    <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
-                </form>
-                <label for = "nombre" class="label">
-                    <span class="label-text text-base">Caravana</span>
-                </label>
-                <label class="input-group">
-                    <input 
-                        id ="nombre" 
-                        type="text"  
-                        class={`
-                            input 
-                            input-bordered 
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                            w-full
-                            ${estilos.bgdark2} 
-                            ${malcaravana?"input-error":""}
-                        `}
-                        bind:value={caravana}
-                        oninput={()=>oninput("NOMBRE")}
-                    />
-                    <div class={`label ${malcaravana?"":"hidden"}`}>
-                        <span class="label-text-alt text-red-400">Error debe escribir la caravana del animal</span>
-                    </div>
-                </label>
-                <label for = "sexo" class="label">
-                    <span class="label-text text-base">Sexo</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `} bind:value={sexo}>
-                        {#each sexos as s}
-                            <option value={s.id}>{s.nombre}</option>    
-                        {/each}
-                      </select>
-                </label>
-                <label for = "peso" class="label">
-                    <span class="label-text text-base">Peso (KG)</span>
-                </label>
-                <label class="input-group">
-                    <input id ="peso" type="number"  
-                        class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                        bind:value={peso}
-                    />
-                </label>
-                <div class="modal-action justify-start ">
-                    <form method="dialog" >
-                        <button class="btn btn-success text-white" disabled='{!botonhabilitadoAnimal}' onclick={guardarAnimal} >Guardar Animal</button>
-                    </form>
-                </div>
             {/if}
             <label for = "fecha" class="label">
                 <span class="label-text text-base">Fecha observación</span>

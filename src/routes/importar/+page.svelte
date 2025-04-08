@@ -24,8 +24,8 @@
     onMount(async ()=>{
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
-        const records = await pb.collection('animales').getFullList({
-            filter: `active = true && delete = false && cab = '${cab.id}'`
+        const records = await pb.collection('Animalestacto').getFullList({
+            filter: `active = true  && cab = '${cab.id}'`
         })
         animales = records
         let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
