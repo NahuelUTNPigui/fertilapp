@@ -315,31 +315,32 @@
             peso,
             sexo,
             caravana,
-            rodeo:rodeo,
+            rodeo,
             lote,
             prenada,
             categoria,
             rp
         }
-        let datahistorial = {
-            prenada:prenadaviejo,
-            sexo:sexoviejo,
-            peso:pesoviejo,
-            caravana:caravanavieja,
-            active:true,
-            delete: false,
-            fechanacimiento:fecha+ " 03:00:00",
-            lote:loteviejo,
-            rodeo:rodeovieja,
-            user:userid,
-            categoria:categoriavieja,
-            rp:rpviejo,
-            animal:id
-        }
+        //let datahistorial = {
+        //    prenada:prenadaviejo,
+        //    sexo:sexoviejo,
+        //    peso:pesoviejo,
+        //    caravana:caravanavieja,
+        //    active:true,
+        //    delete: false,
+        //    fechanacimiento:fecha+ " 03:00:00",
+        //    lote:loteviejo,
+        //    rodeo:rodeovieja,
+        //    user:userid,
+        //    categoria:categoriavieja,
+        //    rp:rpviejo,
+        //    animal:id
+        //}
         try{
             const record = await pb.collection('animales').update(id, data);
             
-            await pb.collection("historialanimales").create(datahistorial)
+            //await pb.collection("historialanimales").create(datahistorial)
+            await guardarHistorial(pb,id)
             sexo = data.sexo
             peso = data.peso
             caravana = data.caravana
@@ -359,6 +360,7 @@
             else{
                 nombrelote = ""
             }
+            //PEnsar en editar la madre
             Swal.fire("Éxito editar","Se pudo editar el animal","success")
             modoedicion = false
 

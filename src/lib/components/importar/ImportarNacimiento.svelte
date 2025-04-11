@@ -6,6 +6,7 @@
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
     import cuentas from '$lib/stores/cuentas';
+    import categorias from "$lib/stores/categorias";
     let {animales,animalesusuario} = $props()
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
@@ -32,7 +33,8 @@
             fechanacimiento:"MM/DD/AAAA",
             nombremadre:"",
             nombrepadre:"",
-            observaciones:""
+            observaciones:"",
+            categoria:""
         }].map(item=>({
             CARAVANA: item.caravana,
             PESO: item.peso,
@@ -42,7 +44,8 @@
             FECHANACIMIENTO: item.fechanacimiento,
             CARAVANA_MADRE: item.nombremadre,
             CARAVANA_PADRE: item.nombrepadre,
-            OBSERVACIONES:item.observaciones
+            OBSERVACIONES:item.observaciones,
+            CATEGORIA:item.categoria
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -113,6 +116,9 @@
                 if(firstLetter=="I"){
                     animaleshashmap[tail].observaciones = value.v
                 }
+                if(firstLetter=="J"){
+                    animaleshashmap[tail].categoria = value.v
+                }
             }
             else{
                 animaleshashmap[tail]={
@@ -145,6 +151,9 @@
                 if(firstLetter=="I"){
                     animaleshashmap[tail].observaciones = value.v
                 }          
+                if(firstLetter=="J"){
+                    animaleshashmap[tail].categoria = value.v
+                }
             }
         }
         let nuevoanimales = 0
@@ -170,6 +179,7 @@
             let conlote = false
             let lote = lotes.filter(l=>l.nombre==an.lote)[0]
             let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
+            let categoria = categorias.filter(c=>c.id==an.categoria || c.nombre==an.categoria)[0]
             let padre = animales.filter(p=>p.caravana==an.nombrepadre)
             let madre = animales.filter(m=>m.caravana==an.nombremadre)
             
@@ -199,6 +209,9 @@
             }
             if(rodeo){
                 dataadd.rodeo = rodeo.id
+            }
+            if(categoria){
+                dataadd.categoria = categoria.id
             }
 
             if(padre){

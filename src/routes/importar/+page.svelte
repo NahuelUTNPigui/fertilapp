@@ -1,7 +1,8 @@
 <script>
     import Navbarr from '$lib/components/Navbarr.svelte';
-    
     import CardImportar from '$lib/components/importar/CardImportar.svelte';
+
+    import ImportarServicios from '$lib/components/importar/ImportarServicios.svelte';   
     import ImportarAnimal from '$lib/components/importar/ImportarAnimal.svelte';
     import ImportarLotes from '$lib/components/importar/ImportarLotes.svelte';
     import ImportarNacimiento from '$lib/components/importar/ImportarNacimiento.svelte';
@@ -53,6 +54,9 @@
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar observaciones">
         <ImportarObservaciones {animales}/>
+    </CardImportar>
+    <CardImportar cardsize="max-w-2xl" titulo="Importar servicios">
+        <ImportarServicios {animales}/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar inseminaciones">
         <ImportarInseminaciones {animales}/>

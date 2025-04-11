@@ -121,7 +121,7 @@
                 </button>
               </div>
               <div class="flex-1">
-                <a href={pre+"/inicio"} 
+                <a href={pre+"/establecimientos"} 
                   class={`ps-0 btn btn-ghost text-xl ${classtextnavbar}`}
                 >
                   {nombreestablecimiento}

@@ -21,7 +21,6 @@
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     import cuentas from '$lib/stores/cuentas';
     import { getSexoNombre,capitalize } from '$lib/stringutil/lib';
-
     
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
@@ -391,6 +390,7 @@
     function prepararData(item){
         return {
             CARAVANA:item.caravana,
+            RP:item.pr,
             NACIMIENTO:item.fechanacimiento?new Date(item.fechanacimiento).toLocaleDateString():"",
             PADRE:item.expand?
                 item.expand.nacimiento?
@@ -432,10 +432,46 @@
         isOpenOrdenar = !isOpenOrdenar
     }
     //Para los ordenar
-    let ascendente = $state(false)
+    let ascendente = $state(true)
     let forma = $state("caravana")
     let selectforma = $state("caravana")
     //Ordenar animales
+    function ordenarAnimalesDescendente(p_forma){
+        console.log(ascendente)
+        let escalar = 1
+        if(!ascendente){
+            escalar = -1
+        }
+        forma = p_forma
+        if(forma=="caravana"){
+            
+            animalesrows.sort((a1,a2)=>escalar * a1.caravana.localeCompare(a2.caravana))
+        }
+        else if(forma=="sexo"){
+            
+            animalesrows.sort((a1,a2)=>escalar * a1.sexo.localeCompare(a2.sexo))
+        }
+        else if(forma=="categoria"){
+            animalesrows.sort((a1,a2)=>escalar * a1.categoria.localeCompare(a2.categoria))
+        }
+        else if(forma=="estado"){
+            animalesrows.sort((a1,a2)=> a1.prenada > a2.prenada?escalar:-1*escalar)
+        }
+        else if(forma=="lote"){
+            animalesrows.sort((a1,a2)=>{
+                let l1 = a1.expand?a1.expand.lote?a1.expand.lote.nombre:"":""
+                let l2 = a2.expand?a2.expand.lote?a2.expand.lote.nombre:"":""
+                return escalar * l1.localeCompare(l2)
+            })
+        }
+        else if(forma=="rodeo"){
+            animalesrows.sort((a1,a2)=>{
+                let r1 = a1.expand?a1.expand.rodeo?a1.expand.rodeo.nombre:"":""
+                let r2 = a2.expand?a2.expand.rodeo?a2.expand.rodeo.nombre:"":""
+                return escalar * r1.localeCompare(r2)
+            })
+        }
+    }
     function ordenarAnimales(p_forma){
         
         if(p_forma == forma){
@@ -701,6 +737,14 @@
                         </select>
                     </label>
                 </div>
+                <div class="my-1">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Ascendente</span>
+                            <input type="checkbox" class="toggle" bind:checked={ascendente} onclick={()=>ordenarAnimales(selectforma)}/>
+                        </label>
+                      </div>
+                </div>
             </div>
         {/if}
     </div>
@@ -713,7 +757,7 @@
                         class={`
                             text-base p-3 border-b dark:border-gray-600 
                             hover:cursor-pointer hover:bg-gray-200 
-                            dark:hover:bg-gray-800}
+                            dark:hover:bg-gray-800
                         `}  >
                         Animal
                     </th>

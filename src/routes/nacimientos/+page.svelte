@@ -511,7 +511,7 @@
         </div>
         {#if isOpenFilter}
             <div transition:slide>
-                <div class="grid grid-cols-2 lg:grid-cols-2 mb-2 lg:mb-3 gap-1" >
+                <div class="grid grid-cols-1 lg:grid-cols-2 mb-2 lg:mb-3 gap-1" >
                     <div class="">
                         <label class="block tracking-wide  mb-2" for="grid-first-name">
                           Fecha desde
@@ -776,56 +776,56 @@
                 {/if}
             </label>
             <div class="hidden">
-            <label for = "nombremadre" class="label">
-                <span class="label-text text-base">Caravana madre</span>
-            </label>
-            <label class="input-group">
-                <input 
-                    id ="nombremadre" 
-                    type="text"  
-                    class={`
-                        input 
-                        input-bordered 
-                        border border-gray-300 rounded-md
-                        focus:outline-none 
-                        focus:ring-2 focus:ring-green-500 
-                        focus:border-green-500
-                        w-full 
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={nombremadre}
-                    oninput={()=>onchange("MADRE")}
-                    
-                />
-                {#if malmadre}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500">Debe escribir el nombre de la madre</span>                    
-                    </div>
-                {/if}
-            </label>
-            <label for = "madre" class="label">
-                <span class="label-text text-base">Madre</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={madre}
-                    onchange={getNombreMadre}
-                >
-                    {#each madres as m}
-                        <option value={m.id}>{m.caravana}</option>    
-                    {/each}
-                  </select>
-            </label>
-            <label for = "nombrepadre" class="label">
-                <span class="label-text text-base">Caravana padre</span>
-            </label>
+                <label for = "nombremadre" class="label">
+                    <span class="label-text text-base">Caravana madre</span>
+                </label>
+                <label class="input-group">
+                    <input 
+                        id ="nombremadre" 
+                        type="text"  
+                        class={`
+                            input 
+                            input-bordered 
+                            border border-gray-300 rounded-md
+                            focus:outline-none 
+                            focus:ring-2 focus:ring-green-500 
+                            focus:border-green-500
+                            w-full 
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={nombremadre}
+                        oninput={()=>onchange("MADRE")}
+                        
+                    />
+                    {#if malmadre}
+                        <div class="label">
+                            <span class="label-text-alt text-red-500">Debe escribir el nombre de la madre</span>                    
+                        </div>
+                    {/if}
+                </label>
+                <label for = "madre" class="label">
+                    <span class="label-text text-base">Madre</span>
+                </label>
+                <label class="input-group ">
+                    <select 
+                        class={`
+                            select select-bordered w-full
+                            border border-gray-300 rounded-md
+                            focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:border-green-500
+                            ${estilos.bgdark2} 
+                        `}
+                        bind:value={madre}
+                        onchange={getNombreMadre}
+                    >
+                        {#each madres as m}
+                            <option value={m.id}>{m.caravana}</option>    
+                        {/each}
+                    </select>
+                </label>
+                <label for = "nombrepadre" class="label">
+                    <span class="label-text text-base">Caravana padre</span>
+                </label>
             
             </div>
             {#if cargadoanimales}

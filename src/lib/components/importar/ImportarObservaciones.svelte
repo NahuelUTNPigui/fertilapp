@@ -5,6 +5,7 @@
     import PocketBase from 'pocketbase';
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import categorias from "$lib/stores/categorias";
     let {animales} = $props()
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
@@ -19,12 +20,14 @@
             caravana:"AAA",
             categoria:"",
             fecha:"MM/DD/AAAA",
-            observacion:""
+            observacion:"",
+            categoria:""
         }].map(item=>({
             CARAVANA: item.caravana,
             CATEGORIA: item.categoria,
             FECHA: item.fecha,
-            OBSERVACION: item.observacion
+            OBSERVACION: item.observacion,
+            CATEGORIA:item.categoria
         }))
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(csvData);
@@ -77,10 +80,13 @@
                 if(firstLetter=="D"){
                     observacioneshashmap[tail].observacion = value.v
                 }
+                if(firstLetter=="E"){
+                    observacioneshashmap[tail].categoria = value.v
+                }
             }
             else{
                 observacioneshashmap[tail]={
-                     caravana:"", categoria:"", fecha:"", observacion:""
+                    caravana:"", categoria:"", fecha:"", observacion:""
                 }
                 if(firstLetter=="A"){
                     observacioneshashmap[tail].caravana = value.v
@@ -93,6 +99,9 @@
                 }
                 if(firstLetter=="D"){
                     observacioneshashmap[tail].observacion = value.v
+                }
+                if(firstLetter=="E"){
+                    observacioneshashmap[tail].categoria = value.v
                 }
             }
         }
@@ -110,7 +119,7 @@
                 observacion: ob.observacion,
                 cab: cab.id,
                 active: true,
-                }
+            }
 
             let datamod = {
                 observacion: ob.observacion,

@@ -43,7 +43,6 @@
     let malpadre = $state(false)
     let botonhabilitado = $state(false)
     
-    
     function onelegir(){}
     function onwrite(){}
     async function getAnimales(){
