@@ -231,6 +231,22 @@
     function onwrite(){
         
     }
+    function incluidoPadre(cadena, p_padres) {
+    
+        if (!cadena || !p_padres || p_padres.length === 0) {
+            return false;
+        }
+        
+        const lowerCadena = cadena.toLowerCase();
+        
+        for (const str of p_padres) {
+            if (str.toLowerCase().includes(lowerCadena)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     function filterUpdate(){
         serviciosrow = []
         if(filtroservicio == 0){
@@ -243,11 +259,39 @@
         }
         else{
             serviciosrow = inseminaciones
-            
         }
-        serviciosrow = serviciosrow.sort((s1,s2)=>new Date(s1.fechaparto)>new Date(s2.fechaparto)?-1:1)
+        if(fechaservdesdefiltro != ""){
+            serviciosrow = serviciosrow.filter(s=>{
+                let f = s.fechadesde?s.fechadesde:s.fechainseminacion?s.fechainseminacion:""
+                return f>=fechaservdesdefiltro
+            })
+        }
+        if(fechaservhastafiltro != ""){
+            serviciosrow = serviciosrow.filter(s=>{
+                let f = s.fechadesde?s.fechadesde:s.fechainseminacion?s.fechainseminacion:""
+                return f<=fechaservhastafiltro
+            })
+        }
+        if(fechapartodesde != ""){
+            serviciosrow = serviciosrow.filter(s=>{
+                let f = s.fechaparto
+                return f>=fechapartodesde
+            })
+        }
+        if(fechapartohasta != ""){
+            serviciosrow = serviciosrow.filter(s=>{
+                let f = s.fechaparto
+                return f<=fechapartohasta
+            })
+        }
+        if(buscarpadre != ""){
+            serviciosrow = serviciosrow.filter(s=>{
+                let s_padres = s.fechadesde?getNombrePadres(s.padres).split(","):[s.pajuela]
+                return incluidoPadre(buscarpadre,s_padres)
+            })
+        }
         
-        
+        ordenarServicios(forma)
         totalServicios = serviciosrow.length
     }
     function prepararData(item){
@@ -277,7 +321,64 @@
         await getServicios()
         await getInseminaciones()
         filterUpdate()
+        ordenarServicios("fecha")
     })
+    //Para el collapse de los ordenar
+    let isOpenOrdenar = $state(false)
+    function clickOrdenar(){
+        isOpenOrdenar = !isOpenOrdenar
+    }
+    //Para los ordenar
+    let ascendente = $state(true)
+    let forma = $state("fecha")
+    let selectforma = $state("fecha")
+    //Ordenar servicios
+    function ordenarServiciosDescendente(p_forma){
+        
+        let escalar = 1
+        if(!ascendente){
+            escalar = -1
+        }
+        forma = p_forma
+        if(forma=="fecha"){
+            
+            serviciosrow.sort((a1,a2)=>{
+                let f1 = a1.fechadesde?a1.fechadesde:a1.fechainseminacion?a1.fechainseminacion:""
+                let f2 = a2.fechadesde?a2.fechadesde:a2.fechainseminacion?a2.fechainseminacion:""
+                return escalar * f1.localeCompare(f2)
+            })
+        }
+        else if(forma=="fechaparto"){
+            
+            serviciosrow.sort((a1,a2)=>escalar * a1.fechaparto.localeCompare(a2.fechaparto))
+        }
+        else if(forma=="madre"){
+            serviciosrow.sort((a1,a2)=>{
+                let m1 = a1.fechadesde?a1.expand.madre.caravana:a1.expand.animal.caravana
+                let m2 = a2.fechadesde?a2.expand.madre.caravana:a2.expand.animal.caravana
+                return escalar * m1.localeCompare(m2)
+
+            })
+        }
+        else if(forma=="tipo"){
+            serviciosrow.sort((a1,a2)=>{
+                let t1 = a1.fechadesde?1:0
+                let t2 = a2.fechadesde?1:0
+                return escalar * (t1<t2?-1:1)
+            })
+        }
+    }
+    function ordenarServicios(p_forma){
+        
+        if(p_forma == forma){
+            ascendente = !ascendente
+            
+        }
+        else{
+            ascendente = true
+        }
+        ordenarServiciosDescendente(p_forma)
+    }
 </script>
 <Navbarr>
     <div class="grid grid-cols-1 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
@@ -318,6 +419,7 @@
             </label>
         </div>
     </div>
+    <!--Filtrar-->
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
         <button 
             aria-label="Filtrar" 
@@ -339,17 +441,18 @@
         </div>
         {#if isOpenFilter}
             <div transition:slide>
-                <div class="grid grid-cols-2 lg:grid-cols-4" >
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
                     <div class="">
                         <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
-                        Servicio desde
+                            Servicio desde
                         </label>
                         <input id ="fechainseminaciondesde" type="date"  
                             class={`
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
-                            bind:value={fechaservdesdefiltro} onchange={filterUpdate}
+                            bind:value={fechaservdesdefiltro} 
+                            onchange={filterUpdate}
                         />
                     </div>
                     <div class="">
@@ -361,7 +464,8 @@
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
-                            bind:value={fechaservhastafiltro} onchange={filterUpdate}
+                            bind:value={fechaservhastafiltro} 
+                            onchange={filterUpdate}
                         />
                     </div>
                     <div class="">
@@ -373,7 +477,9 @@
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
-                            bind:value={fechapartodesde} onchange={filterUpdate}
+                            
+                            bind:value={fechapartodesde} 
+                            onchange={filterUpdate}
                         />
                     </div>
                     <div class="">
@@ -385,8 +491,9 @@
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
-                            onchange={filterUpdate}
+                            
                             bind:value={fechapartohasta} 
+                            onchange={filterUpdate}
                         />
                     </div>
                     <div class="">
@@ -441,16 +548,151 @@
             </div>
         {/if}
     </div>
+    <!--Ordenar-->
+    <div class="block  md:hidden w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Ordenar" 
+            class="w-full"
+            onclick={clickOrdenar}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Ordenar</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`size-6 transition-all duration-300 ${isOpenOrdenar? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            
+        </button>
+        {#if isOpenOrdenar}
+            <div transition:slide>
+                <div class="my-0 py-0">
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={selectforma}
+                            onchange={()=>ordenarServicios(selectforma)}
+                            
+                        >
+                            <option value="fecha" class="rounded">Fecha</option>
+                            <option value="fechaparto" class="rounded">Fecha Parto</option>
+                            <option value="madre" class="rounded">Madre</option>
+                            <option value="tipo" class="rounded">Tipo</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="my-1">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Ascendente</span>
+                            <input type="checkbox" class="toggle" bind:checked={ascendente} onclick={()=>ordenarServicios(selectforma)}/>
+                        </label>
+                      </div>
+                </div>
+            </div>
+        {/if}
+    </div>
     <div class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Hasta</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Fecha Parto</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Madre</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Padres</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Tipo</th>
+                    <th 
+                        onclick={()=>ordenarServicios("fecha")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                    <div
+                            class="flex flex-row justify-between"
+                    >
+                            Fecha
+                            {#if forma == "fecha"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                        
+                    </th>
+                    <th 
+                        class="text-base mx-1 px-1 border-b dark:border-gray-600"
+                    >
+                        
+                        Fecha Hasta
+                    </th>
+                    <th 
+                        onclick={()=>ordenarServicios("fechaparto")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Fecha Parto
+                            {#if forma == "fechaparto"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                        
+                    </th>
+                    <th 
+                        onclick={()=>ordenarServicios("madre")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Madre
+                            {#if forma == "madre"}
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                            {/if}
+                        </div>
+                        
+                    </th>
+                    <th 
+                        class="text-base mx-1 px-1 border-b dark:border-gray-600"
+                    >
+                        Padres
+                    </th>
+                    <th 
+                        onclick={()=>ordenarServicios("tipo")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Tipo
+                            {#if forma == "tipo"}
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                            {/if}
+                        </div>
+                        
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -517,7 +759,10 @@
                             
                         </div>
                         <div class={`flex items-start ${s.fechadesde?"":"col-span-2"}`}>
-                            <span >Fecha {s.fechadesde?"desde":"de inseminación"}:</span> 
+                            <span 
+                            >
+                                Fecha {s.fechadesde?"desde":"de inseminación"}:
+                            </span> 
                             <span class="mx-1 font-semibold">
                                 {
                                     s.fechadesde?new Date(s.fechadesde).toLocaleDateString():
@@ -549,7 +794,12 @@
                             
                         </div>
                         <div class="flex items-start">
-                            <span >Padres:</span> 
+                            <span >
+                                {   s.fechadesde?
+                                    "Padres":
+                                    "Padre"
+                                }
+                            </span> 
                             <span class="mx-1 font-semibold">
                                 {
                                     s.fechadesde?

@@ -337,6 +337,7 @@
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
         await getNacimientos()
+        ordenarNacimientos(forma)
         filterUpdate()
         await getAnimales()
     })
@@ -450,6 +451,50 @@
             OBSERVACION:item.observacion
         }
     }
+    //Para el collapse de los ordenar
+    let isOpenOrdenar = $state(false)
+    function clickOrdenar(){
+        isOpenOrdenar = !isOpenOrdenar
+    }
+    //Para los ordenar
+    let ascendente = $state(true)
+    let forma = $state("fecha")
+    let selectforma = $state("fecha")
+    //Ordenar nacimientos
+    function ordenarNacimientosDescendente(p_forma){
+        
+        let escalar = 1
+        if(!ascendente){
+            escalar = -1
+        }
+        forma = p_forma
+        if(forma=="fecha"){
+            
+            nacimientosrow.sort((a1,a2)=>escalar * a1.fecha.localeCompare(a2.fecha))
+        }
+        else if(forma=="caravana"){
+            
+            nacimientosrow.sort((a1,a2)=>escalar * a1.caravana.localeCompare(a2.caravana))
+        }
+        else if(forma=="madre"){
+            nacimientosrow.sort((a1,a2)=>escalar * a1.nombremadre.localeCompare(a2.nombremadre))
+        }
+        else if(forma=="padre"){
+            nacimientosrow.sort((a1,a2)=>escalar * a1.nombrepadre.localeCompare(a2.nombrepadre))
+        }
+    }
+    function ordenarNacimientos(p_forma){
+        
+        if(p_forma == forma){
+            ascendente = !ascendente
+            
+        }
+        else{
+            ascendente = true
+        }
+        ordenarNacimientosDescendente(p_forma)
+    }
+
 </script>
 <Navbarr>
     <div class="grid grid-cols-2 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
@@ -490,6 +535,7 @@
             </label>
         </div>
     </div>
+    <!--Filtrar-->
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
         <button 
             aria-label="Filtrar" 
@@ -585,16 +631,143 @@
                 </div>
             </div>
         {/if}
+    </div>
+    <!--Ordenar-->
+    <div class="block  md:hidden w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Ordenar" 
+            class="w-full"
+            onclick={clickOrdenar}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Ordenar</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`size-6 transition-all duration-300 ${isOpenOrdenar? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            
+        </button>
+        {#if isOpenOrdenar}
+            <div transition:slide>
+                <div class="my-0 py-0">
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={selectforma}
+                            onchange={()=>ordenarNacimientos(selectforma)}
+                            
+                        >
+                            <option value="fecha" class="rounded">Fecha</option>
+                            <option value="caravana" class="rounded">Caravana</option>
+                            <option value="madre" class="rounded">Madre</option>
+                            <option value="padre" class="rounded">Padre</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="my-1">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Ascendente</span>
+                            <input type="checkbox" class="toggle" bind:checked={ascendente} onclick={()=>ordenarNacimientos(selectforma)}/>
+                        </label>
+                      </div>
+                </div>
+            </div>
+        {/if}
     </div> 
     <div class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Caravana</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Madre</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Padre</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Observacion</th>
+                    <th 
+                        onclick={()=>ordenarNacimientos("fecha")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Fecha
+                            {#if forma == "fecha"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarNacimientos("caravana")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                                Caravana
+                                {#if forma == "caravana"}
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarNacimientos("madre")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Madre
+                            {#if forma == "madre"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarNacimientos("padre")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Padre
+                            {#if forma == "padre"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        
+                        </div>
+                    </th>
+                    <th 
+                        class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600"
+                    >
+                        Observacion
+                    </th>
                     
                 </tr>
             </thead>

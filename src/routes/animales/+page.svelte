@@ -134,6 +134,7 @@
         
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+        
         animalesrows = animales
         madres = animales.filter(a=>a.sexo=="H")
         padres = animales.filter(a=>a.sexo=="M")
@@ -437,7 +438,7 @@
     let selectforma = $state("caravana")
     //Ordenar animales
     function ordenarAnimalesDescendente(p_forma){
-        console.log(ascendente)
+        
         let escalar = 1
         if(!ascendente){
             escalar = -1
@@ -478,7 +479,7 @@
             ascendente = !ascendente
         }
         else{
-            ascendente = false
+            ascendente = true
         }
         let escalar = 1
         if(!ascendente){
@@ -748,7 +749,7 @@
             </div>
         {/if}
     </div>
-    <div class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
+    <div class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-5/6 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr >
@@ -758,40 +759,121 @@
                             text-base p-3 border-b dark:border-gray-600 
                             hover:cursor-pointer hover:bg-gray-200 
                             dark:hover:bg-gray-800
-                        `}  >
-                        Animal
+                            
+                        `}  
+                    >
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Animal
+                        
+                            {#if forma == "caravana"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
                     </th>
+
                     <th 
                         onclick={()=>ordenarAnimales("sexo")}
-                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"  >
-                        Sexo
+                        class={`
+                            text-base p-3 border-b dark:border-gray-600 
+                            hover:cursor-pointer hover:bg-gray-200 
+                            dark:hover:bg-gray-800
+                            
+                        `}
+                    >
+                        <div
+                         class="flex flex-row justify-between"
+                        > 
+                            Sexo
+                            {#if forma == "sexo"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                        
                     </th>
                     <th 
                         onclick={()=>ordenarAnimales("categoria")}
-                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"  >
-                        Categoria
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                            <div
+                                class="flex flex-row justify-between"
+                            >
+                                Categoria
+                                {#if forma == "categoria"}
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                {/if}
+                            </div>
                     </th>
                     <th 
                         onclick={()=>ordenarAnimales("estado")}
-                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"  >
-                        Estado
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 ">
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Estado
+                            {#if forma == "estado"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                        
                     </th>
                     <th 
                         onclick={()=>ordenarAnimales("lote")}
-                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"  >
-                        Lote
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 ">
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Lote
+                            {#if forma == "lote"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
                     </th>
                     <th 
                         onclick={()=>ordenarAnimales("rodeo")}
-                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"  >
-                        Rodeo
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 ">
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Rodeo
+                            {#if forma == "rodeo"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
                     </th>
-                    <!--<th class="text-base"  >Acciones</th>-->
-                    
                 </tr>
-                
             </thead>
-            
             <tbody>
                 {#each animalesrows as a}
                 <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`${pre}/animales/${a.id}`)}>

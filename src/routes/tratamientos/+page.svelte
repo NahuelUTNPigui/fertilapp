@@ -12,6 +12,7 @@
     import categorias from '$lib/stores/categorias';
     import estilos from '$lib/stores/estilos';
     import { goto } from "$app/navigation";
+    import {capitalize} from "$lib/stringutil/lib"
     
     
     let caber = createCaber()
@@ -436,6 +437,49 @@
             
         }
     }
+    //Para el collapse de los ordenar
+    let isOpenOrdenar = $state(false)
+    function clickOrdenar(){
+        isOpenOrdenar = !isOpenOrdenar
+    }
+    //Para los ordenar
+    let ascendente = $state(true)
+    let forma = $state("fecha")
+    let selectforma = $state("fecha")
+    //Ordenar servicios
+    function ordenarTratamientosDescendente(p_forma){
+        
+        let escalar = 1
+        if(!ascendente){
+            escalar = -1
+        }
+        forma = p_forma
+        if(forma=="fecha"){
+            
+            tratamientosrow.sort((a1,a2)=>escalar * a1.fecha.localeCompare(a2.fecha))
+        }
+        else if(forma=="animal"){
+            
+            tratamientosrow.sort((a1,a2)=>escalar * a1.expand.animal.caravana.localeCompare(a2.expand.animal.caravana))
+        }
+        else if(forma=="categoria"){
+            tratamientosrow.sort((a1,a2)=>escalar * (a1.categoria < a2.categoria?-1:1))
+        }
+        else if(forma=="tipo"){
+            tratamientosrow.sort((a1,a2)=>escalar * a1.expand.tipo.nombre.localeCompare(a2.expand.tipo.nombre))
+        }
+    }
+    function ordenarTratamientos(p_forma){
+        
+        if(p_forma == forma){
+            ascendente = !ascendente
+            
+        }
+        else{
+            ascendente = true
+        }
+        ordenarTratamientosDescendente(p_forma)
+    }
 </script>
 <Navbarr>
     <div class="grid grid-cols-3 lg:grid-cols-4 mx-1 lg:mx-10 mt-1 w-11/12">
@@ -497,6 +541,7 @@
             </label>
         </div>
     </div>
+    <!--Filtrar-->
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
         <button 
             aria-label="Filtrar" 
@@ -518,7 +563,7 @@
         </div>
         {#if isOpenFilter}
             <div transition:slide>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-1" >
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-1" >
                     <div class="">
                         <label class="block tracking-wide  mb-2" for="grid-first-name">
                           Fecha desde
@@ -595,15 +640,139 @@
             </div>
         {/if}
     </div>
-   
+    <!--Ordenar-->
+    <div class="block  md:hidden w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
+        <button 
+            aria-label="Ordenar" 
+            class="w-full"
+            onclick={clickOrdenar}
+        >
+            <div class="flex justify-between items-center px-1">
+                <h1 class="font-semibold text-lg py-2">Ordenar</h1>
+                <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    class={`size-6 transition-all duration-300 ${isOpenOrdenar? 'transform rotate-180':''}`}
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            
+        </button>
+        {#if isOpenOrdenar}
+            <div transition:slide>
+                <div class="my-0 py-0">
+                    <label class="input-group ">
+                        <select 
+                            class={`
+                                select select-bordered w-full
+                                rounded-md
+                                focus:outline-none focus:ring-2 
+                                focus:ring-green-500 
+                                focus:border-green-500
+                                
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={selectforma}
+                            onchange={()=>ordenarTratamientos(selectforma)}
+                            
+                        >
+                            <option value="fecha" class="rounded">Fecha</option>
+                            <option value="animal" class="rounded">Animal</option>
+                            <option value="categoria" class="rounded">Categoria</option>
+                            <option value="tipo" class="rounded">Tipo</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="my-1">
+                    <div class="form-control">
+                        <label class="label cursor-pointer">
+                            <span class="label-text">Ascendente</span>
+                            <input type="checkbox" class="toggle" bind:checked={ascendente} onclick={()=>ordenarTratamientos(selectforma)}/>
+                        </label>
+                      </div>
+                </div>
+            </div>
+        {/if}
+    </div> 
     <div class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto">
         <table class="table table-lg w-full" >
             <thead>
                 <tr>
-                    <th class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600">Fecha</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Animal</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Categoria</th>
-                    <th class="text-base mx-1 px-1 border-b dark:border-gray-600">Tipo</th>
+                    <th 
+                        onclick={()=>ordenarTratamientos("fecha")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Fecha
+                            {#if forma == "fecha"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarTratamientos("animal")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Animal
+                            {#if forma == "animal"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarTratamientos("categoria")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Categoria
+                            {#if forma == "categoria"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
+                    <th 
+                        onclick={()=>ordenarTratamientos("tipo")}
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        
+                        <div
+                                class="flex flex-row justify-between"
+                        >
+                            Tipo
+                            {#if forma == "tipo"}
+                                <svg 
+                                    xmlns="http://www.w3.org/2000/svg" 
+                                    class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            {/if}
+                        </div>
+                    </th>
                     <!--<th class="text-base mx-1 px-1">Acciones</th>-->
                 </tr>
             </thead>
@@ -615,7 +784,7 @@
                             {`${t.expand.animal.caravana}`}
                         </td>
                         <td class="text-base mx-1 px-1 ">
-                            {`${t.expand.animal.categoria}`}
+                            {`${capitalize(t.categoria)}`}
                         </td>
                         <td class="text-base mx-1 px-1 ">
                             {`${t.expand.tipo.nombre}`}
