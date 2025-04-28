@@ -181,7 +181,8 @@
           </div>
           {@render children()}
       </div>
-      <div class="drawer-side">
+      
+      <div class="drawer-side overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
         <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         
         <ul 
@@ -215,6 +216,7 @@
               </a>
             </li>
           {:else if rol=="Establecimiento"}
+          
             <!--Inicio-->
             <li  class={`mt-2 ${pageurl.includes("inicio")?"bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25":""} rounded-full`}>
               <a class = {`pb-0 ${classtext}`} href={pre+"/inicio"}>

@@ -20,7 +20,7 @@
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
     import cuentas from '$lib/stores/cuentas';
     import MultipleToros from '$lib/components/MultipleToros.svelte';
-    
+    import{verificarNivel} from "$lib/permisosutil/lib"
 
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
@@ -295,20 +295,13 @@
         nuevoModalObservacion.showModal()
     }
     async function guardarAnimal(esTacto,esInseminacion) {
-        let user = await pb.collection("users").getOne(usuarioid)
-        
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        
-        
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        
-        let verificar = true
+        let verificar = await verificarNivel(cab.id)
         if(nivel.animales != -1 && animals.totalItems >= nivel.animales){
             verificar =  false
         }
         
         if(!verificar){
-            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
+            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más animales`,"error")
             return {id:-1}
         }
         let data = {
@@ -393,12 +386,7 @@
         
     }
     async function guardarNacimiento(){
-        let user = await pb.collection("users").getOne(usuarioid)
-        
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        let verificar = true
+        let verificar = await verificarNivel(cab.id)
         if(nivel.animales != -1 && animals.totalItems > nivel.animales){
             verificar =  false
         }
@@ -1038,7 +1026,7 @@
     
     {#if cab.exist}
     
-        <CardBase titulo="Bienvenido a Creciente Fertil" cardsize="max-w-5xl">
+        <CardBase titulo="Bienvenido a Creciente Fértil" cardsize="max-w-5xl">
             <div class="mx-1 my-2 lg:mx-10 grid grid-cols-2  lg:grid-cols-3 gap-1">
                 <StatCard urlto={"/animales"} titsize={"text-md"} titulo="Animales" valor={totaleventos.animales}/>
                 <StatCard urlto={"/lotes"} titsize={"text-md"} titulo="Lotes" valor={totaleventos.lotes}/>
@@ -1334,7 +1322,7 @@
             </div>
         </CardBase>
     {:else}
-        <CardBase titulo="Bienvenido a Creciente Fertil">
+        <CardBase titulo="Bienvenido a Creciente Fértil">
             <div class="grid grid-cols-1 gap-6">
                 <a class={classbutton}
                     href={pre+"/establecimiento"}

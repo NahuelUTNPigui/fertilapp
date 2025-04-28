@@ -109,8 +109,9 @@
     }
     async function transferir(codigo){
         const resultcab = await pb.collection('cabs').getList(1, 1, {
-            filter: `active = true && codigo = '${codigo}'`,    
+            filter: `active = true && renspa = '${codigo}'`,    
         });
+        
         try{
             
             let data = {
@@ -125,7 +126,7 @@
         
             let origenusuarioid =  pb_json.record.id
             let datatrans = {
-                texto:"Se transfirió a "+caravana,
+                texto:"Se transfirió a "+codigo,
                 titulo:"Transferencia de 1 animal",
                 tipo:tiponoti[1].id,
                 origen:origenusuarioid,

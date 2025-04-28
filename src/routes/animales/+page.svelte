@@ -20,7 +20,8 @@
     import { getEstadoNombre,getEstadoColor } from '$lib/components/estadosutils/lib';
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     import cuentas from '$lib/stores/cuentas';
-    import { getSexoNombre,capitalize } from '$lib/stringutil/lib';
+    import { getSexoNombre,capitalize,shorterWord } from '$lib/stringutil/lib';
+    import{verificarNivel} from "$lib/permisosutil/lib"
     
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
@@ -93,21 +94,7 @@
     function isEmpty(str){
         return (!str || str.length === 0 );
     }
-    async function verificarNivel() {
-        let user = await pb.collection("users").getOne(usuarioid)
-        
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        
-        if(animals.totalItems >= nivel.animales){
-            return false
-        }
-        else{
-            return true
-        }
-
-    }
+    
     async function getRodeos(){
         const records = await pb.collection('rodeos').getFullList({
             filter:`active = true && cab = '${cab.id}'`,
@@ -188,20 +175,11 @@
     }
     //Se puede guardar un animal con su nacimiento
     async function guardar(){
-        let user = await pb.collection("users").getOne(usuarioid)
-        
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        let verificar = true
-        if(nivel.animales != -1 && animals.totalItems >= nivel.animales){
-            verificar =  false
-        }
-        
+        let verificar = await verificarNivel(cab.id)
         if(!verificar){
-            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
+            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más animales`,"error")
             return
         }
-        
         try{
             let recordparicion = null
             if(conparicion){
@@ -242,13 +220,16 @@
                     nacimiento : recordparicion
                 }
             }
-            let datapesaje = {
-                animal:recorda.id,
-                fecha:fechanacimiento +" 03:00:00",
-                pesoanterior:0,
-                pesonuevo:peso
+            if(fechanacimiento){
+                let datapesaje = {
+                    animal:recorda.id,
+                    fecha:fechanacimiento +" 03:00:00",
+                    pesoanterior:0,
+                    pesonuevo:peso
+                }
+                await pb.collection('pesaje').create(datapesaje)
             }
-            await pb.collection('pesaje').create(datapesaje)
+            
             animales.push(recorda)
             animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
 
@@ -417,7 +398,7 @@
                 "":
                 "",
             CATEGORIA:capitalize(item.categoria),
-            ESTADO:getEstadoNombre(item.prenada),
+            ESTADO:item.sexo=="M"?"-":getEstadoNombre(item.prenada),
             FALLECIMIENTO:item.fechafallecimiento?new Date(item.fechafallecimiento).toLocaleDateString():""
 
         }
@@ -587,12 +568,12 @@
             
         </button>
         <div>
-            <span class = "text-lg mx-1">Total de animales encontrados: {totalAnimalesEncontrados}</span>
+            <span class = "text-lg my-1">Total de animales encontrados: {totalAnimalesEncontrados}</span>
         </div>
         {#if isOpenFilter}
                 <div transition:slide>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-10 w-full" >
-                        <div class="mt-0">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-10 w-full my-1" >
+                        <div class="mt-1">
                             <MultiSelect
                                 opciones={[{id:"-1",nombre:"Sin rodeo"}].concat(rodeos)}
                                 bind:valores={rodeoseleccion}
@@ -633,12 +614,12 @@
                                 filterUpdate = {filterUpdate}
                             />
                         </div>
-                        <div class="">
+                        <div class="mt-1">
                             <MultiSelect
                                 opciones={[{id:"-1",nombre:"Sin categoria"}].concat(categorias)}
                                 bind:valores={categoriaseleccion}
                                 etiqueta="Categorias"
-                                margintop="mt-0"
+                                
                                 filterUpdate = {filterUpdate}
                             />
                         </div>
@@ -879,7 +860,7 @@
                 <tr class=" hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>goto(`${pre}/animales/${a.id}`)}>
                     <td class="text-base p-3 ">
                         <div class="flex gap-1">
-                            {`${a.caravana}`}
+                            {`${shorterWord(a.caravana)}`}
                             {#if !a.active}
                                 <div class={`
                                     bg-transparent rounded-lg
@@ -894,8 +875,12 @@
                     </td>
                     <td class="text-base p-3 "> {a.sexo}</td>
                     <td class="text-base p-3 "> {a.categoria}</td>
-                    <td class="text-base p-3 "> 
-                        {getEstadoNombre(a.prenada)}
+                    <td class="text-base p-3 ">
+                        {#if a.sexo == "H"}
+                            {getEstadoNombre(a.prenada)}
+                        {:else}
+                            -
+                        {/if}
                     </td>
                     <td class="text-base p-3 ">
                         {
@@ -928,7 +913,7 @@
             <button  onclick={()=>goto(`${pre}/animales/${a.id}`)}>
                 <div class="block p-4">
                     <div class="flex justify-between items-start mb-2">
-                        <h3 class="font-medium">{a.caravana}</h3>
+                        <h3 class="font-medium">{shorterWord(a.caravana)}</h3>
                         {#if a.sexo == "H" && a.prenada != 1}
                             <div class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}>{getEstadoNombre(a.prenada)}</div>
                         {/if}

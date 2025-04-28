@@ -2,7 +2,7 @@
     import estilos from "$lib/stores/estilos";
     import {isEmpty} from "$lib/stringutil/lib"
     import { goto } from "$app/navigation";
-    let {colabs = $bindable()} = $props()
+    let {colabs = $bindable([])} = $props()
     let pre = import.meta.env.VITE_PRE
     function getColab(id){
         goto(pre+"/colaboradores/"+id)

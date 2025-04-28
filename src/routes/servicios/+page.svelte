@@ -78,6 +78,7 @@
     let padres = $state([])
     let borrados = $state([])
     let idanimal = $state("")
+    //Dado que puede haber eliminaciones involuntarias  
     //Validaciones
     let botonhabilitado = $state(true)
     
@@ -101,11 +102,8 @@
     }
     function openEditModalIns(id){
         esinseminacion = true
-        idserv = id
-        
-        
+        idins = id
         let ser = serviciosrow.filter(s=>s.id == id)[0]
-        
         if(ser){
             idanimal = ser.animal
             fechainseminacion = ser.fechainseminacion.split(" ")[0]
@@ -166,14 +164,31 @@
         }
         
     }
-    async function eliminar(id){
-        try{
-            await pb.collection("servicios").update(id,{active:false})
-            await getServicios()
+    async function eliminar(id,esInseminacion){
+        if(!esInseminacion){
+            try{
+                await pb.collection("servicios").update(id,{active:false})
+                await getServicios()
+                filterUpdate()
+                Swal.fire("Éxito eliminar","Se eliminó con éxito el servicio","success")
+            }
+            catch(err){
+                console.error(err)
+            }
         }
-        catch(err){
-            console.error(err)
+        else{
+            try{
+                await pb.collection("inseminacion").update(id,{active:false})
+                await getInseminaciones()
+                filterUpdate()
+                Swal.fire("Éxito eliminar","Se eliminó con éxito la inseminación","success")
+
+            }
+            catch(err){
+                console.error(err)
+            }  
         }
+        
     }
     function cerrarModal(){
         
@@ -437,7 +452,7 @@
             </div> 
         </button>
         <div>
-            <span class = "text-lg mx-1">Total de servicios encontrados: {totalServicios}</span>
+            <span class = "text-lg my-1">Total de servicios encontrados: {totalServicios}</span>
         </div>
         {#if isOpenFilter}
             <div transition:slide>
@@ -448,6 +463,7 @@
                         </label>
                         <input id ="fechainseminaciondesde" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
@@ -461,6 +477,7 @@
                         </label>
                         <input id ="fechainseminacionhasta" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
@@ -469,11 +486,12 @@
                         />
                     </div>
                     <div class="">
-                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
-                        Parto desde
+                        <label class="block tracking-wide text-base font-medium mb-2" for="fechapartodesde">
+                            Parto desde
                         </label>
-                        <input id ="fechainseminaciondesde" type="date"  
+                        <input id ="fechapartodesde" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
@@ -483,11 +501,12 @@
                         />
                     </div>
                     <div class="">
-                        <label class="block tracking-wide text-base font-medium mb-2" for="grid-first-name">
+                        <label class="block tracking-wide text-base font-medium mb-2" for="fechapartohasta">
                             Parto hasta
                         </label>
-                        <input id ="fechainseminacionhasta" type="date"  
+                        <input id ="fechapartohasta" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
@@ -525,7 +544,7 @@
                         <label for = "nombrepadre" class="label">
                             <span class="label-text text-base">Pajuela</span>
                         </label>
-                        <label class="input-group">
+                        <label class="input-group md:w-1/2 md:flex">
                             <input 
                                 id ="nombrepadre" 
                                 type="text"  
@@ -942,7 +961,7 @@
         <div class="modal-action justify-start ">
             <form method="dialog" >
                 <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
-                <button class="btn btn-error text-white" onclick={()=>eliminar(idserv)}>Eliminar</button>
+                <button class="btn btn-error text-white" onclick={()=>eliminar(idserv,false)}>Eliminar</button>
                 <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
             </form>
         </div>
@@ -1076,7 +1095,7 @@
         <div class="modal-action justify-start ">
             <form method="dialog" >
                 <button class="btn btn-success text-white" disabled='{!botonhabilitado}' onclick={editar} >Editar</button>
-                <button class="btn btn-error text-white" onclick={()=>eliminar(idins)}>Eliminar</button>
+                <button class="btn btn-error text-white" onclick={()=>eliminar(idins,true)}>Eliminar</button>
                 <button class="btn btn-neutral " onclick={cerrarModal}>Cerrar</button>
             </form>
         </div>

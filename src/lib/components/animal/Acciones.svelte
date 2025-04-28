@@ -67,17 +67,23 @@
     }
     async function transfer(){
         const resultList = await pb.collection('cabs').getList(1, 1, {
-            filter: `active = true && codigo = '${codigo}'`,
+            filter: `active = true && renspa = '${codigo}'`,
         });
         if(resultList.items.length == 0){
             malcodigo = true
+            transferModal.close()
+            return
+        }
+        if(resultList.totalItems > 1){
+            Swal.fire("Error transferencia","Hay varios establecimientos con ese RENSPA","error")
+            transferModal.close()
             return
         }
         transferModal.close()
         
         Swal.fire({
             title: 'Transferir animal',
-            text: `¿Seguro que deseas transferir el animal a ${caravana}?`,
+            text: `¿Seguro que deseas transferir el animal ${caravana} a ${codigo}?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si',
@@ -289,16 +295,16 @@
         </div>
     </div>
 </div>
-<dialog id="transferModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-    <div class="modal-box w-11/12 max-w-xl bg-50">
+<dialog id="transferModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle ">
+    <div class="modal-box w-11/12 max-w-xl bg-white dark:bg-gray-800">
         <form method="dialog">
             <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
         </form>
         <!--<h3 class="text-lg font-bold">Buscar cabañas</h3> -->
         <div 
-            class="form-control bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-fullmax-w-xl"
+            class="form-control p-8 w-full"
         >
-            <h2 class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">Código de transferencia</h2>
+            <h2 class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start">RENSPA</h2>
             <input 
                 id ="token" 
                 type="text"  

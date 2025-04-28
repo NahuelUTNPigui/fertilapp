@@ -45,6 +45,7 @@
     //Desasociar
     let asociado = $state(false)
     let idestxcolab = $state("")
+    
     async function getCabaña(){
         try{
             const record = await pb.collection('cabs').getFirstListItem(`id='${cab.id}' && active=true`, {});
@@ -585,8 +586,8 @@
                 {/if}
                 
             </div>
-            <Colaboradores {mostrarcolab} {guardarColab} {desasociar} {asociado}/>
-            <ListaColabs {colabs}/>
+            <Colaboradores bind:colabs={colabs} {mostrarcolab} {guardarColab} {desasociar} {asociado} cabid={cab.id} {cab}/>
+            <ListaColabs bind:colabs={colabs}/>
         </CardBase>
     {:else}
         <CardBase titulo="Registra tu establecimiento">

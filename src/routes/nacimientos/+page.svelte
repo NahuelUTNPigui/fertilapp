@@ -10,7 +10,8 @@
     import { createCaber } from '$lib/stores/cab.svelte';
     import {guardarHistorial} from "$lib/historial/lib"
     import PredictSelect from '$lib/components/PredictSelect.svelte';
-    import cuentas from '$lib/stores/cuentas';
+    import{verificarNivel} from "$lib/permisosutil/lib"
+
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -92,20 +93,13 @@
         nacimientosrow = nacimientos
     }
     async function guardar(){
-        let user = await pb.collection("users").getOne(usuarioid)
-        
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        
-        
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        
-        let verificar = true
+        let verificar = await verificarNivel(cab.id)
         if(nivel.animales != -1 && animals.totalItems >= nivel.animales){
             verificar =  false
         }
         
         if(!verificar){
-            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
+            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más animales`,"error")
             return
         }
         try{
@@ -318,13 +312,15 @@
                 try{
                     await pb.collection('nacimientos').delete(idnacimiento);
                     nacimientos = nacimientos.filter(n=>n.id!=idnacimiento)
+                    
+                    //const recorda = await pb.collection('animales').getFirstListItem(`nacimiento='${idnacimiento}'`, {});
+                    //console.log(recorda)
+                    //const recordupdate = await pb.collection('animales').update(recorda.id, {nacimiento:""});
                     filterUpdate()
-                    const recorda = await pb.collection('animales').getFirstListItem(`nacimiento='${idnacimiento}'`, {});
-                    const recordupdate = await pb.collection('animales').update(recorda.id, {nacimiento:""});
-
                     Swal.fire('Nacimiento eliminado!', 'Se eliminó el nacimiento correctamente.', 'success');
                 }
                 catch(e){
+                    console.log(e)
                     Swal.fire('Acción cancelada', 'No se pudo eliminar al nacimiento', 'error');
                 }
                 idnacimiento = ""
@@ -553,7 +549,7 @@
             </div> 
         </button>
         <div>
-            <span class = "text-lg mx-1">Total de nacimientos encontrados: {totalNacimientosEncontrados}</span>
+            <span class = "text-lg my-1">Total de nacimientos encontrados: {totalNacimientosEncontrados}</span>
         </div>
         {#if isOpenFilter}
             <div transition:slide>
@@ -564,6 +560,7 @@
                         </label>
                         <input id ="fechadesde" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
@@ -576,17 +573,18 @@
                         </label>
                         <input id ="fechadesde" type="date"  
                             class={`
+                                w-full md:w-1/2
                                 input input-bordered
                                 ${estilos.bgdark2}
                             `} 
                             bind:value={fechahasta} onchange={filterUpdate}
                         />
                     </div>
-                    <div>
+                    <div class="">
                         <label for = "nombremadre" class="label">
                             <span class="label-text text-base">Madre</span>
                         </label>
-                        <label class="input-group">
+                        <label class="input-group md:w-1/2 md:flex">
                             <input 
                                 id ="nombremadre" 
                                 type="text"  
@@ -609,7 +607,7 @@
                         <label for = "nombrepadre" class="label">
                             <span class="label-text text-base">Padre</span>
                         </label>
-                        <label class="input-group">
+                        <label class="input-group md:w-1/2 md:flex">
                             <input 
                                 id ="nombrepadre" 
                                 type="text"  

@@ -9,6 +9,8 @@
     import { getPermisosList } from "$lib/permisosutil/lib";
     import cuentas from '$lib/stores/cuentas';
     import categorias from "$lib/stores/categorias";
+    import{verificarNivelCantidad} from "$lib/permisosutil/lib"
+
     let {animales,animalesusuario} = $props()
     let usuarioid = $state("")
     let ruta = import.meta.env.VITE_RUTA
@@ -133,6 +135,7 @@
             }
         }
         let animalesimportar = []
+        let nuevoanimales = 0
         for (const [key, value ] of Object.entries(animaleshashmap)) {
             animalesimportar.push(value)
             let conocido = animales.filter(a=>a.caravana == value.caravana).length == 0
@@ -140,14 +143,9 @@
                 nuevoanimales += 1
             }
         }
-        let user = await pb.collection("users").getOne(usuarioid)
-        let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
+
         
-        let verificar = true
-        if(nivel.animales != -1 && animalesusuario + nuevoanimales >= nivel.animales){
-            verificar =  false
-        }
-        
+        let verificar = await verificarNivelCantidad(cab.id,nuevoanimales)
         if(!verificar){
             Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener mas de ${nivel.animales} animales`,"error")
             loading = false

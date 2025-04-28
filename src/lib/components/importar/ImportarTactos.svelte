@@ -19,7 +19,7 @@
     let wkbk = $state(null)
     let loading = $state(false)
     function exportarTemplate2(){
-        goto(`${ruta}/Modelo tactos validados.xlsx`)
+        goto(`${ruta}/Modelo tactos.xlsx`)
     }
     function exportarTemplate(){
         let csvData = [{
@@ -233,7 +233,7 @@
             w-full text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        href="{`${ruta}/Modelo tactos validados.xlsx`}"
+        href="{`${ruta}/Modelo tactos.xlsx`}"
         
     >
        Descargar Plantilla

@@ -7,6 +7,7 @@
     import { onMount } from "svelte";
     import cuentas from '$lib/stores/cuentas';
     import categorias from "$lib/stores/categorias";
+    import{verificarNivelCantidad} from "$lib/permisosutil/lib"
     let {animales,animalesusuario} = $props()
     let ruta = import.meta.env.VITE_RUTA
     let caber = createCaber()
@@ -165,7 +166,8 @@
                 nuevoanimales += 1
             }
         }
-        if(nivel.animales != -1 && animalesusuario + nuevoanimales >= nivel.animales){
+        let verificar = await verificarNivelCantidad(cab.id,nuevoanimales)
+        if(!verificar){
             errornuevoanimales = true
             filename = ""
             loading = false

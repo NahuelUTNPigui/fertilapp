@@ -180,7 +180,6 @@
         
     }
     function inputObsGeneral(){
-        
         for(let i = 0 ;i < selectanimales.length;i++){
             selectanimales[i].observacionnuevo = observaciongeneral
             
@@ -231,7 +230,8 @@
                 selectanimales.push({
                     ...value,
                     tipotratamiento:"",
-                    observacionnuevo:""})
+                    observacionnuevo:""
+                })
             }
         }
         tratamientoMasivo.showModal()
@@ -794,20 +794,21 @@
                     <tbody>
                         {#each selectanimales as a,i}
                             <tr>
+                                
                                 <td class="text-base">{a.caravana}</td>
                                 <td class="text-base">{a.categoria}</td>
                                 <td class="">
                                     <input
-                                    bind:value={selectanimales[i].observacionnuevo}
-                                    class={`
-                                        px-1
-                                        h-12 border border-gray-300 
-                                        w-full
-                                        rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2}
+                                        bind:value={selectanimales[i].observacionnuevo}
+                                        class={`
+                                            px-1
+                                            h-12 border border-gray-300 
+                                            w-full
+                                            rounded-md
+                                            focus:outline-none focus:ring-2 
+                                            focus:ring-green-500 
+                                            focus:border-green-500
+                                            ${estilos.bgdark2}
                                     `}
                                     />
                                 </td>
@@ -832,7 +833,7 @@
                             
                             
                             <input
-                                bind:value={selectanimales[i].observacion}
+                                bind:value={selectanimales[i].observacionnuevo}
                                 placeholder="Observación"
                                 class={`
                                     h-12 border border-gray-300

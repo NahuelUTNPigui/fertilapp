@@ -360,13 +360,13 @@
                             {f.animal}
                         </td>
                         {#each Array(3) as _,idx}
-                            {#if f.pesajes.length < ultimos - idx}
+                            {#if f.pesajes.length < ultimos - ( idx + 2)}
                                 <td>
                                     {"-"}
                                 </td>
                             {:else}
-                                <td onclick={()=>openDetalle(f.pesajes[ultimos - idx - 1].id)} class="cursor-pointer text-base mx-1 px-1 hover:bg-gray-200 dark:hover:bg-gray-900">
-                                    {new Date(f.pesajes[ultimos - idx - 1].fecha).toLocaleDateString()} , {f.pesajes[ultimos - idx - 1].peso}
+                                <td onclick={()=>openDetalle(f.pesajes[ultimos - ( idx + 2) - 1].id)} class="cursor-pointer text-base mx-1 px-1 hover:bg-gray-200 dark:hover:bg-gray-900">
+                                    {new Date(f.pesajes[ultimos - ( idx + 2) - 1].fecha).toLocaleDateString()} , {f.pesajes[ultimos - ( idx + 2) - 1].peso}
                                 </td>
                             {/if}
                                 

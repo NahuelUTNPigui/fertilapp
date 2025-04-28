@@ -275,10 +275,14 @@
         }
         if(selecttransfer){
             const resultList = await pb.collection('cabs').getList(1, 1, {
-                filter: `active = true && codigo = '${codigo}'`,
+                filter: `active = true && renspa = '${codigo}'`,
             });
             if(resultList.items.length == 0){
                 malcodigo = true
+                return
+            }
+            if(resultList.totalItems> 1){
+                Swal.fire("Error transferencia","Hay varios establecimientos con ese RENSPA","error")
                 return
             }
             data.cab = resultList.items[0].id
@@ -1065,7 +1069,7 @@
                     <div class="grid grid-cols-1 gap-1">
                         <div>
                             <label for = "codigo" class="label">
-                                <span class="label-text text-base">Código</span>
+                                <span class="label-text text-base">RENSPA</span>
                             </label>
                             <input id ="codigo" type="text"  
                                 class={`input input-bordered w-full ${estilos.bgdark2}`}

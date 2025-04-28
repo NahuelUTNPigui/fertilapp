@@ -295,7 +295,11 @@
                 <div>
                     <button 
                         onclick={guardar}
-                        class="w-full bg-green-600 text-white rounded-md py-2 px-4 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition" 
+                        class={`
+                            w-full  ${botonhabilitado && condiciones?"bg-green-600":"bg-gray-600"} text-white rounded-md py-2 px-4 
+                            hover:bg-green-700 focus:outline-none focus:ring-2 
+                            focus:ring-green-500 focus:ring-offset-2 transition
+                        `}
                         disabled='{!botonhabilitado || !condiciones}'
                     >
                       Crear cuenta

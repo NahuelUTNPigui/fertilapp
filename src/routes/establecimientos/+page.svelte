@@ -40,7 +40,7 @@
 
     }
     function crearEstablecimiento() {
-        goto(pre+"nuevo")
+        goto(pre+"/establecimientos/nuevo")
     }
     async function getTotalAnimales(cabid){
         const record = await pb.collection("animales").getList(1,2,{
