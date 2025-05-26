@@ -8,6 +8,7 @@
     import estados from "$lib/stores/estados";
     import {capitalize} from "$lib/stringutil/lib"
     import { getEstadoNombre } from "../estadosutils/lib";
+    
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let id = $state("")

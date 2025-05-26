@@ -5,7 +5,12 @@
     import PocketBase from 'pocketbase'
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
+    let {
+        rodeos=$bindable([])
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     
@@ -13,8 +18,10 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
-    let rodeos = $state([])
     let loading = $state(false)
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo rodeos.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             nombre:"",
@@ -51,7 +58,7 @@
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
         
-        let rodeos = []
+        let rodeosimportar = []
         let rodeoshashmap = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetrodeos)) {
@@ -77,10 +84,10 @@
             }
         }
         for (const [key, value ] of Object.entries(rodeoshashmap)) {
-            rodeos.push(value)
+            rodeosimportar.push(value)
         }
-        for(let i = 0;i<rodeos.length;i++){
-            let ro = rodeos[i]
+        for(let i = 0;i<rodeosimportar.length;i++){
+            let ro = rodeosimportar[i]
 
             let dataadd = {
                 nombre:ro.nombre,
@@ -92,16 +99,12 @@
             let datamod = {
                 nombre:ro.nombre 
             }
-
-            try{
-                const record = await pb.collection('rodeos').getFirstListItem(`nombre="${ro.nombre}"`,{});
-                
-                await pb.collection('rodeos').update(record.id, datamod);               
+            let idx_rodeo = rodeos.findIndex(r=>r.nombre == ro.nombre)
+            if(idx_rodeo != -1){
+                await pb.collection('rodeos').update(rodeos[idx_rodeo].id, datamod);  
             }
-            catch(err){
-                
+            else{
                 await pb.collection('rodeos').create(dataadd);
-
             }
         }
         filename = ""
@@ -117,15 +120,17 @@
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar rodeos.xlsx`}
+        download="Importar rodeos.xlsx"
     >
        Descargar Plantilla
-    </button>
+    </a>
     <div class={`
         w-full
         

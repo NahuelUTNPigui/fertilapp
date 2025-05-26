@@ -19,18 +19,44 @@
     let caber = createCaber()
     let cab = caber.cab
     let animales = $state([])
+    let lotes = $state([])
+    let rodeos = $state([])
+    let nacimientos = $state([])
+    let observaciones = $state([])
+    let pesajes = $state([])
+    let inseminaciones = $state([])
+    let servicios = $state([])
+    let tactos = $state([])
+    let tratamientos = $state([])
     let animalesusuario = $state(0)
     let cargado = $state(false)
     let usuarioid = $state("")
+    async function getCabData() {
+        let res = await fetch(`${ruta}/api/creciente/fullcab/${cab.id}`)
+        let data =  await res.json()
+        animales = data.animales
+        lotes = data.lotes
+        rodeos = data.rodeos
+        nacimientos = data.nacimientos
+        observaciones = data.observaciones
+        pesajes = data.pesajes
+        inseminaciones = data.inseminaciones
+        servicios = data.servicios
+        tactos = data.tactos
+    }
+    async function getAnimalesUser() {
+        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
+        animalesusuario = animals.totalItems
+    }
     onMount(async ()=>{
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
-        const records = await pb.collection('Animalestacto').getFullList({
-            filter: `active = true  && cab = '${cab.id}'`
-        })
-        animales = records
-        let animals = await pb.collection('Animalesxuser').getList(1,1,{filter:`user='${usuarioid}'`})
-        animalesusuario = animals.totalItems
+        //const records = await pb.collection('Animalestacto').getFullList({
+        //    filter: `active = true  && cab = '${cab.id}'`
+        //})
+        //animales = records
+        await getCabData()
+        await getAnimalesUser()
         cargado = true
     })
 
@@ -38,31 +64,39 @@
 <Navbarr>
     {#if cargado}
     <CardImportar cardsize="max-w-2xl" titulo="Importar animales">
-        <ImportarAnimal {animales} {animalesusuario}/>
+        <!--LOTES Y RODEOS-->
+        <ImportarAnimal bind:animales bind:animalesusuario {getAnimalesUser} bind:lotes bind:rodeos/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar tactos">
-        <ImportarTactos {animales}/>
+        <ImportarTactos bind:animales bind:tactos/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar nacimientos">
-        <ImportarNacimiento {animales} {animalesusuario}/>
+        <!--LOTES Y RODEOS NACIMIENTOS-->
+        <ImportarNacimiento bind:animales bind:animalesusuario {getAnimalesUser} bind:lotes bind:rodeos bind:nacimientos/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar rodeos">
-        <ImportarRodeos/>
+        <!--RODEOS -->
+        <ImportarRodeos bind:rodeos/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar lotes">
-        <ImportarLotes/>
+        <!--LOTES -->
+        <ImportarLotes bind:lotes/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar observaciones">
-        <ImportarObservaciones {animales}/>
+        <!--OBSERVACIONES animales-->
+        <ImportarObservaciones bind:animales bind:observaciones/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar servicios">
-        <ImportarServicios {animales}/>
+        <!--SERVICIOS animales-->
+        <ImportarServicios bind:animales bind:servicios/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar inseminaciones">
-        <ImportarInseminaciones {animales}/>
+        <!--INSEMINACIONES animales-->
+        <ImportarInseminaciones bind:animales bind:inseminaciones/>
     </CardImportar>
     <CardImportar cardsize="max-w-2xl" titulo="Importar pesajes">
-        <ImportarPesajes {animales}/>
+        <!--PESAJES animales-->
+        <ImportarPesajes bind:animales bind:pesajes/>
     </CardImportar>
     {:else}
     <CardImportar cardsize="max-w-2xl" titulo="Cargando">

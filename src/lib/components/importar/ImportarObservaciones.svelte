@@ -6,8 +6,13 @@
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
     import categorias from "$lib/stores/categorias";
-    let {animales} = $props()
+    import { goto } from "$app/navigation";
+    let {
+        animales=$bindable([]),
+        observaciones = $bindable([])
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     let loading = $state(false)
@@ -15,6 +20,9 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo observaciones.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -58,7 +66,7 @@
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
         
-        let observaciones = []
+        let observacionesimportar = []
         let observacioneshashmap = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetobservaciones)) {
@@ -106,10 +114,11 @@
             }
         }
         for (const [key, value ] of Object.entries(observacioneshashmap)) {
-            observaciones.push(value)
+            observacionesimportar.push(value)
         }
-        for(let i = 0;i<observaciones.length;i++){
-            let ob = observaciones[i]
+        errores = false
+        for(let i = 0;i<observacionesimportar.length;i++){
+            let ob = observacionesimportar[i]
             let an = animales.filter(a=>a.caravana==ob.caravana)[0]
 
             let dataadd = {
@@ -125,7 +134,7 @@
                 observacion: ob.observacion,
                 categoria: ob.categoria
             }
-
+            let idx_o 
             try{
                 const record = await pb.collection('observaciones').getFirstListItem(`fecha="${ob.fecha + " 03:00:00"}" && animal="${an.id}"`,{});
                 await pb.collection('observaciones').update(record.id, datamod);               
@@ -139,27 +148,30 @@
         loading = false
         filename = ""
         wkbk = null
-        Swal.fire("Éxito importar","Se lograron importar los datos","success")
-    }
-    onMount(async ()=>{
-        const observaciones = await pb.collection('observaciones').getFullList({
+        if(errores){
+            Swal.fire("Error importar","Hubo algunas observaciones con errores","error")
+        }
+        else{
+            Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        }
+        
+        observaciones = await pb.collection('observaciones').getFullList({
             filter:`active = true && cab ='${cab.id}'`
         })
-        animales = await pb.collection('animales').getFullList({
-            filter:`delete = false && cab ='${cab.id}'`,
-        }) 
-    })
+    }
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar observaciones.xlsx`}
+        download="Importar observaciones.xlsx"
     >
        Descargar Plantilla
-    </button>
+    </a>
     <div class={`
         w-full
         

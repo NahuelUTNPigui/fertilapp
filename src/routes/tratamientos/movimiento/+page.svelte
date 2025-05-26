@@ -14,7 +14,7 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import MultiSelect from "$lib/components/MultiSelect.svelte";
     import { getSexoNombre } from '$lib/stringutil/lib';
-    
+    import { shorterWord } from "$lib/stringutil/lib";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -236,27 +236,7 @@
         }
         tratamientoMasivo.showModal()
     }
-    async function guardarTratamiento(){
-        if(fecha == "" || tipotratamientoselect == ""){
-            Swal.fire("Error tratamientos","Debe seleccionar una fecha","error")
-            return 
-        }
-        let errores = false
-        let bulkdata = []
-        for(let i = 0;i<selectanimales.length;i++){
-            let tratamientoanimal = selectanimales[i]
-            let datatratamiento = {
-                    fecha : fecha+ " 03:00:00",
-                    observacion:tratamientoanimal.observacionnuevo,
-                    categoria:tratamientoanimal.categoria,
-                    animal:tratamientoanimal.id,
-                    tipo:tipotratamientoselect,
-                    active : true,
-                    cab:cab.id
-            }
-            bulkdata.push(datatratamiento)
-            
-        }
+    async function guardarBulkTratamiento(bulkdata) {
         try{
             const batch = pb.createBatch();
             for(let i = 0;i<bulkdata.length;i++){
@@ -272,14 +252,52 @@
         catch(err){
             Swal.fire("Error tratamientos","Hubo algun error en algun tratamiento","error")
         }
+    }
+    async function guardarTratamiento(){
+        if(fecha == "" || tipotratamientoselect == ""){
+            Swal.fire("Error tratamientos","Debe seleccionar una fecha","error")
+            return 
+        }
+        let errores = false
+        let bulkdata = []
+        let errorestrata = []
+        for(let i = 0;i<selectanimales.length;i++){
+            let tratamientoanimal = selectanimales[i]
+            let datatratamiento = {
+                    fecha : fecha+ " 03:00:00",
+                    observacion:tratamientoanimal.observacionnuevo,
+                    categoria:tratamientoanimal.categoria,
+                    animal:tratamientoanimal.id,
+                    tipo:tipotratamientoselect,
+                    active : true,
+                    cab:cab.id
+            }
+            try{
+                await pb.collection("tratamientos").create(datatratamiento)
+            }
+            catch(err){
+                errorestrata.push(tratamientoanimal.id)
+                console.error(err)
+                errores = true
+            }
+            
+        }
+        // await guardarBulkTratamiento(bulkdata)
         
         fecha = ""
         malfecha = false
         maltipo = false
         tipotratamientoselect = ""
         botonhabilitado = false
-        selecthashmap = {}
-        selectanimales = []
+        for(let i = 0;i<selectanimales.length;i++){
+            let ts = selectanimales[i]
+            let i_error = errorestrata.findIndex(pid=>pid==ts.id)
+            if(i_error == -1){
+                
+                delete selecthashmap[ts.id]
+            }
+        }
+        selectanimales =[]
     }
     onMount(async ()=>{
         await getAnimales()
@@ -550,7 +568,7 @@
                                 {/if}
                             </button>
                         </td>
-                        <td class="text-base mx-1 px-0">{a.caravana}</td>
+                        <td class="text-base mx-1 px-0">{shorterWord(a.caravana)}</td>
                         <td class="text-base mx-1 px-0">{a.categoria}</td>
                         <td class="text-base mx-1 px-0">{a.peso}</td>
                         <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
@@ -620,7 +638,7 @@
                                 </svg>
                             {/if}
                         </button>
-                        {a.caravana}
+                        {shorterWord(a.caravana)}
                     </h3>
                 </div>
                 <div class="grid grid-cols-2 gap-y-2">
@@ -795,7 +813,7 @@
                         {#each selectanimales as a,i}
                             <tr>
                                 
-                                <td class="text-base">{a.caravana}</td>
+                                <td class="text-base">{shorterWord(a.caravana)}</td>
                                 <td class="text-base">{a.categoria}</td>
                                 <td class="">
                                     <input
@@ -826,7 +844,7 @@
                         <div class="flex items-start col-span-2">
                             <span >Caravana:</span> 
                             <span class="font-semibold">
-                              {a.caravana}
+                              {shorterWord(a.caravana)}
                             </span>
                         </div>
                         <div class="flex items-start col-span-2">

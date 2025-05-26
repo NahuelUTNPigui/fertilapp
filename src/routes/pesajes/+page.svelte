@@ -13,6 +13,7 @@
     import MultiSelect from "$lib/components/MultiSelect.svelte";
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
     import { getSexoNombre } from '$lib/stringutil/lib';
+    import { shorterWord } from "$lib/stringutil/lib";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -223,7 +224,7 @@
     }
     async function crearPesaje(){
         let errores = false
-        
+        let pesajeserror = []
         for(let i = 0;i<selectanimales.length ;i++){
             
             let ps = selectanimales[i]
@@ -243,6 +244,7 @@
                 await pb.collection("pesaje").create(data)
             }
             catch(err){
+                pesajeserror.push(ps.id)
                 console.error(err)
                 errores = true
             }
@@ -253,10 +255,22 @@
         else{
             Swal.fire("Éxito pesaje","Se lograron registar todos los pesajes","success")
         }
+        
+        for(let i = 0;i<selectanimales.length;i++){
+            let ps = selectanimales[i]
+            let i_error = pesajeserror.findIndex(pid=>pid==ps.id)
+            if(i_error == -1){
+                
+                delete selecthashmap[ps.id]
+            }
+        }
+        selectanimales =[]
+        
         await getAnimales()
         filterUpdate()
-        selecthashmap = {}
-        selectanimales = []
+        
+        
+        
     }
     onMount(async ()=>{
         await getAnimales()
@@ -656,7 +670,7 @@
                         <div class="flex items-start col-span-2">
                             <span >Caravana:</span> 
                             <span class="font-semibold">
-                              {a.caravana}
+                              {shorterWord(a.caravana)}
                             </span>
                         </div>
                         <div class="flex items-start col-span-2">

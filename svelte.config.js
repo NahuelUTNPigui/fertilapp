@@ -51,7 +51,8 @@ const config = {
 				"/user/nivel",
 				"/servicios",
 				"/servicios/movimiento",
-				"/pesajes/historial"
+				"/pesajes/historial",
+				"/manual"
 
 			]
 		}

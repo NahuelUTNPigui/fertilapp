@@ -143,14 +143,7 @@
             return ""
         }        
     }
-    function getFechaNacimiento(nacimiento){
-        if(nacimiento){
-            return new Date(nacimiento.fecha).toLocaleDateString()
-        }
-        else{
-            return false
-        }
-    }
+    
     function openEditar(){
         if(userpermisos[5]){
             modoedicion = true
@@ -216,7 +209,7 @@
         }
         
     }
-    async function guardarNaciminento(){
+    async function guardarNacimiento(){
         try{
             let dataparicion = {
                 madre,
@@ -661,7 +654,7 @@
     {/if}
 </div>
 {#if connacimiento}
-    <div class="grid grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-2 lg:grid-cols-2">
         <h3 class="text-2xl font-bold mt-2 mb-1 text-left">
             Nacimiento
         </h3>
@@ -677,8 +670,7 @@
             >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-                </svg>
-              
+                </svg> 
             </button>    
         </div>
     </div>
@@ -734,14 +726,7 @@
         
     </div>
 {/if}
-<div class="grid grid-cols-3 mx-0  mt-1 ">
-    
-    <div class="flex col-span-2 gap-1 justify-start">
-        <button aria-label="historiaclinica" class={` btn rounded-lg ${estilos.basico} ${estilos.primario} px-2 mx-1`} onclick={()=>modohistoria = !modohistoria}>
-            <span  class="text-lg m-1">{modohistoria?"Ocultar":"Mostrar"} historia clinica</span>      
-        </button>
-    </div>  
-</div>
+
 
 <dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
     <div 
@@ -890,7 +875,7 @@
                 {#if connacimiento}
                     <button class="btn btn-success text-white" onclick={editarNacimiento} >Editar</button>
                 {:else}
-                    <button class="btn btn-success text-white" onclick={guardarNaciminento} >Guardar</button>
+                    <button class="btn btn-success text-white" onclick={guardarNacimiento} >Guardar</button>
                 {/if}
               
               <button class="btn btn-error text-white" onclick={cerrarModal}>Cancelar</button>

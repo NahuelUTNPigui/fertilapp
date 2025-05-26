@@ -82,6 +82,28 @@
     let malfechanacimiento = $state(false)
     let malpeso = $state(false)
     let botonhabilitado=$state(false)
+    function calcularEdad(fechaNacimiento, fechaReferencia = new Date()) {
+        const nacimiento = new Date(fechaNacimiento);
+        const referencia = new Date(fechaReferencia);
+
+        let años = referencia.getFullYear() - nacimiento.getFullYear();
+        let meses = referencia.getMonth() - nacimiento.getMonth();
+        let dias = referencia.getDate() - nacimiento.getDate();
+
+        if (dias < 0) {
+            // Restar un mes y calcular días exactos
+            meses -= 1;
+            const ultimoMes = new Date(referencia.getFullYear(), referencia.getMonth(), 0);
+            dias += ultimoMes.getDate();
+        }
+
+        if (meses < 0) {
+            años -= 1;
+            meses += 12;
+        }
+
+        return `${años} A ${meses} M ${dias} D`;
+    }
     function cambiarFiltros(){
         filtros != filtros
     }
@@ -853,6 +875,16 @@
                             {/if}
                         </div>
                     </th>
+                    <th 
+                        
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 ">
+                        <div
+                            class="flex flex-row justify-between"
+                        >
+                            Edad
+                            
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -901,6 +933,9 @@
                             :""
                         }
                     </td>
+                    <td>
+                        {a.fechanacimiento!=""?calcularEdad(a.fechanacimiento):"-"}
+                    </td>
                     
 
                 </tr>
@@ -917,7 +952,13 @@
                         {#if a.sexo == "H" && a.prenada != 1}
                             <div class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}>{getEstadoNombre(a.prenada)}</div>
                         {/if}
+                    </div><div class="flex items-start">
+                        <span >Edad:</span>
+                        <span class="font-semibold">
+                                {a.fechanacimiento!=""?calcularEdad(a.fechanacimiento):""}
+                        </span>
                     </div>
+                    
                     <div class="grid grid-cols-2 gap-y-2">
                         <div class="flex items-start">
                           <span class="font-semibold">{getSexoNombre(a.sexo)}</span>

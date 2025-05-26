@@ -10,10 +10,17 @@
     import cuentas from '$lib/stores/cuentas';
     import categorias from "$lib/stores/categorias";
     import{verificarNivelCantidad} from "$lib/permisosutil/lib"
-
-    let {animales,animalesusuario} = $props()
+    import { goto } from "$app/navigation";
+    let {
+        animales = $bindable([]),
+        animalesusuario = $bindable(0),
+        lotes = $bindable([]),
+        rodeos = $bindable([]),
+        getAnimalesUser
+        } = $props()
     let usuarioid = $state("")
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     let per = createPer()
@@ -23,9 +30,11 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
-    let lotes = $state([])
-    let rodeos = $state([])
     let loading = $state(false)
+    //Le pongo 2 porque capaz haya que ver la parte offline
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo animales.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -151,6 +160,7 @@
             loading = false
             return
         }
+        let errores = false
         for(let i = 0;i<animalesimportar.length;i++){
             let an = animalesimportar[i]
             let conlote = false
@@ -188,50 +198,59 @@
                 datamod.categoria = categoria.id
             }
             try{
-                const record = await pb.collection('animales').getFirstListItem(`
-                    caravana="${an.caravana}" && cab='${cab.id}' && active = True`,
-                {});
-                await pb.collection('animales').update(record.id, datamod);
-
-                
+                let aidx = animales.findIndex(a=>a.caravana==an.caravana)
+                if(aidx == -1){
+                    await pb.collection('animales').create(dataadd);
+                }
+                else{
+                    let a = animales[aidx]
+                    await pb.collection('animales').update(a.id, datamod);
+                }
             }
             catch(err){
-                
-                await pb.collection('animales').create(dataadd);
-
+                console.error(err)
+                errores = true
+                continue
             }
+            
+            
         }
         loading = false
         
         filename = ""
         wkbk = null
-        Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        const records = await pb.collection('animales').getFullList({
+            filter: `active = true  && cab = '${cab.id}'`
+        })
+        animales = records
+        await getAnimalesUser()
+        if(errores){
+            Swal.fire("Error importar","Hubo algún anima con error","error")
+        }
+        else{
+            Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        }
+        
+        
         
     }
     onMount(async ()=>{
         let pb_json =  JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
-        rodeos = await pb.collection('rodeos').getFullList({
-            filter:`active = true && cab ='${cab.id}'`,
-            sort: '-nombre',
-        });
-        
-        lotes = await pb.collection('lotes').getFullList({
-            filter:`active = true && cab ='${cab.id}'`,
-            sort: '-nombre',
-        });
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar animales.xlsx`}
+        download="Importar animales.xlsx"
     >
        Descargar Plantilla
-    </button>
+    </a>
     <div class={`
         w-full
         

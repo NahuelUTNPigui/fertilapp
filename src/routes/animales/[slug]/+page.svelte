@@ -23,12 +23,16 @@
     import HistoriaClinica from "$lib/components/animal/HistoriaClinica.svelte";
     import tiponoti from "$lib/stores/tiponoti";
     import Servicios from "$lib/components/animal/Servicios.svelte";    
+    import SelectTab from "$lib/components/animal/SelectTab.svelte";
+    
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
     let caber = createCaber()
     let cab = caber.cab
     let cargado = $state(false)
+    let pestañas = $state([])
+    let tab=$state("")
     // Datos
     let slug = $state("")
     let caravana = $state("")
@@ -48,7 +52,6 @@
     let nacimientoobj = $state({})
     let tactos = $state([])
     let prenada = $state(0)
-    
     let modohistoria = $state(false)
     
     async function  getPariciones(id){
@@ -143,6 +146,7 @@
         }
         
     }
+    //Necesito una funcion que traiga toda la informacion del animal
     onMount(async ()=>{
         slug = $page.params.slug
         if(slug != ""){
@@ -172,7 +176,30 @@
                     motivobaja = recorda.motivobaja
                 }
                 cargado = true
-                
+                tab = "datos"
+                if(sexo.toLowerCase()=="h"){
+                    pestañas = [
+                        {id:"datos",nombre:"Datos básicos"},
+                        {id:"pesajes",nombre:"Pesajes"},
+                        {id:"tratamientos",nombre:"Tratamientos"},
+                        {id:"observaciones",nombre:"Observaciones"},
+                        {id:"pariciones",nombre:"Pariciones"},
+                        {id:"tactos",nombre:"Tactos"},
+                        {id:"servicios",nombre:"Servicios"},
+                        {id:"clinica",nombre:"Historia clínica"},
+                        {id:"historial",nombre:"Historial"}
+                    ]
+                }
+                else{
+                    pestañas = [
+                        {id:"datos",nombre:"Datos básicos"},
+                        {id:"pesajes",nombre:"Pesajes"},
+                        {id:"tratamientos",nombre:"Tratamientos"},
+                        {id:"observaciones",nombre:"Observaciones"},
+                        {id:"clinica",nombre:"Historia clínica"},
+                        {id:"historial",nombre:"Historial"}
+                    ]
+                }
             }
             catch(err){
                 
@@ -184,59 +211,70 @@
     })
 </script>
 <Navbarr>
-    <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
-        <DatosBasicos {rp} {peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
-    </CardAnimal>
-    {#if !modohistoria}
-        <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
-            <Pesajes pesoanterior={peso} bind:peso={peso} {caravana}></Pesajes>
-        </CardAnimal>
-        {#if cargado}
-        <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
-            <Tratamientos cabid={cab.id} {categoria} ></Tratamientos>
-        </CardAnimal>
-        <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
-            <Observaciones cabid={cab.id} {categoria}/>
-        </CardAnimal>
-        {/if}
-        
-        {#if sexo=="H"}
-            {#if cargado}
+    <div class="flex justify-center mt-1">
+        <div class="w-full max-w-7xl px-4">
+          <!-- Combo alineado al borde izquierdo de la card -->
+          <SelectTab bind:pestañas bind:tab />
+        </div>
+    </div>
+
+    {#if cargado}
+        {#if tab == "datos"}
+            <!--Datos animal-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
+                <DatosBasicos {rp} {peso} {prenada} {categoria} {lote} {rodeo} sexo={sexo} caravana={caravana} connacimiento={nacimiento != ""} nacimiento={nacimientoobj} fechanacimiento = {fechanacimiento} bind:modohistoria={modohistoria}/>
+            </CardAnimal>
+            <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
+                <Acciones 
+                    caravana = {caravana}
+                    fechafallecimiento  = {fechafall}
+                    motivo = {motivobaja}
+                    bajar={async (fechafallecimiento,motivo)=>await darBaja(fechafallecimiento,motivo)}
+                    eliminar={eliminar}
+                    transferir={async (codigo)=>await transferir(codigo)}
+                />
+            </CardAnimal>
+        {:else if tab =="pesajes"}
+            <!--Pesajes-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
+                <Pesajes pesoanterior={peso} bind:peso={peso} {caravana}></Pesajes>
+            </CardAnimal>
+        {:else if tab =="tratamientos"}
+            <!--Tipos y tratamientos-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
+                <Tratamientos cabid={cab.id} {categoria} ></Tratamientos>
+            </CardAnimal>
+        {:else if tab =="observaciones"}
+            <!--Observaciones-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
+                <Observaciones cabid={cab.id} {categoria}/>
+            </CardAnimal>
+        {:else if tab =="pariciones"}
+            <!--Animales nacimientos-->
             <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
                 <Pariciones cabid={cab.id} sexoanimal = {sexo} bind:prenada={prenada}/>
             </CardAnimal>
-            
+        {:else if tab =="tactos"}
+            <!--Tactos-->
             <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-                
                 <Tactos cabid={cab.id}  bind:prenadaori={prenada} {categoria}/>
-                
             </CardAnimal>
-            <CardAnimal cardsize="max-w-7xl" titulo="Inseminaciones">
-                <Inseminaciones cabid={cab.id} {categoria} bind:prenadaori={prenada}/>
+        {:else if tab =="servicios"}
+            <!--Animales servicios-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Servicios">
+                <Servicios cabid={cab.id} {categoria}/>
             </CardAnimal>
-
-            <!--<CardAnimal cardsize="max-w-7xl" titulo="Servicios">
-                <Servicios cabid={cab.id} {categoria} bind:prenadaori={prenada}/>
+        {:else if tab =="clinica"}
+            <!--Pesajes, tactos, servicios, tratamientos, observaciones,pariciones-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Historia clínica">
+                <HistoriaClinica  />
             </CardAnimal>
-            -->
-            {/if}
+        {:else if tab=="historial"}
+            <!--Historial del animal-->
+            <CardAnimal cardsize="max-w-7xl" titulo="Historial">
+                <Historial  />
+            </CardAnimal>
         {/if}
-        <CardAnimal cardsize="max-w-7xl" titulo="Historial">
-            <Historial  />
-        </CardAnimal>
-    {:else}
-        <CardAnimal cardsize="max-w-7xl" titulo="Historia clínica">
-            <HistoriaClinica  />
-        </CardAnimal>
     {/if}
-    <CardAnimal cardsize="max-w-7xl" titulo="Acciones">
-        <Acciones 
-            caravana = {caravana}
-            fechafallecimiento  = {fechafall}
-            motivo = {motivobaja}
-            bajar={async (fechafallecimiento,motivo)=>await darBaja(fechafallecimiento,motivo)}
-            eliminar={eliminar}
-            transferir={(codigo)=>transferir(codigo)}
-        />
-    </CardAnimal>
+
 </Navbarr>

@@ -7,7 +7,10 @@
     import { onMount } from "svelte";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
+    import { goto } from "$app/navigation";
+    let {lotes = $bindable([])} = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     let per = createPer()
@@ -16,8 +19,10 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
-    let lotes = $state([])
     let loading = $state(false)
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo lotes.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             nombre:"",
@@ -60,7 +65,7 @@
             return
         }
         
-        let lotes = []
+        let lotesimportar = []
         let loteshashmap = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetlotes)) {
@@ -86,10 +91,11 @@
             }
         }
         for (const [key, value ] of Object.entries(loteshashmap)) {
-            lotes.push(value)
+            lotesimportar.push(value)
         }
-        for(let i = 0;i<lotes.length;i++){
-            let lo = lotes[i]
+        let errores = false
+        for(let i = 0;i<lotesimportar.length;i++){
+            let lo = lotesimportar[i]
 
             let dataadd = {
                 nombre:lo.nombre,
@@ -101,40 +107,48 @@
             let datamod = {
                 nombre:lo.nombre 
             }
-
             try{
-                const record = await pb.collection('lotes').getFirstListItem(`nombre="${lo.nombre}"`,{});
-                
-                await pb.collection('lotes').update(record.id, datamod);               
+                let lidx = lotes.findIndex(l=>l.nombre == lo.nombre)
+                if(lidx == -1){
+                    await pb.collection('lotes').create(dataadd);
+                }
+                else{
+                    await pb.collection('lotes').update(lotes[lidx].id, datamod);
+                }
             }
             catch(err){
-                
-                await pb.collection('lotes').create(dataadd);
-
+                errores = true
             }
         }
         filename = ""
         loading = false
         wkbk = null
-        Swal.fire("Éxito importar","Se lograron importar los datos","success")
-    }
-    onMount(async ()=>{
+        if(errores){
+            Swal.fire("Error importar","Hubo algun lote con error para importar","success")
+        }
+        else{
+            Swal.fire("Éxito importar","Se lograron importar los datos","success")    
+        }
         lotes = await pb.collection('lotes').getFullList({
             filter:`active = true && cab ='${cab.id}'`,
             sort: '-nombre',
         })
-    })
+        
+    }
+    
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar lotes.xlsx`}
+        download="Importar lotes.xlsx"
     >
        Descargar Plantilla
-    </button>
+        </a>
     <div class={`
         w-full
         

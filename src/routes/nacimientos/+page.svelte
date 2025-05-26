@@ -11,7 +11,7 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import PredictSelect from '$lib/components/PredictSelect.svelte';
     import{verificarNivel} from "$lib/permisosutil/lib"
-
+    import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -32,6 +32,7 @@
     let buscarpadre = $state("")
     let cargadoanimales = $state(false)
     //Datos nacimiento
+    let agregaranimal = $state(false)
     let nacimiento = $state(null)
     let idnacimiento = $state("")
     let caravana = $state("")
@@ -39,6 +40,7 @@
     let padre = $state("")
     let madre = $state("")
     let peso = $state("")
+    let categoria = $state("")
     let nombremadre = $state("")
     let nombrepadre = $state("")
     let cadenamadre = $state("")
@@ -93,15 +95,15 @@
         nacimientosrow = nacimientos
     }
     async function guardar(){
-        let verificar = await verificarNivel(cab.id)
-        if(nivel.animales != -1 && animals.totalItems >= nivel.animales){
-            verificar =  false
+        if(agregaranimal){
+            let verificar = await verificarNivel(cab.id)
+            if(!verificar){
+                Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más animales`,"error")
+                return
+            }
         }
+        //No todo nacimiento es nuevo animal
         
-        if(!verificar){
-            Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más animales`,"error")
-            return
-        }
         try{
             
             let ms = madres.filter(ma=>ma.id==madre)
@@ -128,32 +130,35 @@
                 cab:cab.id
             }
             const recordparicion = await pb.collection('nacimientos').create(dataparicion);
-            let data = {
-                caravana,
-                active:true,
-                delete:false,
-                fechanacimiento:fecha +" 03:00:00",
-                sexo,
-                cab:cab.id,
-                peso,
-                lote:m.lote,
-                rodeo:m.rodeo,
-                nacimiento:recordparicion.id
-            }
-            let recorda = await pb.collection('animales').create(data); 
-            if(m.id != ""){
-                let datamadre = {
-                prenada:0
-            }
-            if(m.categoria == "vaquillona"){
-                datamadre.categoria = "vaca"
-                let datamadre = {
-                    categoria:"vaca"
+            if(agregaranimal){
+                let data = {
+                    caravana,
+                    active:true,
+                    delete:false,
+                    fechanacimiento:fecha +" 03:00:00",
+                    sexo,
+                    cab:cab.id,
+                    peso,
+                    lote:m.lote,
+                    rodeo:m.rodeo,
+                    nacimiento:recordparicion.id
                 }
+                let recorda = await pb.collection('animales').create(data); 
             }
-            await guardarHistorial(pb,madre)
-            await pb.collection('animales').update(madre,datamadre)
-            }
+            //Pensar las fechas
+            //if(m.id != ""){
+            //    let datamadre = {
+            //        prenada:0
+            //    }
+            //    if(m.categoria == "vaquillona"){
+            //        datamadre.categoria = "vaca"
+            //        let datamadre = {
+            //            categoria:"vaca"
+            //        }
+            //    }
+            //    await guardarHistorial(pb,madre)
+            //    await pb.collection('animales').update(madre,datamadre)
+            //}
             
             Swal.fire("Éxito guardar","Se pudo guardar el nacimiento con exito","success")
             
@@ -241,6 +246,9 @@
             totalNacimientosEncontrados = nacimientosrow.length
         }
         
+    }
+    function clickNuevoAnimal(){
+        nuevoAnimal = !nuevoAnimal
     }
     function openNewModal(){
         idnacimiento = ""
@@ -375,13 +383,15 @@
     function validarBoton(){
         botonhabilitado = true
         if(isEmpty(fecha)){
+            console.log("mal fecha")
             botonhabilitado = false
             
         }
-        //if(isEmpty(nombremadre)){
-        //    botonhabilitado = false
-        //    
-        //}
+        if(isEmpty(madre)){
+            console.log("madre")
+            botonhabilitado = false
+            
+        }
         //if(isEmpty(nombrepadre)){
         //    botonhabilitado = false
         //    
@@ -390,10 +400,7 @@
         //    botonhabilitado = false
         //    
         //}
-        if(isEmpty(caravana)){
-            botonhabilitado = false
-            
-        }
+        
     }
     function onchange(nombreCampo){
         validarBoton()
@@ -405,38 +412,14 @@
                 malfecha = false
             }
         }
-        if(nombreCampo=="CARAVANA"){
-            if(isEmpty(caravana)){
-                malcaravana = true
+        if(nombreCampo=="MADRE"){
+            if(isEmpty(madre)){
+                malmadre = true
             }
             else{
-                malcaravana = false
+                malmadre = false
             }
         }
-        //if(nombreCampo=="MADRE"){
-        //    if(isEmpty(nombremadre)){
-        //        malmadre = true
-        //    }
-        //    else{
-        //        malmadre = false
-        //    }
-        //}
-        //if(nombreCampo=="PADRE"){
-        //    if(isEmpty(nombrepadre)){
-        //        malpadre=true
-        //    }
-        //    else{
-        //        malpadre = true
-        //    }
-        //}
-        //if(nombreCampo=="SEXO"){
-        //    if(isEmpty(sexo)){
-        //        malsexo = true
-        //    }
-        //    else{
-        //        malsexo = false
-        //    }
-        //}
     }
     function prepararData(item){
         return {
@@ -853,77 +836,8 @@
             <h3 class="text-lg font-bold">Ver nacimiento</h3>  
         {/if}
         <div class="form-control">
-            <label for = "nombre" class="label">
-                <span class={estilos.labelForm}>Caravana</span>
-            </label>
-            <label class="input-group">
-                <input id ="nombre" type="text"  
-                    class={`
-                        input input-bordered 
-                        w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 
-                        focus:border-green-500
-                        ${estilos.bgdark2} 
-                        
-                    `}
-                    disabled={idnacimiento!=""}
-                  
-                    bind:value={caravana}
-                    oninput={()=>onchange("CARAVANA")}
-                />
-                {#if malcaravana}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500">Debe escribir la caravana del animal por nacer</span>                    
-                    </div>
-                {/if}
-            </label>
+            <AgregarAnimal bind:agregaranimal bind:caravana bind:categoria bind:sexo bind:peso bind:fechanacimiento = {fecha} confechanac={true}/>
             
-            {#if idnacimiento == ""}
-                <label for = "sexo" class="label">
-                    <span class={estilos.labelForm}>Sexo</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 
-                            focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={sexo}
-                        onchange={()=>onchange("SEXO")}
-                    >
-                        {#each sexos as s}
-                            <option value={s.id}>{s.nombre}</option>    
-                        {/each}
-                    </select>
-                    {#if malsexo}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe seleccionar el sexo del animal</span>                    
-                        </div>
-                    {/if}
-                </label>
-
-                <label for = "peso" class="label">
-                    <span class={estilos.labelForm}>Peso (KG)</span>
-                </label>
-                <label class="input-group">
-                    <input id ="peso" type="number"  
-                        class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `} 
-                        bind:value={peso}
-                    />
-                </label>
-            {/if}
             <label for = "fechanacimiento" class="label">
                 <span class={estilos.labelForm}>Fecha nacimiento</span>
             </label>
@@ -946,112 +860,11 @@
                     </div>
                 {/if}
             </label>
-            <div class="hidden">
-                <label for = "nombremadre" class="label">
-                    <span class="label-text text-base">Caravana madre</span>
-                </label>
-                <label class="input-group">
-                    <input 
-                        id ="nombremadre" 
-                        type="text"  
-                        class={`
-                            input 
-                            input-bordered 
-                            border border-gray-300 rounded-md
-                            focus:outline-none 
-                            focus:ring-2 focus:ring-green-500 
-                            focus:border-green-500
-                            w-full 
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={nombremadre}
-                        oninput={()=>onchange("MADRE")}
-                        
-                    />
-                    {#if malmadre}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe escribir el nombre de la madre</span>                    
-                        </div>
-                    {/if}
-                </label>
-                <label for = "madre" class="label">
-                    <span class="label-text text-base">Madre</span>
-                </label>
-                <label class="input-group ">
-                    <select 
-                        class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={madre}
-                        onchange={getNombreMadre}
-                    >
-                        {#each madres as m}
-                            <option value={m.id}>{m.caravana}</option>    
-                        {/each}
-                    </select>
-                </label>
-                <label for = "nombrepadre" class="label">
-                    <span class="label-text text-base">Caravana padre</span>
-                </label>
-            
-            </div>
             {#if cargadoanimales}
                 <PredictSelect bind:valor={madre} etiqueta = {"Madre"} bind:cadena={nombremadre} lista = {listamadres} onelegir={onelegirMadre} onwrite={onwriteMadre}/>
                 <PredictSelect bind:valor={padre} etiqueta = {"Padre"} bind:cadena={nombrepadre} lista = {listapadres} onelegir={onelegirPadre} onwrite={onwritePadre}/>
             {/if}
-            
-            
-            
-            
-            <div class="hidden">
-                <label class="input-group">
-                    <input 
-                        id ="nombrepadre" 
-                        type="text"  
-                        class={`
-                            input 
-                            input-bordered 
-                            border border-gray-300 rounded-md
-                            focus:outline-none 
-                            focus:ring-2 focus:ring-green-500 
-                            focus:border-green-500
-                            w-full 
-                            ${estilos.bgdark2} 
-                        `}
-                        bind:value={nombrepadre}
-                        oninput={()=>onchange("PADRE")}
-                    />
-                    {#if malmadre}
-                        <div class="label">
-                            <span class="label-text-alt text-red-500">Debe escribir el nombre del padre</span>                    
-                        </div>
-                    {/if}
-                </label>
-            <label for = "padre" class="label">
-                <span class="label-text text-base">Padre</span>
-            </label>
-            <label class="input-group ">
-                <select 
-                    class={`
-                        select select-bordered w-full
-                        border border-gray-300 rounded-md
-                        focus:outline-none focus:ring-2 
-                        focus:ring-green-500 focus:border-green-500
-                        ${estilos.bgdark2} 
-                    `}
-                    bind:value={padre}
-                    onchange={getNombrePadre}
-                >
-                    {#each padres as p}
-                        <option value={p.id}>{p.caravana}</option>    
-                    {/each}
-                  </select>
-            </label>
-            </div>
+
             <label class="form-control">
                 <div class="label">
                     <span class="label-text">Observacion</span>                    

@@ -8,8 +8,9 @@
     import { guardarHistorial } from "$lib/historial/lib";
     import { goto } from "$app/navigation";
     import categorias from "$lib/stores/categorias";
-    let {animales} = $props()
+    let {animales=$bindable([]),tactos=$bindable([])} = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     
@@ -157,7 +158,7 @@
         let errores = false
         for(let i = 0;i<tactos.length;i++){
             let ta = tactos[i]
-            let categoria = categorias.filter(c=>c.id==an.categoria || c.nombre==an.categoria)[0]
+            //let categoria = categorias.filter(c=>c.id==an.categoria || c.nombre==an.categoria)[0]
             let ans = animales.filter(a=>a.caravana==ta.caravana)
             if(ans.length == 0){
                 continue
@@ -182,33 +183,26 @@
                 prenada: ta.prenada,
                 tipo: ta.tipo,   
             }
+            
             try{
-                //Agregar Tacto si no existe
-                let fecha = ta.fecha.toISOString().split("T")[0] + " 03:00:00"
-                dataadd.fecha = fecha
+                let tidx = tactos.filter(t=>t.fecha == fecha && animal==an.id  )
+                if(tidx == -1){
+                    await pb.collection('tactos').create(dataadd);
+                }
+                else{
+                    await pb.collection('tactos').update(tactos[tidx].id, datamod);         
+                }
             }
             catch(err){
                 console.error(err)
                 errores = true
                 continue
             }
-
-            try{
-                const record = await pb.collection('tactos').getFirstListItem(`fecha="${fecha}" && animal="${an.id}"`,{});
-                await pb.collection('tactos').update(record.id, datamod);         
-                //Pensar lo de los estados y el historial
-                await guardarHistorial(pb,an.id)      
-                await pb.collection("animales").update(an.id,{prenada:ta.prenada})
-            }
-            catch(err){
-                //Pensar lo de los estados y el historial
-                await pb.collection('tactos').create(dataadd);
-                await guardarHistorial(pb,an.id)      
-                await pb.collection("animales").update(an.id,{prenada:ta.prenada})
-            }
+            
+            
         }
         if(errores){
-            Swal.fire("Error importart","Hubo algún tacto con error","error")
+            Swal.fire("Error importar","Hubo algún tacto con error","error")
         }
         else{
             Swal.fire("Éxito importar","Se lograron importar los datos","success")
@@ -216,16 +210,10 @@
         filename = ""
         wkbk = null
         loading = false
-        
-    }
-    onMount(async ()=>{
-        const tactos = await pb.collection('tactos').getFullList({
+        tactos = await pb.collection('tactos').getFullList({
             filter:`active = true && cab ='${cab.id}'`
         })
-        animales = await pb.collection('animales').getFullList({
-            filter:`delete = false && cab ='${cab.id}'`,
-        }) 
-    })
+    }
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
     <a
@@ -233,7 +221,8 @@
             w-full text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        href="{`${ruta}/Modelo tactos.xlsx`}"
+        href={`${pre}/Importar tactos.xlsx`}
+        download="/Importar tactos.xlsx"
         
     >
        Descargar Plantilla

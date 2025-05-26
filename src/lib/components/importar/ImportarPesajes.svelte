@@ -6,8 +6,13 @@
     import Swal from 'sweetalert2';
     import { onMount } from "svelte";
     import {guardarHistorial} from "$lib/historial/lib"
-    let {animales} = $props()
+    import { goto } from "$app/navigation"
+    let {
+        animales=$bindable([]),
+        pesajes=$bindable([]),
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     
@@ -16,6 +21,9 @@
     let filename = $state("")
     let wkbk = $state(null)
     let loading = $state(false)
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo pesajes.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -56,7 +64,7 @@
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
         
-        let pesajes = []
+        let pesajesimportar = []
         let pesajeshashmap = {}
         loading = true
         let errores = false
@@ -94,34 +102,50 @@
             }
         }
         for (const [key, value ] of Object.entries(pesajeshashmap)) {
-            pesajes.push(value)
+            pesajesimportar.push(value)
         }
-        for(let i = 0;i<pesajes.length;i++){
-            let pe = pesajes[i]          
+        errores =  false
+        for(let i = 0;i<pesajesimportar.length;i++){
+            let pe = pesajesimportar[i]          
+            let s_fecha = pe.fecha.toISOString().split("T")[0]+" 03:00:00"
+            let a_idx =  animales.findIndex(a=>a.caravana == pe.caravana)
 
-            let datapesaje = {
-                pesonuevo:pe.peso,
-                cab:cab.id,
-                fecha:pe.fecha?pe.fecha.toISOString().split("T")[0]:""
-            }
-
-            let datamod = {
-                peso:pe.peso,                   
-            }
-
-            try{
-                let recordanimal = await pb.collection("animales").getFirstListItem(`caravana="${pe.caravana}" && cab='${cab.id}' && active = True`)
-                datapesaje.animal = recordanimal.id
-                datapesaje.pesoanterior  = recordanimal.peso
-                const record = await pb.collection('pesaje').create(datapesaje);
-                await guardarHistorial(pb,recordanimal.id)
-                await pb.collection('animales').update(recordanimal.id, datamod);
-
-                
-            }
-            catch(err){
-                console.error(err)
-                errores = true
+            if( pe.fecha != "" && a_idx != -1){
+                let a = animales[a_idx]
+                let p_idx = pesajes.findIndex(p=>p.fecha == s_fecha && p.animal == a.id)
+                if(p_idx != -1){
+                    let datamod = {
+                        pesonuevo:pe.peso,                   
+                    }
+                    try{
+                        //Debo modificar el pesonuevo
+                        await pb.collection('pesajes').update(pesajes[p_idx].id, datamod)
+                    }
+                    catch(err){
+                        console.error(err)
+                        errores = true
+                    }
+                    
+                } 
+                else{
+                    let datapesaje = {
+                        pesonuevo:pe.peso,
+                        pesoanterior : 0,
+                        anima:a.id,
+                        fecha:s_fecha
+                    }
+                    try{
+                        const record = await pb.collection('pesaje').create(datapesaje);
+                        //Hay que laburar el tema de las  fechas
+                        await guardarHistorial(pb,a.id)
+                        await pb.collection('animales').update(a.id, {peso:p.peso});
+                    }
+                    catch(err){
+                        console.error(err)
+                        errores = true
+                    }
+                    
+                }
             }
         }
         if(errores){
@@ -139,15 +163,17 @@
     }
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar pesajes.xlsx`}
+        download="Importar pesajes.xlsx"
     >
        Descargar Plantilla
-    </button>
+    </a>
     <div class={`
         w-full
         

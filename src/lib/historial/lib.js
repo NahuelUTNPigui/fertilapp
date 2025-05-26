@@ -7,14 +7,16 @@ export async function guardarHistorial(pb,idanimal){
         active:true,
         delete:false,
         fechanacimiento:record.fechanacimiento,
+        nacimiento:record.nacimiento,
         sexo:record.sexo,
         peso:record.peso,
         lote:record.lote,
         rodeo:record.rodeo,
         categoria:record.categoria,
         prenada:record.prenada,
-        rp:record.rp
-
+        rp:record.rp,
+        raza:record.raza,
+        color:record.color,
     }
     await pb.collection("historialanimales").create(histo)
 }

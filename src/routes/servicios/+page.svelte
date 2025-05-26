@@ -16,6 +16,7 @@
     import { isEmpty,getWholeWordButLastLetter,addDays } from '$lib/stringutil/lib';
     import MultipleToros from "$lib/components/MultipleToros.svelte";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
+    import { shorterWord } from '$lib/stringutil/lib';
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -32,25 +33,24 @@
     let esinseminacion = $state(false)
     let filtroservicio = $state(0)
     let opcionservicio = [{id:0,nombre:"Todos"},{id:1,nombre:"Solo servicios"},{id:2,nombre:"Solo inseminaciones"}]
+    let buscar = $state("")
+    let isOpenFilter = $state(false)
+    // Datos para mostrar
+    let servicios = $state([])
+    let serviciosrow = $state([])
+    
+    let totalServicios = $state(0)
     // Datos para mostrar
     let inseminaciones = $state([])
     let totalInseminacionesEncontradas = $state(0)
     //Datos inseminaciones
     let idins = $state("")
     let listapadres = $state([])
-    // La inseminacion es a un animal hembra que luego sera un nacimiento
     let padre = $state("")
     let pajuela = $state("")
-    //Seria la fecha del parto
-    //Datos de la inseminacion
     let categoria = $state("")
     let fechainseminacion = $state("")
-    // Datos para mostrar
-    let servicios = $state([])
-    let serviciosrow = $state([])
-    let buscar = $state("")
-    let isOpenFilter = $state(false)
-    let totalServicios = $state(0)
+    
     //Validaciones
     let malanimal = $state(false) 
     let malpadre = $state(false)
@@ -324,7 +324,7 @@
     function getNombrePadres(p_padres){
         let ids = p_padres.split(",")
         let nombres = ids.reduce(
-            (acc,valor)=>borrados.filter(p=>p.id==valor)[0].caravana + " , " +acc,
+            (acc,valor)=>shorterWord(borrados.filter(p=>p.id==valor)[0].caravana) + " , " +acc,
             ""
         )
 
@@ -730,8 +730,8 @@
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">{s.fechaparto?new Date(s.fechaparto).toLocaleDateString():""}</td>
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">
                         {   s.fechadesde?
-                            s.expand.madre.caravana:
-                            s.expand.animal.caravana
+                            shorterWord(s.expand.madre.caravana):
+                            shorterWord(s.expand.animal.caravana)
                         }
                     </td>
                     <td class="text-base mx-1 px-1 border-b dark:border-gray-600">
@@ -806,8 +806,8 @@
                             <span >Madre:</span> 
                             <span class="mx-1 font-semibold">
                                 {   s.fechadesde?
-                                    s.expand.madre.caravana:
-                                    s.expand.animal.caravana
+                                    shorterWord(s.expand.madre.caravana):
+                                    shorterWord(s.expand.animal.caravana)
                                 }
                             </span>
                             

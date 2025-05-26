@@ -1,13 +1,12 @@
 <script>
-    let {option =$bindable(0),deshabilitado} = $props()
+    let {option = $bindable(0),deshabilitado} = $props()
     
     let options = [
         {id:0,nombre:"Vacia"},
         {id:2,nombre:"Preñada"},
         {id:3,nombre:"En servicio"}
     ]
-    function select(id){
-        
+    function select(id){  
         option = id
     }
     

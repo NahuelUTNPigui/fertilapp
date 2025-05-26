@@ -17,6 +17,7 @@
     import { getSexoNombre } from '$lib/stringutil/lib';
     import RadioButton from "$lib/components/RadioButton.svelte";
     import MultiSelect from '$lib/components/MultiSelect.svelte';
+    import { shorterWord } from "$lib/stringutil/lib";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -327,7 +328,7 @@
             return 
         }
         let errores = false
-
+        let tactoerrores = []
         for(let i = 0;i<selectanimales.length;i++){
             let tactoanimal = selectanimales[i]
             try{
@@ -352,6 +353,7 @@
                 
             }
             catch(err){
+                tactoerrores.push(tactoanimal.id)
                 console.error(err)
                 errores = true
             }
@@ -367,8 +369,15 @@
         fecha = ""
         botonhabilitado = false
         malfecha = false
-        selecthashmap = {}
-        selectanimales = []
+        for(let i = 0;i<selectanimales.length;i++){
+            let tactoanimal = selectanimales[i]
+            let i_error = tactoerrores.findIndex(pid=>pid==tactoanimal.id)
+            if(i_error == -1){
+                
+                delete selecthashmap[tactoanimal.id]
+            }
+        }
+        selectanimales =[]
     }
     function inputObsGeneral(){
         for(let i = 0;i<selectanimales.length;i++){
@@ -618,7 +627,7 @@
                             {/if}
                         </button>
                     </td>
-                    <td class="text-base mx-1 px-1">{a.caravana}</td>
+                    <td class="text-base mx-1 px-1">{shorterWord(a.caravana)}</td>
                     <td class="text-base mx-1 px-1">{getEstadoNombre(a.prenada)}</td>
                     <td class="text-base mx-1 px-1">{a.categoria}</td>
                     <td class="text-base mx-1 px-1">{a.peso}</td>
@@ -689,7 +698,7 @@
                                 </svg>
                             {/if}
                         </button>
-                        {a.caravana}
+                        {shorterWord(a.caravana)}
                     </h3>
                     {#if a.sexo == "H" && a.prenada != 1}
                         <div class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}>{getEstadoNombre(a.prenada)}</div>

@@ -3,8 +3,6 @@
     import estilos from "$lib/stores/estilos";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
-    import CardCabana from "./CardCabana.svelte";
-    import CardBase from "../CardBase.svelte";
     import motivos from '$lib/stores/motivos';
     import { onMount } from "svelte";
     import tiponoti from '$lib/stores/tiponoti';
@@ -15,8 +13,6 @@
     let nombredel = $state("")
     let nombretrans = $state("")
     let buscar = $state("")
-    let cabanas = $state([])
-    let cabanasrow = $state([])
     let codigo = $state("")
     let malcodigo = $state(false)
     
@@ -98,32 +94,9 @@
         
         
     }
-    async function getCabañas(){
-        try{
-            const records = await pb.collection('cabs').getFullList({
-                filter:"active = true",
-                sort: 'nombre',
-            });    
-            cabanas = records
-        }
-        catch(err){
-            Swal.fire("Error",err,"error")
-        }
-        
-    }
-    function filterUpdateCabs(){
-        
-        cabanasrow = cabanas
-        if(buscar != ""){
-            cabanasrow = cabanasrow.filter(c=>c.nombre.startsWith(buscar))
-        }
-
-    }
-    
     onMount(async ()=>{
         id = $page.params.slug
-        await getCabañas()
-        filterUpdateCabs()
+
     })
 </script>
 <div class="p-2">

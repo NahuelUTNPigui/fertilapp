@@ -117,19 +117,22 @@
     })
 </script>
 <Navbarr>
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-2">
-        <div>
-            <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 ">Tus establecimientos</h1>
-        </div>
-        <div class="flex col-span-2 justify-end mt-2 lg:mt-0">
-            <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={crearEstablecimiento}>
-                <span  class="text-xl">Nuevo</span>
-            </button>
+    <div class="flex justify-center mt-1">
+        <div class="w-full max-w-7xl px-4">
+            <div class="grid grid-cols-3 mx-1  lg:mx-10 mt-2">
+                <div>
+                    <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 ">Tus establecimientos</h1>
+                </div>
+                <div class="flex col-span-2 justify-end mt-2 lg:mt-0">
+                    <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={crearEstablecimiento}>
+                        <span  class="text-xl">Nuevo</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+    
     <div class="grid grid-cols-1 gap-2">
-
-        
         {#each establecimientos as e,i}
             <div class="flex items-center justify-center">
                 <div 
@@ -183,12 +186,16 @@
         
     </div>
     {#if establecimientoscolab.length != 0}
-    <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-2">
-        <div>
-            <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 ">Establecimientos asociados</h1>
+    <div class="flex justify-center mt-1">
+        <div class="w-full max-w-7xl px-4">
+            <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-2">
+                <div>
+                    <h1 class="text-2xl font-bold text-green-700 dark:text-green-400 mb-6 ">Establecimientos asociados</h1>
+                </div>
+            </div>
         </div>
-        
     </div>
+    
     {/if}
     <div class="grid grid-cols-1 gap-2">
         {#if establecimientoscolab.length != 0}

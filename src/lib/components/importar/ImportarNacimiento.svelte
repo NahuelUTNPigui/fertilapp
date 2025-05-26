@@ -8,8 +8,17 @@
     import cuentas from '$lib/stores/cuentas';
     import categorias from "$lib/stores/categorias";
     import{verificarNivelCantidad} from "$lib/permisosutil/lib"
-    let {animales,animalesusuario} = $props()
+    import { goto } from "$app/navigation";
+    let {
+        animales=$bindable([]),
+        animalesusuario=$bindable(0),
+        getAnimalesUser,
+        lotes =$bindable([]),
+        rodeos = $bindable([]),
+        nacimientos = $bindable([])
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
     let usuarioid = $state("")
@@ -18,12 +27,9 @@
     const pb = new PocketBase(ruta);
     let filename = $state("")
     let wkbk = $state(null)
-    let lotes = $state([])
-    let rodeos = $state([])
-    let nacimientos = $state([])
-    let padres = $state([])
-    let madres = $state([])
-
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo nacimientos.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             caravana:"AAA",
@@ -80,7 +86,7 @@
         let user = await pb.collection("users").getOne(usuarioid)
         
         let nivel  = cuentas.filter(c=>c.nivel == user.nivel)[0]
-        let nacimientos = []
+        let nacimientosimportar = []
         let animaleshashmap = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetanimales)) {
@@ -160,7 +166,7 @@
         let nuevoanimales = 0
         let errornuevoanimales = false
         for (const [key, value ] of Object.entries(animaleshashmap)) {
-            nacimientos.push(value)
+            nacimientosimportar.push(value)
             let conocido = animales.filter(a=>a.caravana == value.caravana).length == 0
             if(!conocido ){
                 nuevoanimales += 1
@@ -176,125 +182,109 @@
             return 
             
         }
-        for(let i = 0;i<nacimientos.length;i++){
-            let an = nacimientos[i]
+        let errores = false
+        for(let i = 0;i<nacimientosimportar.length;i++){
+            let an = nacimientosimportar[i]
             let conlote = false
-            let lote = lotes.filter(l=>l.nombre==an.lote)[0]
-            let rodeo = rodeos.filter(r=>r.nombre==an.rodeo)[0]
-            let categoria = categorias.filter(c=>c.id==an.categoria || c.nombre==an.categoria)[0]
+            let id_lote = lotes.findIndex(l=>l.nombre==an.lote)
+            let id_rodeo = rodeos.findIndex(r=>r.nombre==an.rodeo)
+            let id_categoria = categorias.findIndex(c=>c.id==an.categoria || c.nombre==an.categoria)
             let padre = animales.filter(p=>p.caravana==an.nombrepadre)
             let madre = animales.filter(m=>m.caravana==an.nombremadre)
             
-            // Agregar animal si no existe y nacimiento
-            let dataadd = {
-                caravana:an.caravana,
-                active:true,
-                delete:false,
-                sexo:an.sexo,
-                peso:an.peso,
-                fechanacimiento: an.fechanacimiento?an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00":"",
-                nombremadre:madre.length>0?madre[0].caravana:an.nombremadre,
-                nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
-                cab:cab.id
-            }
-            //Modificar nacimiento cuando existe
-            let datanacimiento = {
-                fecha:an.fechanacimiento?an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00":"",
-                nombremadre:madre.length>0?madre[0].caravana:an.nombremadre,
-                nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
-                observacion:an.observaciones,
-                cab:cab.id
-            }
-            
-            if(lote){
-                dataadd.lote = lote.id
-            }
-            if(rodeo){
-                dataadd.rodeo = rodeo.id
-            }
-            if(categoria){
-                dataadd.categoria = categoria.id
-            }
-
-            if(padre){
-                datanacimiento.padre=padre.id
-            }
-            if(madre){
-                datanacimiento.madre = madre.id
-            }
-            
-            try{
+            let s_fecha = an.fechanacimiento.toISOString().split("T")[0]+ " 03:00:00"
+            if(an.nombremadre != "" && an.fechanacimiento != "" && madre.length>0){
                 
-                const record = await pb.collection('animales').getFirstListItem(`caravana="${an.caravana}"`,{});
-                if(record.nacimiento != ""){
-                    try{
-                        await pb.collection('nacimientos').update(record.nacimiento,datanacimiento)
-                    }
-                    catch(err){
-                        console.error(err)
-                    }
-                    
+                //data nacimiento cuando existe
+                let datanacimiento = {
+                    fecha:s_fecha,
+                    madre:madre[0].id,
+                    nombremadre:madre[0].caravana,
+                    nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
+                    observacion:an.observaciones,
+                    cab:cab.id
                 }
-                else{
-                    try{
-                        
+                if(padre.length>0){
+                    datanacimiento.padre=padre[0].id
+                }
+                try{
+                    // Me  fijo si existe el nacimiento
+                    let idx_nacimiento = nacimientos.findIndex(na=>na.madre == an.madre && na.fechanacimiento == s_fecha)
+                    let idnac = ""
+                    if(idx_nacimiento != -1){
+                        let nacimiento =  nacimientos[idx_nacimiento]
+                        idnac = nacimiento.id
+                        await pb.collection('nacimientos').update(idnac,datanacimiento)
+                    }
+                    else{
                         const recordnacimiento = await pb.collection('nacimientos').create(datanacimiento)
-                        await pb.collection('animales').update(record.id,{
-                            fechanacimiento: an.fechanacimiento+ " 03:00:00",
-                            nacimiento : recordnacimiento.id
-                        })
+                        idnac = recordnacimiento.id
                     }
-                    catch(err){
-                        console.error(err)
+                    //Quiero crear un animal y asociarle un nacimiento o asociarle un nacimiento a un animal que existe
+                    if (caravana != ""){
+                        let dataadd = {
+                            caravana:an.caravana,
+                            active:true,
+                            delete:false,
+                            sexo:an.sexo,
+                            peso:an.peso,
+                            fechanacimiento: an.fechanacimiento?s_fecha:"",
+                            nombremadre:madre.length>0?madre[0].caravana:an.nombremadre,
+                            nombrepadre: padre.length>0?padre[0].caravana:an.nombrepadre,
+                            cab:cab.id
+                        }
+                        if(id_lote != -1){
+                            dataadd.lote = lotes[id_lote]
+                        }
+                        if(id_rodeo != -1){
+                            dataadd.rodeo = rodeos[id_rodeo]
+                        }
+                        if(id_categoria !=-1){
+                            dataadd.categoria = categorias[id_categoria]
+                        }
+                        //me fijo si existe el animal
+                        let id_animal = animales.findIndex(a=>a.caravana == an.caravana)
+                        if(id_animal != -1){
+                            let a = animales[id_animal]
+                            //como existe tan solo le asocio el nacimiento
+                            await pb.collection('animales').update(a.id, {nacimiento:idnac});
+                        }
+                        else{
+                            dataadd.nacimiento = id_nac
+                            const recordanimal = await pb.collection('animales').create(dataadd);
+                        }
+
                     }
-                    
                 }
-            }
-            catch(err){
-                
-                if(!errornuevoanimales){
-                    const recordnacimiento = await pb.collection('nacimientos').create( datanacimiento);
-                    dataadd.nacimiento = recordnacimiento.id
-                    await pb.collection('animales').create(dataadd);
+                catch(err){
+                    errores = true
                 }
-                
             }
         }
         filename = ""
         loading = false
         wkbk = null
+        
         Swal.fire("Éxito importar","Se lograron importar los datos","success")
         
     }
     onMount(async ()=>{
         let pb_json =  JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
-        rodeos = await pb.collection('rodeos').getFullList({
-            filter:`active = true && cab ='${cab.id}'`,
-            sort: '-nombre',
-        });
-        
-        lotes = await pb.collection('lotes').getFullList({
-            filter:`active = true && cab ='${cab.id}'`,
-            sort: '-nombre',
-        });
-        animales = await pb.collection('animales').getFullList({
-            filter:`delete = false && cab ='${cab.id}'`,
-        })
-
-        
     })
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar nacimientos.xlsx`}
+        download="Importar nacimientos.xlsx"
     >
         Descargar Plantilla
-    </button>
+    </a>
     <div class={`
         w-full
         

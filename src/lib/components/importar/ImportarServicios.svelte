@@ -8,8 +8,13 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import {addDays} from "$lib/stringutil/lib"
     import categorias from "$lib/stores/categorias";
-    let {animales} = $props()
+    import { goto } from "$app/navigation";
+    let {
+        animales=$bindable([]),
+        servicios=$bindable([])
+    } = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
 
@@ -17,7 +22,9 @@
     let filename = $state("")
     let wkbk = $state(null)
     let loading = $state(false)
-
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo servicios.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             madre:"AAA",
@@ -64,7 +71,7 @@
         if(!sheetiser){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
-        let servicios = []
+        let serviciosimportar = []
         let serhash = {}
         loading = true
         let errores = false
@@ -131,52 +138,54 @@
             }
         }
         for (const [key, value ] of Object.entries(serhash)) {
-            servicios.push(value)
+            serviciosimportar.push(value)
         }
-        for(let i = 0;i<servicios.length;i++){
-            let ser = servicios[i]
-            
-            if(ser.madre != "" && ser.fechadesde != "" && ser.padres !=""){
-                let madres = animales.filter(a=>a.caravana==ser.madre)
-                let padreslista = ser.padres.split(",")
-                let padres = padreslista.map(p=>{
-                    let padre = ""
-                    for(let i=0;i<animales.length;i++){
-                        if(animales[i].sexo == "M" && animales[i].caravana==p){
-                            return animales[i].id
-                        }
-                    }
-                    return padre
-                })
-                
-                if(madres.length > 0 && padres.length > 0){
-                    let madre = madres[0].id
-                    let padre = padres.join()
-                    let categoria = categorias.filter(c=>c.id==an.categoria || c.nombre==an.categoria)[0]
-                    try{
-                        let dataser = {
-                            fechadesde : ser.fechadesde.toISOString().split("T")[0] + " 03:00:00",
-                            fechaparto: addDays(ser.fechadesde.toISOString().split("T")[0],280).toISOString().split("T")[0]+" 03:00:00",
-                            observacion: ser.observacion,
-                            madre:madre,
-                            padres:padre,
-                            active:true,
-                            cab:cab.id
-                        }
-                        
-                        if(ser.fechahasta != ""){
-                            dataser.fechahasta = ser.fechahasta.toISOString().split("T")[0] + " 03:00:00"
-                        }   
-                        if(categoria){
-                            dataser.categoria = categoria.id
-                        }
-                        const record = await pb.collection("servicios").create(dataser)
-                    }
-                    catch(err){
-                        console.error(err)
-                        errores = true
+        for(let i = 0;i<serviciosimportar.length;i++){
+            let ser = serviciosimportar[i]
+            let i_madre = animales.findIndex(a=>a.sexo == "H" && a.caravana == ser.madre)
+            let padreslista = ser.padres.split(",")
+            let padres = padreslista.map(p=>{
+                let padre = ""
+                for(let i=0;i<animales.length;i++){
+                    if(animales[i].sexo == "M" && animales[i].caravana==p){
+                        return animales[i].id
                     }
                 }
+                return padre
+            })
+            padres = padres.filter(p=>p!="")
+            if(ser.madre != "" && ser.fechadesde != "" && ser.padres !="" && i_madre != -1 && padres.length > 0){
+                let madre = animales[i_madre]
+                let padre = padres.join()
+                let s_fecha = ser.fechadesde.toISOString().split("T")[0] + " 03:00:00"
+                let dataser = {
+                    fechadesde : s_fecha,
+                    fechaparto: addDays(ser.fechadesde.toISOString().split("T")[0],280).toISOString().split("T")[0]+" 03:00:00",
+                    observacion: ser.observacion,
+                    madre:madre,
+                    padres:padre,
+                    active:true,
+                    cab:cab.id
+                }
+                if(ser.fechahasta != ""){
+                    dataser.fechahasta = ser.fechahasta.toISOString().split("T")[0] + " 03:00:00"
+                }   
+                if(categoria){
+                    dataser.categoria = categoria.id
+                }
+                try{
+                    let s_idx = servicios.findIndex(serv=> serv.madre ==  madre && s_fecha == serv.fechadesde && serv.padres == padres)
+                    if(s_idx == -1){
+                        await pb.collection("servicios").create(dataser)
+                    }
+                    else{
+                        await pb.collection("servicios").update(servicios[s_idx].id,dataser)
+                    }
+                }
+                catch(err){
+                    errores = true
+                }
+                
             }
 
                 
@@ -193,15 +202,16 @@
     }
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar servicios.xlsx`}
+        download="Importar servicios.xlsx"
     >
-    Descargar Plantilla
-    </button>
+        Descargar Plantilla
+    </a>
     <div class={`
         w-full
         

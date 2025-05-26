@@ -13,7 +13,7 @@
     import estilos from '$lib/stores/estilos';
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
     import cuentas from '$lib/stores/cuentas';
-    import Observaciones from '$lib/components/animal/Observaciones.svelte';
+    
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA

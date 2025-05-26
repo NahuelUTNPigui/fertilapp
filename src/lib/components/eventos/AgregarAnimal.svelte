@@ -8,7 +8,8 @@
         sexo=$bindable(""),
         fechanacimiento=$bindable(""),
         categoria=$bindable(""),
-        agregaranimal=$bindable(false)
+        agregaranimal=$bindable(false),
+        confechanac =  $bindable(false)
     } = $props()
     let malcaravana = $state(false)
     function onChangeAgregar(){
@@ -100,6 +101,7 @@
                 </select>
             </label>
         </div>
+        {#if !confechanac}
         <div class="mb-1 lg:mb-0">
             <label for = "fechanacimiento" class="label">
                 <span class="label-text text-base">Fecha nacimiento</span>
@@ -116,6 +118,7 @@
                 bind:value={fechanacimiento}
             />
         </div>
+        {/if}
     </div>
 {:else}
     <dir class="flex justify-start mx-0 px-0">

@@ -7,8 +7,10 @@
     import { onMount } from "svelte";
     import {guardarHistorial} from "$lib/historial/lib"
     import {addDays} from "$lib/stringutil/lib"
-    let {animales} = $props()
+    import { goto } from "$app/navigation";
+    let {animales = $bindable([]),inseminaciones = $bindable([])} = $props()
     let ruta = import.meta.env.VITE_RUTA
+    let pre = import.meta.env.VITE_PRE
     let caber = createCaber()
     let cab = caber.cab
 
@@ -18,7 +20,9 @@
     let wkbk = $state(null)
     let loading = $state(false)
 
-
+    function exportarTemplate2(){
+        goto(`${ruta}/Modelo inseminaciones.xlsx`)
+    }
     function exportarTemplate(){
         let csvData = [{
             madre:"AAA",
@@ -60,7 +64,7 @@
         if(!sheetins){
             Swal.fire("Error","Debe subir un archivo válido","error")
         }
-        let inseminaciones = []
+        let inseminacionesimportar = []
         let inshash = {}
         loading = true
         for (const [key, value ] of Object.entries(sheetins)) {
@@ -102,59 +106,70 @@
             }
         }
         for (const [key, value ] of Object.entries(inshash)) {
-            inseminaciones.push(value)
+            inseminacionesimportar.push(value)
         }
-        
-        for(let i = 0;i<inseminaciones.length;i++){
-            let ins = inseminaciones[i]
-            if(ins.madre != "" && ins.fecha != "" && ins.pajuela !=""){
+        errores = false
+        for(let i = 0;i<inseminacionesimportar.length;i++){
+            let ins = inseminacionesimportar[i]
+            let m_idx = animales.findIndex(m=>m.caravana == ins.madre)
+            if(ins.madre != "" && ins.fecha != "" && ins.pajuela !="" && m_idx != -1){
+                let madre = animales[m_idx]
+                let s_fecha =ins.fecha.toISOString().split("T")[0]+" 03:00:00"
+                let i_idx = inseminaciones.findIndex(inseminacion => inseminacion.madre == madre.caravana && inseminacion.pajuela == ins.pajuela && ins.fecha == s_fecha)
+                let p_idx = animales.findIndex(p=>p.caravana == ins.pajuela)
+                let padre = {id:"",pajuela:ins.pajuela}
+                if(p_idx =! -1){
+                    padre.id = animales[p_idx].id
+                }
+                let datains = {
+                    animal:madre.id,
+                    categoria:madre.categoria,
+                    pajuela:ins.pajuela,
+                    padre:padre.id,
+                    fechaparto:addDays(ins.fecha,280).toISOString().split("T")[0]+" 03:00:00",
+                    fechainseminacion:s_fecha,
+                    active:true,
+                    cab:cab.id,
+                    observacion:ins.observacion
+                }
                 try{
-                    let recordmadre = await pb.collection("animales").getFirstListItem(`caravana="${ins.madre}" && cab='${cab.id}' && active = True`)
-                    let recordspadre = await pb.collection("animales").getList(1,1,{
-                        filter:`caravana="${ins.pajuela}" && cab='${cab.id}' && active = True`,
-                        skipTotal:true
-                    })
-                    //let recordspadre = await pb.collection("animales").getList(`caravana="${ins.pajuela}" && cab='${cab.id}' && active = True`)
-                    let datains = {
-                        animal:recordmadre.id,
-                        categoria:recordmadre.categoria,
-                        pajuela:ins.pajuela,
-                        padre:recordspadre.items.length!=0?recordspadre.items[0].id:"",
-                        fechaparto:addDays(ins.fecha,280).toISOString().split("T")[0]+" 03:00:00",
-                        fechainseminacion:ins.fecha.toISOString().split("T")[0]+" 03:00:00",
-                        active:true,
-                        cab:cab.id,
-                        observacion:ins.observacion
+                    if(i_idx != -1){
+                        await pb.collection("inseminacion").create(datains)
                     }
-                    
-                    const record = await pb.collection("inseminacion").create(datains)
-                    //Debo comprobar que tan cierto es. Depende de la fecha de tacot
-                    //await guardarHistorial(pb,recordmadre.id)
-                    //await pb.collection("animales").update(recordmadre.id,{prenada:3})
-
+                    else{
+                        await pb.collection("inseminacion").update(inseminaciones[i_idx],datains)
+                    }
                 }
                 catch(err){
-                    console.error(err)
-                }    
+                    errores = true
+                }  
             }
         }
         filename = ""
         wkbk = null
         loading = false
-        Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        if(errores){
+            Swal.fire("Error importar","Hubo alguna inseminación con errores ","error")
+        }
+        else{
+            Swal.fire("Éxito importar","Se lograron importar los datos","success")
+        }
+        
     }
 
 </script>
 <div class="space-y-4 grid grid-cols-1 flex justify-center">
-    <button
+    <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
-        onclick={exportarTemplate}
+        href={`${pre}/Importar inseminaciones.xlsx`}
+        download="Importar inseminaciones.xlsx"
     >
-    Descargar Plantilla
-    </button>
+        Descargar Plantilla
+    </a>
     <div class={`
         w-full
         
