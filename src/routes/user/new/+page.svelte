@@ -17,6 +17,7 @@
     let confirmcontra = ''
     let nombre = ''
     let apellido = ''
+    let cupon = ''
     let malnombre = false
     let malapellido = false
     let malusuarioname = false
@@ -132,6 +133,9 @@
                 "active": true,
                 "codigo":randomString(10,"n")
             };
+            if(cupon.trim().length>0){
+                data["cupon"] = cupon
+            }
             const record = await pb.collection('users').create(data);
             Swal.fire('Éxito guardar', 'Se logró guardar el nuevo usuario. Ingrese a la aplicación', 'success');
             goto(pre+"/")
@@ -186,7 +190,7 @@
                         Nombre
                     </label>
                     <input 
-                        type="nombre" 
+                        type="text" 
                         id="nombre" 
                         bind:value={nombre} 
                         oninput={()=>onInput("NOMBRE")}
@@ -206,7 +210,7 @@
                         Apellido
                     </label>
                     <input 
-                        type="apellido" 
+                        type="text" 
                         id="apellido" 
                         bind:value={apellido} 
                         oninput={()=>onInput("APE")}
@@ -226,7 +230,7 @@
                         Email
                     </label>
                     <input 
-                        type="nombreusuario" 
+                        type="text" 
                         id="nombreusuario" 
                         bind:value={usuarioemail} 
                         oninput={()=>onInput("EMAIL")}
@@ -278,6 +282,7 @@
                         </div>
                     {/if}
                 </div>
+
                 <div class="">
                     <div class="form-control">
                         <label class="cursor-pointer label">
@@ -294,9 +299,25 @@
                     </div>
                 </div>
                 <div>
+                    <label for="cupon" 
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                        Cupón (Opcional en caso de tener uno)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="cupon" 
+                        bind:value={cupon} 
+                        
+                        required 
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition"
+                    />
+                </div>
+                <div>
                     <button 
                         onclick={guardar}
                         class={`
+                            cursor-pointer
                             w-full  ${botonhabilitado && condiciones?"bg-green-600":"bg-gray-600"} text-white rounded-md py-2 px-4 
                             hover:bg-green-700 focus:outline-none focus:ring-2 
                             focus:ring-green-500 focus:ring-offset-2 transition

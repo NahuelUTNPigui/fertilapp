@@ -173,7 +173,8 @@
         username = pb_json.record.username
         nombre = pb_json.record.nombre
         apellido = pb_json.record.apellido
-        nivel = pb_json.record.nivel
+        const record = await pb.collection('users').getOne(usuarioid);
+        nivel = record.nivel
         let light = !darker.dark
         tokencolab = pb_json.record.codigo
         cab = caber.cab

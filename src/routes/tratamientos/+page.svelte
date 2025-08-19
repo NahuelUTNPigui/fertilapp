@@ -13,7 +13,7 @@
     import estilos from '$lib/stores/estilos';
     import { goto } from "$app/navigation";
     import {capitalize} from "$lib/stringutil/lib"
-    
+    import { shorterWord } from "$lib/stringutil/lib";  
     
     let caber = createCaber()
     let cab = caber.cab
@@ -813,7 +813,7 @@
                             <div class="flex items-start">
                                 <span >Caravana:</span> 
                                 <span class="mx-1 font-semibold">
-                                    {`${t.expand.animal.caravana}`}
+                                    {`${shorterWord(t.expand.animal.caravana)}`}
                                 </span>
                                 
                             </div>

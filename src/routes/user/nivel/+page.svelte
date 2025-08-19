@@ -1,8 +1,11 @@
 <script>
     import { onMount } from "svelte";
     import Navbarr from "$lib/components/Navbarr.svelte";
+    import Mp from "$lib/components/mercadopago/Mp.svelte";
     import PocketBase from 'pocketbase'
     import Swal from "sweetalert2";
+    import { dolar } from "$lib/stores/dolarprecio.svelte";
+
     let ruta = import.meta.env.VITE_RUTA
 
     const pb = new PocketBase(ruta);
@@ -50,7 +53,7 @@
         },
         {
             nivel:4,precio:110,
-            nombre:"Ilimitados",
+            nombre:"Ilimitado",
             descripcion:"Pensado para grandes establecimientos",
             items:[
                 {nombre:"Establecimientos ilimitados"},
@@ -60,44 +63,29 @@
         },    
     ]
     let nivel = $state(0)
-    onMount(()=>{
+    let usuarioid = $state("")
+    onMount(async ()=>{
+        try{
+            dolar.updateDolar()
+        }
+        catch(err){
+            console.error(err)
+        }
+        
+        
         let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-        nivel = pb_json.record.nivel
         
+        usuarioid =  pb_json.record.id
+        
+        const record = await pb.collection('users').getOne(usuarioid);
+        nivel = record.nivel
     })
-    async function cambiarPlan(p_nivel){
-        Swal.fire({
-            title: 'Cambiar plan',
-            text: `¿Seguro que deseas cambiar de plan?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si',
-            cancelButtonText: 'No'
-        }).then(async result=>{
-            if(result.value){
-                nivel = p_nivel
-                let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
-                pb_json.record.nivel = p_nivel
-                let usuarioid = pb_json.record.id
-                localStorage.setItem('pocketbase_auth',JSON.stringify(pb_json))
-                try{
-                    let data = {
-                        nivel:p_nivel
-                    }
-                    const record = await pb.collection('users').update(usuarioid, data);
-                }
-                catch(err){
-                    Swal.fire("Error cambiar plan","No se pudo cambiar el plan","error")
-                }
-            }
-        })
-        
-
-    }
+    
 </script>
 
 <Navbarr>
     <div class="min-h-screen font-sans ">
+
         <div class="container mx-auto px-4 py-16">
             <div class="text-center mb-16">
                 <h1 class="
@@ -149,11 +137,11 @@
                         <h3
                             class="text-xl font-bold "
                         >
-                            Nivel {n.nivel}
+                            {n.nombre}
                         </h3>
                         <div class="mt-4 flex items-baseline">
                             <span class="text-3xl font-extrabold " >
-                                ${n.precio}/mes
+                                ${n.precio}*/mes
                             </span>
                         </div>
                         <p class="mt-2 text-sm  text-gray-500 dark:text-gray-40" >
@@ -173,18 +161,20 @@
                             
                         </ul>
                         {#if nivel != n.nivel}
-                        <button 
-                            class="
-                                w-full mt-6 font-medium py-3 
-                                rounded-lg 
-                                bg-green-100 text-green-600 hover:bg-green-200
-                                dark:bg-green-700 dark:text-white dark:hover:bg-green-600
-                            "
-                            onclick={()=>cambiarPlan(n.nivel)}
+                            <button 
+                                class="
+                                    hidden
+                                    w-full mt-6 font-medium py-3 
+                                    rounded-lg 
+                                    bg-green-100 text-green-600 hover:bg-green-200
+                                    dark:bg-green-700 dark:text-white dark:hover:bg-green-600
+                                "
+                                onclick={()=>cambiarPlan(n.nivel)}
 
-                        >
-                            Elige nivel {n.nivel}
-                        </button>
+                            >
+                                Elige nivel {n.nivel}
+                            </button>
+                            <Mp nivel={n.nivel} {pb} {usuarioid} bind:nivel_actual={nivel}></Mp>
                         {/if}
                     </div>
                 </div>

@@ -247,9 +247,6 @@
         }
         
     }
-    function clickNuevoAnimal(){
-        nuevoAnimal = !nuevoAnimal
-    }
     function openNewModal(){
         idnacimiento = ""
         caravana = ""
@@ -383,12 +380,10 @@
     function validarBoton(){
         botonhabilitado = true
         if(isEmpty(fecha)){
-            console.log("mal fecha")
             botonhabilitado = false
             
         }
         if(isEmpty(madre)){
-            console.log("madre")
             botonhabilitado = false
             
         }

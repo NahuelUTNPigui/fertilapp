@@ -112,7 +112,7 @@
   </script>
   
   
-  <div class="drawer min-h-screen dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
+<div class="drawer min-h-screen dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800">
       <input id="my-drawer" type="checkbox" class="drawer-toggle" bind:checked={checked} />
       <div class="drawer-content w-full">
           <div class={classnavbarr}>

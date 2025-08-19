@@ -205,6 +205,7 @@
     <a
         class={`
             w-full
+            text-center
             ${estilos.basico} ${estilos.grande} ${estilos.secundario}
         `}
         href={`${pre}/Importar servicios.xlsx`}

@@ -52,7 +52,10 @@ const config = {
 				"/servicios",
 				"/servicios/movimiento",
 				"/pesajes/historial",
-				"/manual"
+				"/manual",
+				"/pagos/exito",
+				"/pagos/fail",
+				"/pagos/pending"
 
 			]
 		}

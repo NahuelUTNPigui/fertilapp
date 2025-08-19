@@ -22,18 +22,22 @@
     import MultipleToros from '$lib/components/MultipleToros.svelte';
     import{verificarNivel} from "$lib/permisosutil/lib"
     import {addDays} from "$lib/stringutil/lib"
+    
     import Estable from "$lib/svgs/estable.svelte"
     import Tacto from '$lib/svgs/tacto.svelte';
     import Nacimiento from '$lib/svgs/nacimiento.svelte';
     import Servicio from '$lib/svgs/servicio.svelte';
     import Tratamiento from '$lib/svgs/tratamiento.svelte';
     import Observacion from '$lib/svgs/observacion.svelte';
+
     //Formularios
     import InicioNacimiento from "$lib/components/inicio/Nacimiento.svelte"
     import InicioTacto from "$lib/components/inicio/Tacto.svelte"
     import InicioTratamiento from "$lib/components/inicio/Tratamiento.svelte"
     import InicioServicio from "$lib/components/inicio/Servicio.svelte"
     import InicioObservacion from "$lib/components/inicio/Observacion.svelte"
+    import { dolar } from '$lib/stores/dolarprecio.svelte';
+    import { getDolarPrice } from '$lib/stores/dolar';
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -705,6 +709,13 @@
         totaleventos.rodeos = recordsrodeos.totalItems
     }
     onMount(async ()=>{
+        try{
+            dolar.updateDolar()
+        }
+        catch(err){
+            console.error("Error con el dolar")
+        }
+        
         cab = caber.cab
         let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
         
@@ -725,9 +736,14 @@
  
 </script>
 <Navbarr>
+    <div class="flex items-center justify-center">
+        <h2 class="text-xl font-bold"> ¡Proximamente Lanzamiento de Preventas! </h2>
+        
+        
+    </div>
     
     {#if cab.exist}
-    
+        
         <CardBase titulo="Bienvenido a Creciente Fértil" cardsize="max-w-5xl">
             <div class="mx-1 my-2 lg:mx-10 grid grid-cols-2  lg:grid-cols-3 gap-1">
                 <StatCard urlto={"/animales"} titsize={"text-md"} titulo="Animales" valor={totaleventos.animales}/>
