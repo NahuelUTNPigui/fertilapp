@@ -286,6 +286,8 @@
                 return
             }
             data.cab = resultList.items[0].id
+            data.lote =""
+            data.rodeo=""
             try{
                 let pb_json = JSON.parse(localStorage.getItem('pocketbase_auth'))
         
@@ -326,7 +328,8 @@
                     lote:a.lote,
                     rodeo:a.rodeo,
                     categoria:a.categoria,
-                    prenada:a.prenada
+                    prenada:a.prenada,
+                    cab:cab.id
                 }
                 bulkhistoriales.push(datahistorial)
                 //await guardarHistorial(pb,lista[i].id)

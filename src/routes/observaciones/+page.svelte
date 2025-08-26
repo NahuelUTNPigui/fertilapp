@@ -645,7 +645,7 @@
             </thead>
             <tbody>
                 {#each observacionesrow as o}
-                <tr onclick={()=>openModalEditar(o.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
+                <tr onclick={()=>openModalEditar(o.id)} class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900">
                     <td class="text-base ">
                         {`${new Date(o.fecha).toLocaleDateString()}`}
                     </td>

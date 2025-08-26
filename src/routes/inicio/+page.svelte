@@ -80,7 +80,9 @@
     //Tratamiento
     let tratamiento  = $state({})
     
+
     //Servicio
+    
     let servicio = $state({})
     let inseminacion = $state({})
     let esServicio = $state(true)
@@ -562,7 +564,7 @@
                 active:true,
                 cab:cab.id
             }
-            if(fechahastaserv != ""){
+            if(servicio.fechahastaserv != ""){
                 dataser.fechahasta = servicio.fechahastaserv + " 03:00:00"
             }
             try{
@@ -591,16 +593,16 @@
                 active:true,
                 cab:cab.id
             }
-            if(fechahastaserv != ""){
+            if(servicio.fechahastaserv != ""){
                 dataser.fechahasta = servicio.fechahastaserv + " 03:00:00"
             }
             try{
                 await pb.collection("servicios").create(dataser)
                 // Revisar las fechas
-                await pb.collection('animales').update(idanimalser,{
+                await pb.collection('animales').update(servicio.idanimalser,{
                     prenada:3
                 })
-                await guardarHistorial(pb,idanimalser)
+                await guardarHistorial(pb,servicio.idanimalser)
                 let recordservicios = await pb.collection('servicios').getList(1,1,{
                     filter:`cab='${cab.id}'`
                 })
@@ -781,7 +783,7 @@
                     onclick={openNewModalNacimiento}
                     >
                         <Nacimiento></Nacimiento>
-                        Nuevo nacimiento
+                        Nuevo parición
                     </button> 
                 </div>
                 <div>

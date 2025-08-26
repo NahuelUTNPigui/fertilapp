@@ -203,7 +203,7 @@
     async function getInseminaciones(){
         // you can also fetch all records at once via getFullList
         const records = await pb.collection('inseminacion').getFullList({
-            sort: '-fechainseminacion ',
+            sort: 'fechainseminacion ',
             filter :`cab = '${cab.id}' && active = true`,
             expand:"animal"
         });
@@ -212,7 +212,7 @@
     }
     async function getServicios(){
         const records = await pb.collection('servicios').getFullList({
-            sort: '-fechadesde ',
+            sort: 'fechadesde ',
             filter :`cab = '${cab.id}' && active = true`,
             expand:"madre"
         });
@@ -321,10 +321,20 @@
 
         }
     }
+    function nombreAnimal(valor){
+        let ps = borrados.filter(p=>p.id==valor)
+        if(ps.length>0){
+            return shorterWord(ps[0].caravana)+ " , "
+        }
+        else{
+            return "transfer"+ " , "
+        }
+
+    }
     function getNombrePadres(p_padres){
         let ids = p_padres.split(",")
         let nombres = ids.reduce(
-            (acc,valor)=>shorterWord(borrados.filter(p=>p.id==valor)[0].caravana) + " , " +acc,
+            (acc,valor)=> nombreAnimal(valor) +acc,
             ""
         )
 
@@ -336,7 +346,7 @@
         await getServicios()
         await getInseminaciones()
         filterUpdate()
-        ordenarServicios("fecha")
+        //ordenarServicios("fecha")
     })
     //Para el collapse de los ordenar
     let isOpenOrdenar = $state(false)
@@ -716,7 +726,7 @@
             </thead>
             <tbody>
                 {#each serviciosrow as s}
-                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>s.fechadesde?openEditModal(s.id):openEditModalIns(s.id)}>
+                <tr class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>s.fechadesde?openEditModal(s.id):openEditModalIns(s.id)}>
                     <td 
                         class="text-base ml-3 pl-3 mr-1 pr-1 border-b dark:border-gray-600"
                     >

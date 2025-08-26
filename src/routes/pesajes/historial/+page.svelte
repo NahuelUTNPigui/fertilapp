@@ -221,7 +221,7 @@
             </thead>
             <tbody>
                 {#each pesajesrows as p}
-                <tr onclick={()=>openDetalle(p.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
+                <tr onclick={()=>openDetalle(p.id)} class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td 
                             
                             class="text-base p-3 border-b dark:border-gray-600  "

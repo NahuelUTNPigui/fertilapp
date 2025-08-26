@@ -186,6 +186,7 @@
             m.lote = ms[0].lote
             m.rodeo = ms[0].rodeo
         }
+        //Si es que hay un animal
         let datanimal={
             fechanacimiento:fecha+" 03:00:00"
         }
@@ -198,7 +199,7 @@
             observacion,    
         }
         try{
-            const recorda = await pb.collection('animales').update(idanimal, datanimal);
+            //const recorda = await pb.collection('animales').update(idanimal, datanimal);
             const record = await pb.collection('nacimientos').update(idnacimiento, dataparicion);
             Swal.fire("Éxito editar","Se pudo editar el nacimiento con exito","success")
             
@@ -749,7 +750,7 @@
             </thead>
             <tbody>
                 {#each nacimientosrow as n}
-                    <tr onclick={()=>openEditModal(n.id)} class="hover:bg-gray-200 dark:hover:bg-gray-900">
+                    <tr onclick={()=>openEditModal(n.id)} class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 ">{new Date(n.fecha).toLocaleDateString()}</td>
                         <td class="text-base mx-1 px-1 ">
                             {`${n.caravana}`}

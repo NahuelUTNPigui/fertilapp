@@ -10,6 +10,7 @@
     import {guardarHistorial} from "$lib/historial/lib"
     import RadioButton from "../RadioButton.svelte";
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
+    import Swal from "sweetalert2";
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -59,7 +60,6 @@
                categoria,
                prenada,
                tipo,
-               nombreveterinario,
                cab:cabid,
                active:true
             }
@@ -71,6 +71,7 @@
             })
 
             tactos.push(record)
+            Swal.fire("Éxtio guardar","Se logró guardar")
         }
         catch(err){
             console.error(err)

@@ -1013,7 +1013,7 @@
             <tbody>
                 {#each animalesrows as a}
                     <tr
-                        class=" hover:bg-gray-200 dark:hover:bg-gray-900"
+                        class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900"
                         onclick={() => goto(`${pre}/animales/${a.id}`)}
                     >
                         <td class="text-base p-3">

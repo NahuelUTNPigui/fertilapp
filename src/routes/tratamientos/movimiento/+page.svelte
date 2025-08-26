@@ -297,6 +297,12 @@
                 delete selecthashmap[ts.id]
             }
         }
+        if(!errores){
+            Swal.fire("Éxito guardar","Se logró guardar los tratamientos","success")
+        }
+        else{
+            Swal.fire("Error guardar","No se logró guardar todos los tratamientos","error")
+        }
         selectanimales =[]
     }
     onMount(async ()=>{

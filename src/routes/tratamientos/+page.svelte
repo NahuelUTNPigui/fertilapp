@@ -421,6 +421,7 @@
             tratamientosrow = tratamientosrow.filter(t=>t.tipo==buscartipo)
             totalTratamientosEncontrados = tratamientosrow.length
         }
+        ordenarTratamientosDescendente(forma)
     }
     onMount(async()=>{
         await getTratamientos()
@@ -443,7 +444,7 @@
         isOpenOrdenar = !isOpenOrdenar
     }
     //Para los ordenar
-    let ascendente = $state(true)
+    let ascendente = $state(false)
     let forma = $state("fecha")
     let selectforma = $state("fecha")
     //Ordenar servicios
@@ -456,7 +457,7 @@
         forma = p_forma
         if(forma=="fecha"){
             
-            tratamientosrow.sort((a1,a2)=>escalar * a1.fecha.localeCompare(a2.fecha))
+            tratamientosrow.sort((a1,a2)=>escalar * (new Date(a1.fecha).toLocaleDateString().localeCompare(new Date(a2.fecha).toLocaleDateString())))
         }
         else if(forma=="animal"){
             
@@ -780,7 +781,7 @@
             </thead>
             <tbody>
                 {#each tratamientosrow as t}
-                    <tr onclick={()=>openEditModal(t.id)} class=" hover:bg-gray-200 dark:hover:bg-gray-900">
+                    <tr onclick={()=>openEditModal(t.id)} class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 ">{new Date(t.fecha).toLocaleDateString()}</td>
                         <td class="text-base mx-1 px-1 ">
                             {`${t.expand.animal.caravana}`}

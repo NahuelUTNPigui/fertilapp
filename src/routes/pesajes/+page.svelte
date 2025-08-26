@@ -123,12 +123,13 @@
     }
 
     function clickAnimal(id){
+        
         if(selecthashmap[id]){
             if(todos){
                 todos = false
                 algunos = true
             }
-            selecthashmap[id] = null
+            delete selecthashmap[id]
         }
         else{
             if(ninguno){
@@ -140,6 +141,7 @@
                 ...a
             }
         }
+        
     }
 
     function clickTodos(){
@@ -317,6 +319,11 @@
                 </svg>
             </div> 
         </button>
+        <div>
+            <span class="text-lg my-1"
+                >Total de animales seleccionados: {Object.keys(selecthashmap).length}</span
+            >
+        </div>
         {#if isOpenFilter}
             <div transition:slide class="grid grid-cols-1 lg:grid-cols-4  m-1 gap-2 w-11/12" >
                 <div>

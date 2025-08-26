@@ -388,7 +388,7 @@
     let ascendente = $state(true)
     let forma = $state("fecha")
     let selectforma = $state("fecha")
-    //Ordenar servicios
+    //Ordenar tactos
     function ordenarTactosDescendiente(p_forma){
         
         let escalar = 1
@@ -418,7 +418,6 @@
         
         if(p_forma == forma){
             ascendente = !ascendente
-            
         }
         else{
             ascendente = true
@@ -679,7 +678,7 @@
                         {#if forma == "fecha"}
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
-                                class={`size-5 transition-all duration-300 ${!ascendente? 'transform rotate-180':''}`}
+                                class={`size-5 transition-all duration-300 ${!ascendente? '':'transform rotate-180'}`}
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
@@ -765,7 +764,7 @@
             </thead>
             <tbody>
                 {#each tactosrow as t}
-                    <tr onclick={()=>openModalEdit(t.id) } class=" hover:bg-gray-200 dark:hover:bg-gray-900">
+                    <tr onclick={()=>openModalEdit(t.id) } class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900">
                         <td class="text-base">
                             {`${new Date(t.fecha).toLocaleDateString()}`}
                         </td>

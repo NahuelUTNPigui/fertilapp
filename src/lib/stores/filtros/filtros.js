@@ -1,0 +1,1 @@
+//Funcion para que los filtros se guardan en memoria y no tengas que volver a guardarlo

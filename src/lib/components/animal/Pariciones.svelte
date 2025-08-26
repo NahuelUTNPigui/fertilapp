@@ -62,7 +62,7 @@
 
     async function getPariciones(){
         const recordsn = await pb.collection("nacimientosall").getFullList({
-            filter:`(padre~'${id}' || madre ~ '${id}') && cab='${cabid}' `,
+            filter:`(padre~'${id}' || madre ~ '${id}') `,
             sort:"-fecha"
         })
         pariciones = recordsn

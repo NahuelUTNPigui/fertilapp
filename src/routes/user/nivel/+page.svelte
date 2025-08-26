@@ -22,7 +22,7 @@
             ]
         },
         {
-            nivel:1,precio:20,
+            nivel:1,precio:28,
             nombre:"Inicio",
             descripcion:"Ideal para pequeños establecimientos",
             items:[
@@ -32,7 +32,7 @@
             ]
         },
         {
-            nivel:2,precio:35,
+            nivel:2,precio:50,
             nombre:"Intermedio",
             descripcion:"Ideal para establecimientos mediano",
             items:[
@@ -42,7 +42,7 @@
             ]
         },
         {
-            nivel:3,precio:65,
+            nivel:3,precio:90,
             nombre:"Avanzado",
             descripcion:"Ideal para establecimientos con muchos animales",
             items:[
@@ -52,7 +52,7 @@
             ]
         },
         {
-            nivel:4,precio:110,
+            nivel:4,precio:150,
             nombre:"Ilimitado",
             descripcion:"Pensado para grandes establecimientos",
             items:[

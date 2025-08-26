@@ -308,10 +308,11 @@
             }
             
             const result = await batch.send();
-            
+            Swal.fire("Éxito guardar","Se pudieron guardar los tactos","success")
         }
         catch(err){
             console.error(err)
+            Swal.fire("Error guardar","No se pudieron guardar los tactos","error")
         }
         
         await getAnimales()

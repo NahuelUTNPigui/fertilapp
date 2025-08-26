@@ -90,11 +90,13 @@
             
             await pb.collection("pesaje").delete(idpesaje)
             await getPesajes()
+             Swal.fire("Éxito eliminar pesaje","Se pudo eliminar el pesaje","success")
             filterUpdate()
             detallePesaje.close()
         }
         catch(err){
             console.error(err)
+            Swal.fire("Error eliminar pesaje","No se pudo eliminar el pesaje","error")
             detallePesaje.close()
         }
     }
@@ -226,8 +228,11 @@
 </script>
 <Navbarr>
     <div class="grid grid-cols-1  lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
-        <div>
-            <h1 class="text-2xl col-span-2 lg:col-span-1">Historia pesajes - Últimos {ultimos}</h1>  
+        <div class="hidden md:block">
+            <h1 class="text-2xl col-span-2 lg:col-span-1">Historia pesajes - Últimos 5</h1>  
+        </div>
+        <div class="md:hidden">
+            <h1 class="text-2xl col-span-2 lg:col-span-1">Historia pesajes - Últimos 3</h1>  
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
             
