@@ -16,6 +16,13 @@
     import { guardarHistorial } from "$lib/historial/lib";
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
+    //PERMISOS
+    import { createPer } from "$lib/stores/permisos.svelte";
+    import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+    import {
+        getPermisosCabUser,
+        getPermisosEstXColab,
+    } from "$lib/permisosutil/lib";
     import Inseminaciones from "$lib/components/animal/Inseminaciones.svelte";
     import Tratamientos from "$lib/components/animal/Tratamientos.svelte";
     import Observaciones from "$lib/components/animal/Observaciones.svelte";
@@ -24,7 +31,7 @@
     import tiponoti from "$lib/stores/tiponoti";
     import Servicios from "$lib/components/animal/Servicios.svelte";
     import SelectTab from "$lib/components/animal/SelectTab.svelte";
-
+    let esdev = import.meta.env.VITE_DEV == "si";
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
@@ -33,6 +40,9 @@
     let cargado = $state(false);
     let pestañas = $state([]);
     let tab = $state("");
+    let per = createPer();
+    let userpermisos = $state([]);
+
     // Datos
     let slug = $state("");
     let caravana = $state("");
@@ -49,7 +59,7 @@
     let pariciones = $state([]);
     let fechafall = $state("");
     let motivobaja = $state("");
-    let connacimiento = $state(false)
+    let connacimiento = $state(false);
     let nacimientoobj = $state({});
     let tactos = $state([]);
     let prenada = $state(0);
@@ -73,6 +83,9 @@
         tactos = recordtactos;
     }
     async function darBaja(fechafallecimiento, motivo) {
+        if (!userpermisos[5]) {
+            Swal.fire("Error permisos", getPermisosMessage(5), "error");
+        }
         try {
             const data = {
                 active: false,
@@ -98,6 +111,10 @@
         }
     }
     async function eliminar() {
+        if (!userpermisos[5]) {
+            Swal.fire("Error permisos", getPermisosMessage(5), "error");
+        }
+
         try {
             const data = {
                 delete: true,
@@ -118,6 +135,9 @@
         }
     }
     async function transferir(codigo) {
+        if (!userpermisos[5]) {
+            Swal.fire("Error permisos", getPermisosMessage(5), "error");
+        }
         const resultcab = await pb.collection("cabs").getList(1, 1, {
             filter: `active = true && renspa = '${codigo}'`,
         });
@@ -167,12 +187,8 @@
             skipTotal: true,
         });
         if (recordxiste.length > 0) {
-            
             goto(`${pre}/animales/${_id}`);
             //window.location.reload();
-                        
-            
-            
         } else {
             Swal.fire(
                 "Error padre",
@@ -183,8 +199,8 @@
     }
     async function perfilAnimal(_id) {
         //slug = $page.params.slug;
-        slug = _id
-        
+        slug = _id;
+
         if (slug != "") {
             try {
                 const recorda = await pb.collection("animales").getOne(slug, {
@@ -243,11 +259,21 @@
     //Necesito una funcion que traiga toda la informacion del animal
     onMount(async () => {
         let _id = $page.params.slug;
+        let pb_json = JSON.parse(localStorage.getItem("pocketbase_auth"));
+        usuarioid = pb_json.record.id;
         await perfilAnimal(_id);
+        
+        let respermisos = await getPermisosCabUser(pb, usuarioid, cab.id);
+        per.setPer(respermisos.permisos, usuarioid);
+        
+        userpermisos = getPermisosList(per.per.permisos);
     });
 </script>
 
 <Navbarr>
+    {#if esdev}
+        premisos {JSON.stringify(userpermisos, null, 2)}
+    {/if}
     <div class="flex justify-center mt-1">
         <div class="w-full max-w-7xl px-4">
             <!-- Combo alineado al borde izquierdo de la card -->
@@ -272,6 +298,7 @@
                     nacimiento={nacimientoobj}
                     {fechanacimiento}
                     bind:modohistoria
+                    bind:userpermisos
                     {irPadre}
                 />
             </CardAnimal>
@@ -289,27 +316,43 @@
         {:else if tab == "pesajes"}
             <!--Pesajes-->
             <CardAnimal cardsize="max-w-7xl" titulo="Pesajes">
-                <Pesajes pesoanterior={peso} bind:peso {caravana}></Pesajes>
+                <Pesajes
+                    pesoanterior={peso}
+                    bind:peso
+                    {caravana}
+                    bind:userpermisos
+                ></Pesajes>
             </CardAnimal>
         {:else if tab == "tratamientos"}
             <!--Tipos y tratamientos-->
             <CardAnimal cardsize="max-w-7xl" titulo="Tratamientos">
-                <Tratamientos cabid={cab.id} {categoria}></Tratamientos>
+                <Tratamientos cabid={cab.id} {categoria} bind:userpermisos
+                ></Tratamientos>
             </CardAnimal>
         {:else if tab == "observaciones"}
             <!--Observaciones-->
             <CardAnimal cardsize="max-w-7xl" titulo="Observaciones">
-                <Observaciones cabid={cab.id} {categoria} />
+                <Observaciones cabid={cab.id} {categoria} bind:userpermisos />
             </CardAnimal>
         {:else if tab == "pariciones"}
             <!--Animales nacimientos-->
             <CardAnimal cardsize="max-w-7xl" titulo="Pariciones">
-                <Pariciones cabid={cab.id} sexoanimal={sexo} bind:prenada />
+                <Pariciones
+                    cabid={cab.id}
+                    sexoanimal={sexo}
+                    bind:prenada
+                    bind:userpermisos
+                />
             </CardAnimal>
         {:else if tab == "tactos"}
             <!--Tactos-->
             <CardAnimal cardsize="max-w-7xl" titulo="Tactos">
-                <Tactos cabid={cab.id} bind:prenadaori={prenada} {categoria} />
+                <Tactos
+                    cabid={cab.id}
+                    bind:prenadaori={prenada}
+                    {categoria}
+                    bind:userpermisos
+                />
             </CardAnimal>
         {:else if tab == "servicios"}
             <!--Animales servicios-->
@@ -317,7 +360,7 @@
                 cardsize="max-w-7xl"
                 titulo="Inseminaciones y Servicios"
             >
-                <Servicios cabid={cab.id} {categoria} />
+                <Servicios cabid={cab.id} {categoria} bind:userpermisos />
             </CardAnimal>
         {:else if tab == "clinica"}
             <!--Pesajes, tactos, servicios, tratamientos, observaciones,pariciones-->

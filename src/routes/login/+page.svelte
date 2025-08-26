@@ -26,6 +26,18 @@
     function nuevo(){
         goto(pre+"/user/new")
     }
+    async function existeEmailUsuario(pb,useremail) {
+        const resultList = await pb.collection('users').getList(1, 1, {
+            filter: `name='${useremail}'`,
+            skipTotal:true
+        });
+        if(resultList.items.length>0){
+            return true
+        }
+        else{
+            return false
+        }
+    }
     async function ingresar(){
         if(isEmpty(usuarioname)){
             Swal.fire('Error login', 'Nombre usuario vacio', 'error');
@@ -35,8 +47,13 @@
             Swal.fire('Error login', 'Contraseña vacia', 'error');
             return
         }
-        
         const pb = new PocketBase(ruta);
+        let emailExiste = await existeEmailUsuario(pb,usuarioname)
+        if(!emailExiste){
+            Swal.fire("Error login","No existe un usuario con ese correo","error")
+            return
+        }
+        
 
         try{
             let caber = createCaber()
@@ -52,29 +69,40 @@
                     usuario.set(pb.authStore.token)
                     enabled.set("si")
                     // Cuando te logeas, deberia revisar si tenes una cabaña
-                    
-                    try{
-                        const record = await pb.collection('cabs').getFirstListItem(`user='${authData.record.id}' && active=true`, {});
-                        caber.setCab(record.nombre,record.id)
+                    let reccabs = await pb.collection("cabs").getList(1,50,{
+                        filter:`user='${authData.record.id}' && active=true`
+                    })
+                    if(reccabs.totalItems > 0){
+                        let establecimiento =  reccabs.items[0]
+                        //Hay que guardar a la cabaña de preferencias
+                        caber.setCab(establecimiento.nombre,establecimiento.id,true)
                         per.setPer("0,1,2,3,4,5",authData.record.id)
-                    }
-                    catch(err){
-                        try{
-                            //Revisa si sos colaborador 
-                            const recordcab = await pb.collection('estxcolabs').getFirstListItem(`colab.user='${authData.record.id}'`, {
-                                expand: 'colab,cab,colab.user',
-                            })
-                            const recordper = await pb.collection("permisos").getFirstListItem(`estxcolab='${recordcab.id}'`)
-                            per.setPer(recordper.permisos,authData.record.id)
-                            caber.setCab(recordcab.expand.cab.nombre,recordcab.expand.cab.id)
-                            
-                        }
-                        catch(err){
-                            caber.setDefault()
-                            per.setDefault()
-                        }
+                        
                         
                     }
+                    else{
+                        //Reviso si sos colaborador
+                        const recordcolabcab = await pb.collection('estxcolabs').getList(1,1,{
+                            filter:`colab.user='${authData.record.id}'`,
+                            expand: 'colab,cab,colab.user'
+                        })
+                        if(recordcolabcab.totalItems>0){
+                            let colabcab = recordcolabcab.items[0]
+                            let establecimiento = colabcab.expand.cab
+                            const recordper = await pb.collection("permisos").getFirstListItem(`estxcolab='${colabcab.id}'`)
+                            per.setPer(recordper.permisos,authData.record.id)
+                            caber.setCab(establecimiento.nombre,establecimiento.id,true)
+                            
+                        }
+                        //No tiene cab ni es colaborador
+                        else{
+                            caber.setDefault()
+                            per.setDefault()
+                            
+                            
+                        }
+                    }
+                    
                     goto(pre+'/')
                 }
                 else{

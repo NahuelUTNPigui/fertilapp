@@ -6,10 +6,13 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { createCaber } from "$lib/stores/cab.svelte";
-    import {createPer} from "$lib/stores/permisos.svelte"
+    
     import CardBase from '$lib/components/CardBase.svelte';
     import Colaboradores from '$lib/components/establecimiento/Colaboradores.svelte';
     import ListaColabs from '$lib/components/establecimiento/ListaColabs.svelte';
+    //permisos
+    import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+    import {createPer} from "$lib/stores/permisos.svelte"
     import { usuario } from '$lib/stores/usuario';
     import { codigoSinRepetir,codigoSinRepetirEstablecimiento } from '$lib/pbutils/lib';
     import provincias from '$lib/stores/geo/provincias';
@@ -27,6 +30,7 @@
     })
     let caber = createCaber()
     let per = createPer()
+    let permisos = $state({})
     let colabs = $state([])
     let modoedicion = $state(false)
     //Datos cabaña
@@ -42,6 +46,8 @@
     let mail = $state("")
     let titular = $state("")
     let renspaValido = $state(true)
+    //Datos viejos
+    let datosviejos = $state({})
     //Desasociar
     let asociado = $state(false)
     let idestxcolab = $state("")
@@ -49,6 +55,7 @@
     async function getCabaña(){
         try{
             const record = await pb.collection('cabs').getFirstListItem(`id='${cab.id}' && active=true`, {});
+            datosviejos = {...record}
             nombre = record.nombre
             direccion = record.direccion
             contacto = record.contacto
@@ -89,6 +96,12 @@
     }
     
     async function guardarColab(data){
+        let listapermisos = getPermisosList(permisos.permisos)
+        if(!listapermisos[0]){
+            Swal.fire("Error permisos",getPermisosMessage(0),"error")
+            reestablercerCabaña()
+            return 
+        }
         let codigo = await codigoSinRepetir(pb)
         try{
             let userdata = {
@@ -158,7 +171,24 @@
         renspaValido = true
         
     }
+    function reestablercerCabaña(){
+        nombre = datosviejos.nombre
+        direccion = datosviejos.direccion
+        contacto = datosviejos.contacto
+        codigo = datosviejos.codigo
+        renspa = datosviejos.renspa
+        localidad = datosviejos.localidad
+        provincia = datosviejos.provincia
+        telefono = datosviejos.telefono
+        mail = datosviejos.mail  
+    }
     async function editarCabaña(){
+        let listapermisos = getPermisosList(permisos.permisos)
+        if(!listapermisos[0]){
+            Swal.fire("Error permisos",getPermisosMessage(0),"error")
+            reestablercerCabaña()
+            return 
+        }
         const data = {
             nombre,
             direccion,
@@ -243,9 +273,11 @@
     onMount(async ()=>{
         
         cab = caber.cab
+
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
         if(cab.exist){
+            permisos = per.per
            await getCabaña()
            await getColabs()
            const recordcolab = await pb.collection('colaboradores').getList(1,1,{
@@ -566,7 +598,7 @@
                     </button>    
                 {:else}
                     <button 
-                        onclick={()=>modoedicion=false}
+                        onclick={()=>{reestablercerCabaña();modoedicion=false;}}
                         class="
                             btn btn-error 
                             text-white 
@@ -586,8 +618,8 @@
                 {/if}
                 
             </div>
-            <Colaboradores bind:colabs={colabs} {mostrarcolab} {guardarColab} {desasociar} {asociado} cabid={cab.id} {cab}/>
-            <ListaColabs bind:colabs={colabs}/>
+            <Colaboradores bind:colabs={colabs} {mostrarcolab} {guardarColab} {desasociar} {asociado} cabid={cab.id} {cab} bind:permisos/>
+            <ListaColabs bind:colabs={colabs} />
         </CardBase>
     {:else}
         <CardBase titulo="Registra tu establecimiento">

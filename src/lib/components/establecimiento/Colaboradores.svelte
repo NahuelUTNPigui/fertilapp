@@ -8,10 +8,13 @@
     import { slide } from 'svelte/transition';
     import {verificarNivelColab} from "$lib/permisosutil/lib"
     import tiponoti from '$lib/stores/tiponoti';
+    //permisos
+    import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+    
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let pre = import.meta.env.VITE_PRE
-    let {colabs = $bindable([]),mostrarcolab,guardarColab,desasociar,asociado,cabid,cab} = $props()
+    let {colabs = $bindable([]),permisos=$bindable({}),mostrarcolab,guardarColab,desasociar,asociado,cabid,cab} = $props()
     let titulo = $state("Colaboradores")
     
     //Nuevo colaborador
@@ -34,11 +37,18 @@
     let malcorreo = $state(false)
     let codigoasociar = $state("")
     async function asociar() {
+        let listapermisos = getPermisosList(permisos.permisos)
+        if(!listapermisos[0]){
+            Swal.fire("Error permisos",getPermisosMessage(0),"error")
+            
+            return 
+        }
         if(correoasociar==""){
             malcorreo = true
             return
         }
-        let verificar = await verificarNivelColab(cabid)
+        //let verificar = await verificarNivelColab(cabid)
+        let verificar =true
         if(!verificar){
             Swal.fire("Error guardar",`No tienes el nivel de la cuenta para tener más colaboradores`,"error")
             return

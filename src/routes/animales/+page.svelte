@@ -14,6 +14,11 @@
     import { goto } from "$app/navigation";
     import { createCaber } from "$lib/stores/cab.svelte";
     import { createUserer } from "$lib/stores/user.svelte";
+    //permisos
+    import {
+        getPermisosCabUser,
+        getPermisosEstXColab,
+    } from "$lib/permisosutil/lib";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
     import RadioButton from "$lib/components/RadioButton.svelte";
@@ -29,7 +34,7 @@
         shorterWord,
     } from "$lib/stringutil/lib";
     import { verificarNivel } from "$lib/permisosutil/lib";
-
+    let esdev = import.meta.env.VITE_DEV == "si";
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
@@ -38,7 +43,8 @@
     let userer = createUserer();
     let per = createPer();
     let cab = caber.cab;
-    let userpermisos = getPermisosList(per.per.permisos);
+    let userpermisos = $state([]);
+
     let usuarioid = $state("");
     let filtros = false;
 
@@ -393,6 +399,10 @@
     onMount(async () => {
         let pb_json = JSON.parse(localStorage.getItem("pocketbase_auth"));
         usuarioid = pb_json.record.id;
+        let respermisos = await getPermisosCabUser(pb, usuarioid, cab.id);
+
+        per.setPer(respermisos.permisos, usuarioid);
+        userpermisos = getPermisosList(per.per.permisos);
         await getAnimales();
         await getRodeos();
         await getLotes();
@@ -580,6 +590,9 @@
 </script>
 
 <Navbarr>
+    {#if esdev}
+        premisos {JSON.stringify(userpermisos, null, 2)}
+    {/if}
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div class="">
             <h1 class="text-2xl">Animales</h1>

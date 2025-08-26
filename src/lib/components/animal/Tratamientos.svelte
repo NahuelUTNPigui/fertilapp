@@ -4,7 +4,9 @@
     import estilos from "$lib/stores/estilos";
     import PocketBase from 'pocketbase'
     import categorias from "$lib/stores/categorias";
-    let{cabid,categoria} = $props()
+    import Swal from "sweetalert2";
+    import {getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+    let{cabid,categoria,userpermisos=$bindable([])} = $props()
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
@@ -66,6 +68,10 @@
     }
 
     async function guardarTratamiento(){
+        if(!userpermisos[4]){
+           Swal.fire("Error permisos",getPermisosMessage(4),"error") 
+           return;
+        }
         try{
             let data = {
                 animal:id,

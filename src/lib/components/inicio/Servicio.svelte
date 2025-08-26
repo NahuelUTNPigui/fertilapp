@@ -62,9 +62,9 @@
         if(servicio.fechadesdeserv==""){
             servicio.botonhabilitadoser = false
         }
-        if(servicio.idanimalser==""){
-            servicio.botonhabilitadoser = false
-        }
+        //if(servicio.idanimalser==""){
+        //    servicio.botonhabilitadoser = false
+        //}
     }
 
     function onSelectAnimalIns(){

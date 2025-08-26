@@ -7,6 +7,9 @@
     import estilos from '$lib/stores/estilos';
     import Swal from 'sweetalert2';
     import { goto } from '$app/navigation';
+    //permisos
+    import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+    import {createPer} from "$lib/stores/permisos.svelte"
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     let pre = import.meta.env.VITE_PRE
@@ -15,6 +18,8 @@
     let nombre = $state("")
     let apellido = $state("")
     let userpermisos = $state([false,false,false,false,false,false])
+    let per = createPer()
+    let perpermisos = $state({})
     async function getPermisos(){
         const record = await pb.collection('permisos').getFirstListItem(`estxcolab='${id}'`, {
             expand: 'estxcolab,estxcolab.colab',
@@ -40,6 +45,12 @@
         return "";
     }
     async function guardarPermiso(){
+        let listapermisos = getPermisosList(perpermisos.permisos)
+        if(!listapermisos[0]){
+            Swal.fire("Error permisos",getPermisosMessage(0),"error")
+            
+            return 
+        }
         let per = ""
         for(let i= 0;i<userpermisos.length;i++){
             if(userpermisos[i]){
@@ -62,6 +73,12 @@
     }
 
     async function desasociar() {    
+        let listapermisos = getPermisosList(perpermisos.permisos)
+        if(!listapermisos[0]){
+            Swal.fire("Error permisos",getPermisosMessage(0),"error")
+            
+            return 
+        }
         Swal.fire({
             title: 'Desasociar colaborador',
             text: '¿Seguro que deseas desasociar el colaborador?',
@@ -92,6 +109,7 @@
     onMount(async ()=>{
         id = $page.params.id
         await getPermisos()
+        perpermisos = per.per
 
     })
 </script>

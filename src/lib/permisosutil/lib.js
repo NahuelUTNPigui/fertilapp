@@ -71,12 +71,14 @@ export async function getPermisosCabUser(pb,userid,cabid) {
     if(recordcolabcab.items.length>0){
         let colabcab = recordcolabcab.items[0]
     
-    
+        
         let respermisos = await pb.collection("permisos").getList(1, 1, {
             filter: `estxcolab = '${colabcab.id}'`,
             skipTotal :true
         });
-        if(respermisos.items>0){
+        
+        if(respermisos.items.length>0){
+            
             return respermisos.items[0]
         }
         else{

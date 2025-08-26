@@ -11,8 +11,10 @@
     import categorias from "$lib/stores/categorias";
     import estados from "$lib/stores/estados";
     import RadioButton from "$lib/components/RadioButton.svelte";
+    //PERMISOS
     import { createPer } from "$lib/stores/permisos.svelte";
-    import { getPermisosList } from "$lib/permisosutil/lib";
+    import {getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
+
     import { guardarHistorial } from "$lib/historial/lib";
     import PredictSelect from "../PredictSelect.svelte";
     import { shorterWord } from "$lib/stringutil/lib";
@@ -30,6 +32,7 @@
         rp,
         modohistoria = $bindable(),
         irPadre,
+        userpermisos=$bindable([])
     } = $props();
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
@@ -38,8 +41,7 @@
     let caber = createCaber();
     let userer = createUserer();
     let cab = caber.cab;
-    let per = createPer();
-    let userpermisos = getPermisosList(per.per.permisos);
+    
     let userid = userer.userid;
     let id = $state("");
     let nombrerodeo = $state("");
@@ -211,6 +213,9 @@
         }
     }
     async function guardarNacimiento() {
+        if (!userpermisos[4]) {
+            Swal.fire("Error permisos",getPermisosMessage(4),"error")
+        }
         try {
             let dataparicion = {
                 madre,
@@ -273,6 +278,9 @@
         }
     }
     async function editarNacimiento() {
+        if (!userpermisos[4]) {
+            Swal.fire("Error permisos",getPermisosMessage(4),"error")
+        }
         let data = {
             madre,
             padre,
@@ -756,7 +764,7 @@
                 >
             </label>
             <a
-                class="cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
+                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
                 href={`${pre}/animales/${madre}`}
                 data-sveltekit-reload
             >
@@ -769,7 +777,7 @@
                 <span class="label-text text-base">Padre: {nombrepadre}</span>
             </label>
             <a
-                class="cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 href={`${pre}/animales/${padre}`}
                 data-sveltekit-reload
             >

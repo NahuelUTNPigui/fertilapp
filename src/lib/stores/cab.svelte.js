@@ -1,10 +1,11 @@
 import { browser } from "$app/environment"
+
 //La idea es validar si tiene una cabaña
 
 let defaultcab={
     exist:false,
     nombre:"",
-    id:""
+    id:"",
 }
 export function createCaber(){
     let cab = defaultcab

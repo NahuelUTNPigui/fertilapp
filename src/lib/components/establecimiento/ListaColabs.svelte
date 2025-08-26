@@ -19,7 +19,7 @@
         </thead>
         <tbody>
             {#each colabs as c}
-                <tr class="hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>getColab(c.id)}>
+                <tr class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-900" onclick={()=>getColab(c.id)}>
                     <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{c.expand.colab.nombre}</td>
                     <td class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b">{c.expand.colab.apellido}</td>
                 </tr>

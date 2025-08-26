@@ -9,11 +9,12 @@
     import { getWholeWordButLastLetter, addDays } from "$lib/stringutil/lib";
     import MultipleToros from "../MultipleToros.svelte";
     import { shorterWord } from "$lib/stringutil/lib";
+    import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
     import Swal from "sweetalert2";
-    
+
     let ruta = import.meta.env.VITE_RUTA;
     const pb = new PocketBase(ruta);
-    let { cabid, categoria } = $props();
+    let { cabid, categoria, userpermisos = $bindable([]) } = $props();
     let id = $state("");
 
     let options = [
@@ -147,6 +148,11 @@
         }
     }
     async function guardarServicio() {
+        if (!userpermisos[4]) {
+            nuevoServicioModal.close();
+            Swal.fire("Error permisos", getPermisosMessage(4), "error");
+            return;
+        }
         if (esServicio) {
             let data = {
                 fechadesde: fechadesdeserv + " 03:00:00",
@@ -184,7 +190,7 @@
         }
         await getServicios();
         await getInseminaciones();
-        nuevoServicioModal.close()
+        nuevoServicioModal.close();
         filas.sort((a1, a2) => {
             let f1 = a1.fechadesde
                 ? a1.fechadesde
@@ -272,7 +278,7 @@
 </div>
 <div class="w-full flex justify-items-center mx-1 lg:w-3/4 overflow-x-auto">
     {#if filas.length == 0}
-        <p class="mt-5 text-lg">No tiene inseminaciones y servicios </p>
+        <p class="mt-5 text-lg">No tiene inseminaciones y servicios</p>
     {:else}
         <div
             class="hidden w-full md:grid justify-items-center mx-1 lg:mx-10 lg:w-3/4 overflow-x-auto"
