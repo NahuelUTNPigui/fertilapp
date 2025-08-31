@@ -63,6 +63,12 @@ export async function verificarNivelColab(cabid) {
     }
 }
 export async function getPermisosCabUser(pb,userid,cabid) {
+    const recordcab = await pb.collection('cabs').getList(1,1,{
+        filter:`user='${userid}' && id='${cabid}'`,
+    })
+    if(recordcab.items.length>0){
+        return {id:cabid,permisos:"0,1,2,3,4,5"}
+    }
     const recordcolabcab = await pb.collection('estxcolabs').getList(1,1,{
         filter:`colab.user='${userid}' && cab='${cabid}'`,
         expand: 'colab,cab,colab.user'

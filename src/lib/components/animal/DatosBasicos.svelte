@@ -770,6 +770,13 @@
             >
                 Visitar perfil
             </a>
+            <button
+                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
+                onclick={async ()=>irPadre(madre)}
+                
+            >
+                Boton Visitar perfil
+            </button>
         </div>
 
         <div>

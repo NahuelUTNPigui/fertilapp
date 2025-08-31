@@ -188,6 +188,8 @@
         });
         if (recordxiste.length > 0) {
             goto(`${pre}/animales/${_id}`);
+            slug = $page.params.slug;
+            console.log("nuvo: "+slug)
             //window.location.reload();
         } else {
             Swal.fire(
@@ -258,7 +260,9 @@
     }
     //Necesito una funcion que traiga toda la informacion del animal
     onMount(async () => {
+        
         let _id = $page.params.slug;
+        console.log("viejo: "+slug)
         let pb_json = JSON.parse(localStorage.getItem("pocketbase_auth"));
         usuarioid = pb_json.record.id;
         await perfilAnimal(_id);
