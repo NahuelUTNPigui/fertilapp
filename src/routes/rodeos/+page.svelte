@@ -5,6 +5,12 @@
     import { onMount } from "svelte";
     import estilos from "$lib/stores/estilos";
     import { createCaber } from "$lib/stores/cab.svelte";
+    import { goto } from "$app/navigation";
+    let pre = import.meta.env.VITE_PRE;
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
+
     let ruta = import.meta.env.VITE_RUTA;
 
     const pb = new PocketBase(ruta);
@@ -18,6 +24,31 @@
     let buscar = $state("");
     let mostrarVacios = $state(true);
 
+    let defaultfiltro = {
+        buscar: "",
+        mostrarVacios: true,
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listarodeos", defaultfiltro);
+    //filtros animales
+    let defaultfiltroanimales = {
+        buscar: "",
+        rodeobuscar: "",
+        rodeoseleccion: [],
+        loteseleccion: [],
+        categoriaseleccion: [],
+        sexobuscar: "",
+        lotebuscar: "",
+        estadobuscar: "",
+        categoriabuscar: "",
+        activosbuscar: "activos",
+    };
+    let proxyfiltrosanimales = $state({
+        ...defaultfiltroanimales,
+    });
+    let proxyanimales = createStorageProxy("listaanimales", defaultfiltro);
     //Guardar
     let idrodeo = $state("");
     let nombre = $state("");
@@ -134,7 +165,25 @@
             }
         });
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function filterUpdate() {
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         rodeosrows = rodeos;
         if (buscar != "") {
             rodeosrows = rodeosrows.filter((r) =>
@@ -155,8 +204,17 @@
         });
         return results.totalItems;
     }
+    function goToAnimales(){
+        proxyanimales.load()
+        proxyfiltrosanimales.rodeoseleccion = [`${idrodeo}`]
+        proxyanimales.save(proxyfiltrosanimales)
+        goto(pre+"/animales")
+    }
     onMount(async () => {
+        proxyfiltros = proxy.load();
+        setFilters();
         await getRodeos();
+        filterUpdate()
     });
     function isEmpty(str) {
         return !str || str.length === 0;
@@ -221,6 +279,9 @@
                 </label>
             </div>
         </div>
+    </div>
+    <div class="flex w-11/12 justify-start lg:w-1/2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10">
+        <Limpiar {limpiarFiltros} />
     </div>
     <div
         class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-3/4"
@@ -327,6 +388,9 @@
                         onclick={() => eliminar(idrodeo)}>Eliminar</button
                     >
                 {/if}
+                <button class="btn btn-info" onclick={goToAnimales}
+                    >Ver animales</button
+                >
                 <button class="btn btn-neutral" onclick={cerrarModal}
                     >Cerrar</button
                 >

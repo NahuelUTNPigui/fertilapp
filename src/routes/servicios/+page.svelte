@@ -17,6 +17,9 @@
     import MultipleToros from "$lib/components/MultipleToros.svelte";
     import PredictSelect from "$lib/components/PredictSelect.svelte";
     import { shorterWord } from '$lib/stringutil/lib';
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -78,11 +81,24 @@
     let padres = $state([])
     let borrados = $state([])
     let idanimal = $state("")
+
+    let defaultfiltro = {
+        buscar: "",
+        fechaservhastafiltro: "",
+        fechaservdesdefiltro: "",
+        fechapartodesde: "",
+        fechapartohasta: "",
+        buscarpadre: "",
+        filtroservicio: 0,
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listaservicios", defaultfiltro);
     //Dado que puede haber eliminaciones involuntarias  
     //Validaciones
     let botonhabilitado = $state(true)
-    
-    //No se que poner
+   
     function clickFilter(){
         isOpenFilter = !isOpenFilter
     }
@@ -246,6 +262,32 @@
     function onwrite(){
         
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        fechaservhastafiltro = proxyfiltros.fechaservhastafiltro;
+        fechaservdesdefiltro = proxyfiltros.fechaservdesdefiltro;
+        fechapartodesde = proxyfiltros.fechapartodesde;
+        fechapartohasta = proxyfiltros.fechapartohasta;
+        buscarpadre = proxyfiltros.buscarpadre;
+        filtroservicio = proxyfiltros.filtroservicio;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.fechaservhastafiltro = fechaservhastafiltro;
+        proxyfiltros.fechaservdesdefiltro = fechaservdesdefiltro;
+        proxyfiltros.fechapartodesde = fechapartodesde;
+        proxyfiltros.fechapartohasta = fechapartohasta;
+        proxyfiltros.buscarpadre = buscarpadre;
+        proxyfiltros.filtroservicio = filtroservicio;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function incluidoPadre(cadena, p_padres) {
     
         if (!cadena || !p_padres || p_padres.length === 0) {
@@ -263,6 +305,8 @@
         return false;
     }
     function filterUpdate(){
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         serviciosrow = []
         if(filtroservicio == 0){
             serviciosrow = servicios
@@ -342,6 +386,8 @@
 
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         await getAnimales()
         await getServicios()
         await getInseminaciones()
@@ -429,9 +475,11 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div class="w-full lg:w-1/2">
-            <label 
+    <div
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12"
+    >
+        <div class="w-11/12">
+            <label
                 class={`
                     input 
                     input-bordered 
@@ -440,8 +488,17 @@
                     ${estilos.bgdark2}
                 `}
             >
-                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscar}
+                    oninput={filterUpdate}
+                />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar {limpiarFiltros} />
         </div>
     </div>
     <!--Filtrar-->

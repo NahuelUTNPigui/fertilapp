@@ -12,6 +12,18 @@
     import PredictSelect from '$lib/components/PredictSelect.svelte';
     import{verificarNivel} from "$lib/permisosutil/lib"
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
+    //Filtros
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from '$lib/filtros/Limpiar.svelte';
+    //Permisos
+    import {
+        getPermisosCabUser,
+        getPermisosEstXColab,
+    } from "$lib/permisosutil/lib";
+    import { createPer } from "$lib/stores/permisos.svelte";
+    import { getPermisosList } from "$lib/permisosutil/lib";
+    import RadioButton from "$lib/components/RadioButton.svelte";
+    
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -31,6 +43,18 @@
     let buscarmadre = $state("")
     let buscarpadre = $state("")
     let cargadoanimales = $state(false)
+
+    let defaultfiltro = {
+        buscar: "",
+        fechadesde: "",
+        fechahasta: "",
+        buscarmadre: "",
+        buscarpadre: ""
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listanacimientos", defaultfiltro);
     //Datos nacimiento
     let agregaranimal = $state(false)
     let nacimiento = $state(null)
@@ -223,8 +247,27 @@
             Swal.fire("Error editar","Hubo un error para editar el nacimiento","error")
         }
     }
+    function limpiarFiltros(){
+
+    }
+    function setFilters(){
+    buscar=proxyfiltros.buscar
+    fechadesde=proxyfiltros.fechadesde
+    fechahasta=proxyfiltros.fechahasta
+    buscarmadre=proxyfiltros.buscarmadre
+    buscarpadre=proxyfiltros.buscarpadre
+    }
+    function setProxyFilter(){
+        proxyfiltros.buscar=buscar
+        proxyfiltros.fechadesde=fechadesde
+        proxyfiltros.fechahasta=fechahasta
+        proxyfiltros.buscarmadre=buscarmadre
+        proxyfiltros.buscarpadre=buscarpadre
+    }
     function filterUpdate(){
         nacimientosrow = nacimientos
+        setProxyFilter()
+        proxy.save(proxyfiltros);
         totalNacimientosEncontrados = nacimientosrow.length
         if(buscar != ""){
             nacimientosrow = nacimientosrow.filter(n=>n.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -336,6 +379,8 @@
         })
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
         await getNacimientos()
@@ -495,8 +540,8 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div class="w-full lg:w-1/2">
+    <div class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
+        <div class="w-11/12">
             <label 
                 class={`
                     input 
@@ -508,6 +553,11 @@
             >
                 <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar
+                {limpiarFiltros}
+            />
         </div>
     </div>
     <!--Filtrar-->

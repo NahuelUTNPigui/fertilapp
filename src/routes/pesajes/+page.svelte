@@ -14,6 +14,9 @@
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
     import { getSexoNombre } from '$lib/stringutil/lib';
     import { shorterWord } from "$lib/stringutil/lib";
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -41,6 +44,22 @@
 
     let lotes = $state([])
     let rodeos = $state([])
+
+    let defaultfiltro = {
+        buscar: "",
+        loteseleccion: [],
+        rodeoseleccion: [],
+        categoriaseleccion: [],
+        categoria: "",
+        sexo: "",
+        lote: "",
+        rodeo: "",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("pesajesanimales", defaultfiltro);
+
     let tipos = $state([])
     let isOpenFilter = $state(false)
     //Seleccionados
@@ -76,8 +95,37 @@
         todos = false
         ninguno = true
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        loteseleccion = proxyfiltros.loteseleccion;
+        rodeoseleccion = proxyfiltros.rodeoseleccion;
+        categoriaseleccion = proxyfiltros.categoriaseleccion;
+        categoria = proxyfiltros.categoria;
+        sexo = proxyfiltros.sexo;
+        lote = proxyfiltros.lote;
+        rodeo = proxyfiltros.rodeo;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.loteseleccion = loteseleccion;
+        proxyfiltros.rodeoseleccion = rodeoseleccion;
+        proxyfiltros.categoriaseleccion = categoriaseleccion;
+        proxyfiltros.categoria = categoria;
+        proxyfiltros.sexo = sexo;
+        proxyfiltros.lote = lote;
+        proxyfiltros.rodeo = rodeo;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }   
     function filterUpdate(){
-        
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         animalesrows = animales
         if(buscar != ""){
             animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
@@ -203,6 +251,7 @@
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
         animalesrows = animales
+        filterUpdate()
     }
     function openNewModal(){
         
@@ -275,6 +324,8 @@
         
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         await getAnimales()
         await getRodeos()
         await getLotes()
@@ -296,11 +347,24 @@
         </div>
         
     </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2  m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10" >
+    <div
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10"
+    >
         <div class="w-11/12">
-            <label class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}>
-                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
+            <label
+                class={`input input-bordered flex items-center gap-2 ${estilos.bgdark2}`}
+            >
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscar}
+                    oninput={filterUpdate}
+                />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar {limpiarFiltros} />
         </div>
     </div>
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">

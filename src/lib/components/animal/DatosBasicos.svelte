@@ -19,17 +19,17 @@
     import PredictSelect from "../PredictSelect.svelte";
     import { shorterWord } from "$lib/stringutil/lib";
     let {
-        caravana,
-        rodeo,
-        lote,
-        connacimiento,
-        peso,
-        sexo,
-        nacimiento,
-        fechanacimiento,
-        categoria,
-        prenada,
-        rp,
+        caravana=$bindable(""),
+        rodeo=$bindable(""),
+        lote=$bindable(""),
+        connacimiento=$bindable(false),
+        peso=$bindable(""),
+        sexo=$bindable(""),
+        nacimiento=$bindable({}),
+        fechanacimiento=$bindable(""),
+        categoria=$bindable(""),
+        prenada=$bindable(0),
+        rp=$bindable(""),
         modohistoria = $bindable(),
         irPadre,
         userpermisos=$bindable([])
@@ -764,15 +764,15 @@
                 >
             </label>
             <a
-                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
+                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
                 href={`${pre}/animales/${madre}`}
                 data-sveltekit-reload
             >
                 Visitar perfil
             </a>
             <button
-                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
-                onclick={async ()=>irPadre(madre)}
+                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
+                onclick={async ()=>await irPadre(madre)}
                 
             >
                 Boton Visitar perfil
@@ -784,7 +784,7 @@
                 <span class="label-text text-base">Padre: {nombrepadre}</span>
             </label>
             <a
-                class=" cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 href={`${pre}/animales/${padre}`}
                 data-sveltekit-reload
             >

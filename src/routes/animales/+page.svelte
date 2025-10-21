@@ -14,6 +14,9 @@
     import { goto } from "$app/navigation";
     import { createCaber } from "$lib/stores/cab.svelte";
     import { createUserer } from "$lib/stores/user.svelte";
+    //filtros
+    import { createStorageProxy } from "$lib/filtros/filtros";
+
     //permisos
     import {
         getPermisosCabUser,
@@ -47,7 +50,22 @@
 
     let usuarioid = $state("");
     let filtros = false;
-
+    let defaultfiltro = {
+        buscar: "",
+        rodeobuscar: "",
+        rodeoseleccion: [],
+        loteseleccion: [],
+        categoriaseleccion: [],
+        sexobuscar: "",
+        lotebuscar: "",
+        estadobuscar: -1,
+        categoriabuscar: "",
+        activosbuscar: "activos",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listaanimales", defaultfiltro);
     //Datos para mostrar
     let animales = $state([]);
     let animalesrows = $state([]);
@@ -139,7 +157,12 @@
     function isEmpty(str) {
         return !str || str.length === 0;
     }
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
 
+        setFilters();
+        filterUpdate();
+    }
     async function getRodeos() {
         const records = await pb.collection("rodeos").getFullList({
             filter: `active = true && cab = '${cab.id}'`,
@@ -216,15 +239,38 @@
         rp = animal.rp;
         nuevoModal.showModal();
     }
+    function gotoniveles() {
+        goto(pre + "/user/nivel");
+    }
     //Se puede guardar un animal con su nacimiento
     async function guardar() {
         let verificar = await verificarNivel(cab.id);
         if (!verificar) {
-            Swal.fire(
-                "Error guardar",
-                `No tienes el nivel de la cuenta para tener más animales`,
-                "error",
-            );
+            //Swal.fire(
+            //    "Error guardar",
+            //    `No tienes el nivel de la cuenta para tener más animales`,
+            //    "error",
+            //);
+            Swal.fire({
+                title: "Error al guardar",
+                text: "No tienes el nivel de la cuenta para tener más animales.",
+                icon: "error",
+                showCancelButton: true,
+                confirmButtonText: "Actualizar plan",
+                cancelButtonText: "Ok",
+                reverseButtons: true, // Pone "Ok" a la izquierda, estilo más natural
+                background: "#1f2937", // Fondo oscuro (modo dark opcional)
+                color: "#f3f4f6", // Texto claro
+                confirmButtonColor: "#16a34a", // Verde
+                cancelButtonColor: "#6b7280", // Gris
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Acción al presionar "Actualizar plan"
+                    goto("/user/nivel"); // Ejemplo si usás SvelteKit
+                    // o window.location.href = "/user/nivel";
+                }
+                // Si presiona "Ok" simplemente se cierra
+            });
             return;
         }
         try {
@@ -301,8 +347,33 @@
             );
         }
     }
-
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        rodeobuscar = proxyfiltros.rodeobuscar;
+        rodeoseleccion = proxyfiltros.rodeoseleccion;
+        loteseleccion = proxyfiltros.loteseleccion;
+        categoriaseleccion = proxyfiltros.categoriaseleccion;
+        sexobuscar = proxyfiltros.sexobuscar;
+        lotebuscar = proxyfiltros.lotebuscar;
+        estadobuscar = proxyfiltros.estadobuscar;
+        categoriabuscar = proxyfiltros.categoriabuscar;
+        activosbuscar = proxyfiltros.activosbuscar;
+    }
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.rodeobuscar = rodeobuscar;
+        proxyfiltros.rodeoseleccion = rodeoseleccion;
+        proxyfiltros.loteseleccion = loteseleccion;
+        proxyfiltros.categoriaseleccion = categoriaseleccion;
+        proxyfiltros.sexobuscar = sexobuscar;
+        proxyfiltros.lotebuscar = lotebuscar;
+        proxyfiltros.estadobuscar = estadobuscar;
+        proxyfiltros.categoriabuscar = categoriabuscar;
+        proxyfiltros.activosbuscar = activosbuscar;
+    }
     function filterUpdate() {
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         animalesrows = animales;
         totalAnimalesEncontrados = animalesrows.length;
         if (buscar != "") {
@@ -340,9 +411,10 @@
                 totalAnimalesEncontrados = animalesrows.length;
             }
         }
-        if (estadobuscar != "") {
+
+        if (estadobuscar != -1) {
             animalesrows = animalesrows.filter(
-                (a) => a.prenada == estadobuscar,
+                (a) => a.prenada == estadobuscar && a.sexo == "H",
             );
             totalAnimalesEncontrados = animalesrows.length;
         }
@@ -397,6 +469,9 @@
         }
     }
     onMount(async () => {
+        proxyfiltros = proxy.load();
+        setFilters();
+
         let pb_json = JSON.parse(localStorage.getItem("pocketbase_auth"));
         usuarioid = pb_json.record.id;
         let respermisos = await getPermisosCabUser(pb, usuarioid, cab.id);
@@ -621,8 +696,10 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10">
-        <div class="w-11/12 lg:w-1/2">
+    <div
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10"
+    >
+        <div class="w-11/12">
             <label
                 class={`
                     input 
@@ -642,6 +719,20 @@
                     oninput={filterUpdate}
                 />
             </label>
+        </div>
+        <div class="w-11/12">
+            <button
+                onclick={limpiarFiltros}
+                class={`
+                    bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                    ${estilos.btnsecondary}
+                    rounded-full
+                    px-4 pt-2 pb-3
+                `}
+                aria-label="Limpiar"
+            >
+                <span class="text-xl font-semibold">Limpiar</span>
+            </button>
         </div>
     </div>
     <!--Filtros-->
@@ -749,9 +840,12 @@
                                 bind:value={estadobuscar}
                                 onchange={filterUpdate}
                             >
-                                <option value="">Todos</option>
                                 {#each estados as s}
-                                    <option value={s.id}>{s.nombre}</option>
+                                    <option value={s.id}
+                                        >{s.id == -1
+                                            ? "Todos"
+                                            : s.nombre}</option
+                                    >
                                 {/each}
                             </select>
                         </label>

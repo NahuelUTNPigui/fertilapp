@@ -1,7 +1,17 @@
 <script>
     import estilos from "$lib/stores/estilos";
+    import { onMount } from "svelte";
 
-    let {lista,etiqueta,valor=$bindable(""),cadena=$bindable(""),onelegir,onwrite,validarAnimal,size="w-4/5"} = $props()
+    let {
+        lista=$bindable([]),
+        etiqueta,
+        valor=$bindable(""),
+        cadena=$bindable(""),
+        onelegir=()=>{},
+        onwrite=()=>{},
+        validarAnimal=()=>{},
+        size="w-4/5"
+    } = $props()
     let listarow = $state(lista)
     let isOpen = $state(false)
     let nombre = $state("")
@@ -45,6 +55,18 @@
             validarAnimal()
         }
     }
+    $effect(()=>{
+        if(valor.length !=0){
+            cadena = listarow.filter(l=>l.id==valor)[0].nombre
+            nombre = cadena
+        }
+    })
+    onMount(()=>{
+        if(valor.length !=0){
+            cadena = listarow.filter(l=>l.id==valor)[0].nombre
+            nombre = cadena
+        }
+    })
     
     
 </script>

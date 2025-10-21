@@ -340,7 +340,7 @@
             Swal.fire("Error permisos", getPermisosMessage(5), "error");
             return { id: -1 };
         }
-        
+
         let recorda = await pb.collection("animales").create(data);
         totaleventos.animales += 1;
         return recorda;
@@ -474,9 +474,8 @@
             const recordparicion = await pb
                 .collection("nacimientos")
                 .create(dataparicion);
-            
+
             if (agregaranimal) {
-                
                 if (!listapermisos[5]) {
                     Swal.fire("Error permisos", getPermisosMessage(4), "error");
 
@@ -484,7 +483,7 @@
                 }
                 //Laburar esta parte
                 let a = await guardarAnimal(true, false);
-                
+
                 await getAnimales();
                 await pb
                     .collection("animales")
@@ -1042,58 +1041,77 @@
                     valor={totaleventos.tactos}
                 />
             </div>
-            <h2
-                class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start"
-            >
-                Acciones rapidas
-            </h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                    <a class={classbutton} href={pre + "/establecimiento"}>
-                        <Estable></Estable>
-                        Ir a establecimiento
-                    </a>
-                </div>
-                <div>
-                    <button class={classbutton} onclick={openNewModalTacto}>
-                        <Tacto></Tacto>
-                        Nuevo tacto
-                    </button>
-                </div>
-                <div>
-                    <button
-                        class={classbutton}
-                        onclick={openNewModalNacimiento}
-                    >
-                        <Nacimiento></Nacimiento>
-                        Nueva parición
-                    </button>
-                </div>
-                <div>
-                    <button
-                        class={classbutton}
-                        onclick={openNewModalTratamiento}
-                    >
-                        <Tratamiento></Tratamiento>
+            <div>
+                <h2
+                    class="text-xl font-bold text-green-700 dark:text-green-400 mb-6 text-start"
+                >
+                    Acciones rapidas
+                </h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                        <a class={classbutton} href={pre + "/establecimiento"}>
+                            <Estable></Estable>
+                            Ir a establecimiento
+                        </a>
+                    </div>
+                    <div>
+                        <button class={classbutton} onclick={openNewModalTacto}>
+                            <Tacto></Tacto>
+                            Nuevo tacto
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            class={classbutton}
+                            onclick={openNewModalNacimiento}
+                        >
+                            <Nacimiento></Nacimiento>
+                            Nueva parición
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            class={classbutton}
+                            onclick={openNewModalTratamiento}
+                        >
+                            <Tratamiento></Tratamiento>
 
-                        Nuevo tratamiento
-                    </button>
+                            Nuevo tratamiento
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            class={classbutton}
+                            onclick={openNewModalServicio}
+                        >
+                            <Servicio></Servicio>
+                            Nuevo servicio
+                        </button>
+                    </div>
+                    <div>
+                        <button
+                            class={classbutton}
+                            onclick={openNewModalObservacion}
+                        >
+                            <Observacion></Observacion>
+                            Nueva observacion
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <button class={classbutton} onclick={openNewModalServicio}>
-                        <Servicio></Servicio>
-                        Nuevo servicio
-                    </button>
-                </div>
-                <div>
+            </div>
+
+            <div
+                class="mt-2 w-full bg-blue-100 dark:bg-blue-900/40  text-blue-900 dark:text-blue-300 text-center py-2 px-3"
+            >
+                <p class="text-lg">
+                    
                     <button
-                        class={classbutton}
-                        onclick={openNewModalObservacion}
+                        onclick={() => goto(pre+"/user/nivel")}
+                        class="ml-2 underline font-semibold hover:text-blue-600 dark:hover:text-blue-200"
                     >
-                        <Observacion></Observacion>
-                        Nueva observacion
+                        Puedes mejorar tu plan ahora →
                     </button>
-                </div>
+                </p>
             </div>
         </CardBase>
     {:else}
@@ -1136,6 +1154,7 @@
             bind:tacto
             bind:prenadatacto
             bind:madres
+            bind:listamadres
             bind:cargadoanimales
             {guardarTacto}
         ></InicioTacto>
@@ -1161,7 +1180,7 @@
         <h3 class="text-lg font-bold">Nueva parición</h3>
 
         <InicioNacimiento
-        bind:caravana
+            bind:caravana
             bind:peso
             bind:sexo
             bind:fechanacimiento
@@ -1196,7 +1215,7 @@
 
         <h3 class="text-lg font-bold">Nuevo tratamiento</h3>
         <InicioTratamiento
-        bind:caravana
+            bind:caravana
             bind:peso
             bind:sexo
             bind:fechanacimiento
@@ -1206,6 +1225,7 @@
             bind:tratamiento
             bind:cargadoanimales
             bind:agregaranimal
+            bind:listaanimales
             {guardarTrat}
         ></InicioTratamiento>
     </div>
@@ -1238,6 +1258,7 @@
             bind:animales
             bind:cargadoanimales
             bind:observacion
+            bind:listaanimales
             {guardarObservacion}
         ></InicioObservacion>
     </div>
@@ -1277,6 +1298,7 @@
             bind:inseminacion
             bind:cargadoanimales
             bind:listapadres
+            bind:listamadres
             {guardarInseminacion}
             {guardarServicio}
         ></InicioServicio>

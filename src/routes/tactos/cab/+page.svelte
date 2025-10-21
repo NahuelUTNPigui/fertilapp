@@ -19,7 +19,9 @@
     import { goto } from "$app/navigation";
     import MultiSelect from "$lib/components/MultiSelect.svelte";
     import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
-    
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
 
     let caber = createCaber()
     let cab = caber.cab
@@ -48,6 +50,18 @@
     let buscarcategoria = $state("")
     let buscarestado = $state("")
     let buscartipo = $state("")
+    let defaultfiltro = {
+        buscar: "",
+        fechadesde: "",
+        fechahasta: "",
+        buscarcategoria: "",
+        buscarestado: "",
+        buscartipo: "",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listatactos", defaultfiltro);
     //Datos tacto
     let tacto = $state(null)
     let idtacto = $state("")
@@ -187,8 +201,33 @@
         nombreveterinario = ""
         nuevoModal.close()
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        fechadesde = proxyfiltros.fechadesde;
+        fechahasta = proxyfiltros.fechahasta;
+        buscarcategoria = proxyfiltros.buscarcategoria;
+        buscarestado = proxyfiltros.buscarestado;
+        buscartipo = proxyfiltros.buscartipo;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.fechadesde = fechadesde;
+        proxyfiltros.fechahasta = fechahasta;
+        proxyfiltros.buscarcategoria = buscarcategoria;
+        proxyfiltros.buscarestado = buscarestado;
+        proxyfiltros.buscartipo = buscartipo;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function filterUpdate(){
-        
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         tactosrow = tactos
         totalTactosEncontrados = tactosrow.length
         if(buscar!=""){
@@ -220,6 +259,8 @@
         })
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
         await getTactos()
@@ -468,18 +509,27 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
+    <div 
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12"
+    >
         <div class="w-full lg:w-1/2">
-            <label 
+            <label
                 class={`
                     input input-bordered flex items-center gap-2
                     ${estilos.bgdark2}
                 `}
             >
-                <input type="text" 
-                    class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} 
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscar}
+                    oninput={filterUpdate}
                 />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar {limpiarFiltros} />
         </div>
     </div>
     <!--Filtrar-->

@@ -10,6 +10,9 @@
     import estilos from '$lib/stores/estilos';
     import {shorterWord} from "$lib/stringutil/lib"
     import * as XLSX from "xlsx"
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -30,6 +33,15 @@
     let columnas = $state([])
     let tablapesaje = $state({})
     let pesajesprocesados = $state([])
+    let defaultfiltro = {
+        buscarcaravana: "",
+        fechadesde: "",
+        fechahasta: "",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listapesajes", defaultfiltro);
     //pesaje
     let idpesaje = $state("")
     let caravana = $state("")
@@ -49,7 +61,27 @@
         pesajes = records
         
     }
+    function setFilters() {
+        buscarcaravana = proxyfiltros.buscarcaravana;
+        fechadesde = proxyfiltros.fechadesde;
+        fechahasta = proxyfiltros.fechahasta;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscarcaravana = buscarcaravana;
+        proxyfiltros.fechadesde = fechadesde;
+        proxyfiltros.fechahasta = fechahasta;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function filterUpdate(){
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         filas = []
         columnas = []
         tablapesaje = {}
@@ -222,6 +254,8 @@
         
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         await getPesajes()
         filterUpdate()
     })
@@ -275,9 +309,11 @@
             </div>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div class="w-full lg:w-1/2">
-            <label 
+    <div
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12"
+    >
+        <div class="w-11/12">
+            <label
                 class={`
                     input 
                     input-bordered 
@@ -286,8 +322,17 @@
                     ${estilos.bgdark2}
                 `}
             >
-                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscarcaravana} oninput={filterUpdate} />
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscarcaravana}
+                    oninput={filterUpdate}
+                />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar {limpiarFiltros} />
         </div>
     </div>
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">

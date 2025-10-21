@@ -11,6 +11,7 @@
     import { shorterWord } from "$lib/stringutil/lib";
     import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
     import Swal from "sweetalert2";
+    import { oscuro } from "$lib/stores/oscuro";
 
     let ruta = import.meta.env.VITE_RUTA;
     const pb = new PocketBase(ruta);
@@ -221,12 +222,22 @@
 
         cargado = true;
     }
+    function caravanaPadre(valor){
+        let ps = borrados.filter((p) => p.id == valor)
+        if(ps.length>0){
+            return ps[0].caravana
+        }
+        else{
+            return "No está"
+        }
+
+    }
     function getNombrePadres(p_padres) {
         let ids = p_padres.split(",");
 
         let nombres = ids.reduce(
             (acc, valor) =>
-                shorterWord(borrados.filter((p) => p.id == valor)[0].caravana) +
+                shorterWord(caravanaPadre(valor)) +
                 " , " +
                 acc,
             "",

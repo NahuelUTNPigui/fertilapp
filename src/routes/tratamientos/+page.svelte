@@ -14,7 +14,9 @@
     import { goto } from "$app/navigation";
     import {capitalize} from "$lib/stringutil/lib"
     import { shorterWord } from "$lib/stringutil/lib";  
-    
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -41,7 +43,17 @@
     let buscarcategoria = $state("")
     let buscartipo = $state("")
     let isOpenFilter = $state(false)
-
+    let defaultfiltro = {
+        buscar: "",
+        fechadesde: "",
+        fechahasta: "",
+        buscarcategoria: "",
+        buscartipo: "",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listatratamientos", defaultfiltro);
     //Datos tipo tratamiento
     let nombretipotratamiento = $state("")
     let idtipotratamiento = $state("")
@@ -398,7 +410,31 @@
         nuevoModal.showModal()
 
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        fechadesde = proxyfiltros.fechadesde;
+        fechahasta = proxyfiltros.fechahasta;
+        buscarcategoria = proxyfiltros.buscarcategoria;
+        buscartipo = proxyfiltros.buscartipo;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.fechadesde = fechadesde;
+        proxyfiltros.fechahasta = fechahasta;
+        proxyfiltros.buscarcategoria = buscarcategoria;
+        proxyfiltros.buscartipo = buscartipo;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function filterUpdate(){
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         tratamientosrow = tratamientos
         totalTratamientosEncontrados = tratamientosrow.length
         if(buscar != ""){
@@ -424,6 +460,8 @@
         ordenarTratamientosDescendente(forma)
     }
     onMount(async()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         await getTratamientos()
         await getTiposTratamientos()
         await getAnimales()
@@ -447,6 +485,7 @@
     let ascendente = $state(false)
     let forma = $state("fecha")
     let selectforma = $state("fecha")
+    
     //Ordenar servicios
     function ordenarTratamientosDescendente(p_forma){
         
@@ -457,7 +496,7 @@
         forma = p_forma
         if(forma=="fecha"){
             
-            tratamientosrow.sort((a1,a2)=>escalar * (new Date(a1.fecha).toLocaleDateString().localeCompare(new Date(a2.fecha).toLocaleDateString())))
+            tratamientosrow.sort((a1,a2)=>escalar * a1.fecha.localeCompare(a2.fecha))
         }
         else if(forma=="animal"){
             
@@ -527,9 +566,11 @@
             </button>
         </div>
     </div>
-    <div class="grid grid-cols-1 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-        <div class="w-full lg:w-1/2">
-            <label 
+    <div
+        class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12"
+    >
+        <div class="w-11/12">
+            <label
                 class={`
                     input 
                     input-bordered 
@@ -538,8 +579,17 @@
                     ${estilos.bgdark2}
                 `}
             >
-                <input type="text" class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} />
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscar}
+                    oninput={filterUpdate}
+                />
             </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar {limpiarFiltros} />
         </div>
     </div>
     <!--Filtrar-->

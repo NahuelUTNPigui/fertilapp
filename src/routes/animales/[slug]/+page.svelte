@@ -189,7 +189,7 @@
         if (recordxiste.length > 0) {
             goto(`${pre}/animales/${_id}`);
             slug = $page.params.slug;
-            console.log("nuvo: "+slug)
+            await perfilAnimal(_id)
             //window.location.reload();
         } else {
             Swal.fire(
@@ -215,6 +215,7 @@
                 nacimiento = "";
                 nacimientoobj = {};
                 if (recorda.nacimiento != "") {
+                    connacimiento = true
                     nacimiento = recorda.nacimiento;
                     nacimientoobj = recorda.expand.nacimiento;
                 }
@@ -262,7 +263,6 @@
     onMount(async () => {
         
         let _id = $page.params.slug;
-        console.log("viejo: "+slug)
         let pb_json = JSON.parse(localStorage.getItem("pocketbase_auth"));
         usuarioid = pb_json.record.id;
         await perfilAnimal(_id);
@@ -290,17 +290,17 @@
             <!--Datos animal-->
             <CardAnimal cardsize="max-w-7xl" titulo="Datos básicos">
                 <DatosBasicos
-                    {rp}
-                    {peso}
-                    {prenada}
-                    {categoria}
-                    {lote}
-                    {rodeo}
-                    {sexo}
-                    {caravana}
-                    connacimiento={nacimiento != ""}
-                    nacimiento={nacimientoobj}
-                    {fechanacimiento}
+                    bind:rp
+                    bind:peso
+                    bind:prenada
+                    bind:categoria
+                    bind:lote
+                    bind:rodeo
+                    bind:sexo
+                    bind:caravana
+                    bind:connacimiento
+                    bind:nacimiento={nacimientoobj}
+                    bind:fechanacimiento
                     bind:modohistoria
                     bind:userpermisos
                     {irPadre}

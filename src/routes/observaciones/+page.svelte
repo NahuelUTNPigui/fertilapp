@@ -13,7 +13,10 @@
     import estilos from '$lib/stores/estilos';
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
     import cuentas from '$lib/stores/cuentas';
-    
+    //FILTROS
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
+
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -51,6 +54,16 @@
     let fechadesde = $state("")
     let fechahasta = $state("")
     let isOpenFilter = $state(false)
+    let defaultfiltro = {
+        buscar: "",
+        buscarcategoria: "",
+        fechadesde: "",
+        fechahasta: "",
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listaobservaciones", defaultfiltro);
     //Datos animal
     let caravananuevo = $state("")
     let categorianuevo = $state("")
@@ -155,6 +168,26 @@
         })
         
     }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        buscarcategoria = proxyfiltros.buscarcategoria;
+        fechadesde = proxyfiltros.fechadesde;
+        fechahasta = proxyfiltros.fechahasta;
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        proxyfiltros.buscarcategoria = buscarcategoria;
+        proxyfiltros.fechadesde = fechadesde;
+        proxyfiltros.fechahasta = fechahasta;
+    }
+
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
+    }
     function cerrar(){
         idobservacion = ""
         fecha = ""
@@ -170,6 +203,8 @@
         nuevoModal.close()
     }
     function filterUpdate(){
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         observacionesrow = observaciones
         totalObservacionesEncontradas = observacionesrow.length
         if(buscar != ""){
@@ -190,6 +225,8 @@
         }
     }
     onMount(async ()=>{
+        proxyfiltros = proxy.load();
+        setFilters();
         let pb_json = await JSON.parse(localStorage.getItem('pocketbase_auth'))
         usuarioid = pb_json.record.id
         await getObservaciones()
@@ -428,19 +465,28 @@
     </div>
     
     
-    <div class="grid grid-cols-1 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
-            <div class="w-full lg:w-1/2">
-                <label 
-                    class={`
+    <div class="grid grid-cols-1 lg:grid-cols-2 m-1 mb-2 mt-1 mx-1 lg:mx-10 w-11/12">
+        <div class="w-11/12">
+            <label
+                class={`
                         input input-bordered flex items-center gap-2
                         ${estilos.bgdark2}
                     `}
-                >
-                    <input type="text" 
-                        class="grow" placeholder="Buscar..." bind:value={buscar} oninput={filterUpdate} 
-                    />
-                </label>
-            </div>
+            >
+                <input
+                    type="text"
+                    class="grow"
+                    placeholder="Buscar..."
+                    bind:value={buscar}
+                    oninput={filterUpdate}
+                />
+            </label>
+        </div>
+        <div class="w-11/12">
+            <Limpiar
+                {limpiarFiltros}
+            />
+        </div>
     </div>
     <!--Filtrar-->
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">

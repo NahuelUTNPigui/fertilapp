@@ -7,8 +7,12 @@
     import { createCaber } from "$lib/stores/cab.svelte";
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
+    import { goto } from "$app/navigation";
+    //filtros
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import Limpiar from "$lib/filtros/Limpiar.svelte";
     let ruta = import.meta.env.VITE_RUTA;
-
+    let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0];
     let caber = createCaber();
@@ -21,10 +25,45 @@
     let lotesrows = $state([]);
     let buscar = $state("");
     let mostrarVacios = $state(true);
+    //filtros
+    let defaultfiltro = {
+        buscar: "",
+        mostrarVacios: true,
+    };
+    let proxyfiltros = $state({
+        ...defaultfiltro,
+    });
+    let proxy = createStorageProxy("listalotes", defaultfiltro);
 
+    //filtros animales
+    let defaultfiltroanimales = {
+        buscar: "",
+        rodeobuscar: "",
+        rodeoseleccion: [],
+        loteseleccion: [],
+        categoriaseleccion: [],
+        sexobuscar: "",
+        lotebuscar: "",
+        estadobuscar: "",
+        categoriabuscar: "",
+        activosbuscar: "activos",
+    };
+    let proxyfiltrosanimales = $state({
+        ...defaultfiltroanimales,
+    });
+    let proxyanimales = createStorageProxy("listaanimales", defaultfiltro);
     //Guardar
     let idlote = $state("");
     let nombre = $state("");
+
+    //filtros
+    function goToAnimales(){
+        proxyanimales.load()
+        proxyfiltrosanimales.loteseleccion = [`${idlote}`]
+        proxyanimales.save(proxyfiltrosanimales)
+        goto(pre+"/animales")
+    }
+
     //validacciones
     let malnombre = $state(false);
     let botonhabilitado = $state(false);
@@ -47,6 +86,7 @@
             let total = await getAnimalesTotal(lotes[i].id);
             lotes[i].total = total;
         }
+        filterUpdate()
     }
     function openNewModal() {
         if (userpermisos[1]) {
@@ -60,6 +100,21 @@
                 "error",
             );
         }
+    }
+    function setFilters() {
+        buscar = proxyfiltros.buscar;
+        
+    }
+
+    function setProxyFilter() {
+        proxyfiltros.buscar = buscar;
+        
+    }
+    function limpiarFiltros() {
+        proxyfiltros = { ...defaultfiltro };
+
+        setFilters();
+        filterUpdate();
     }
     async function guardar() {
         try {
@@ -146,6 +201,8 @@
         });
     }
     function filterUpdate() {
+        setProxyFilter();
+        proxy.save(proxyfiltros);
         lotesrows = lotes;
         if (buscar != "") {
             lotesrows = lotesrows.filter((r) =>
@@ -167,6 +224,8 @@
         return results.totalItems;
     }
     onMount(async () => {
+        proxyfiltros = proxy.load();
+        setFilters();
         await getLotes();
     });
     function isEmpty(str) {
@@ -232,7 +291,12 @@
                 </label>
             </div>
         </div>
+        
     </div>
+    <div class="flex w-11/12 justify-start lg:w-1/2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10">
+        <Limpiar {limpiarFiltros} />
+    </div>
+    
     <div
         class="w-full grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-3/4"
     >
@@ -338,6 +402,9 @@
                         onclick={() => eliminar(idlote)}>Eliminar</button
                     >
                 {/if}
+                <button class="btn btn-info" onclick={goToAnimales}
+                    >Ver animales</button
+                >
                 <button class="btn btn-neutral" onclick={cerrarModal}
                     >Cerrar</button
                 >

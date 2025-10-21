@@ -4,7 +4,10 @@
     let {
         toros,
         listavalores=$bindable(),
-        valor=$bindable()
+        valor=$bindable(),
+        cambiar=()=>{},
+        quitarElemento=(id)=>{},
+        agregarElemento=(id)=>{}
     } = $props()
     let cadenabuscar = $state("")
     let torosrows = $state([])
@@ -19,9 +22,12 @@
         
         if(!dentroLista(t)){
             listavalores.push(t.id)
+            agregarElemento(t.id)
+            cambiar()
         }
         else{
             quitar(t.id)
+            
         }
         
     }
@@ -39,6 +45,8 @@
     }
     function quitar(tid){
         listavalores = listavalores.filter(v=>v!=tid)
+        quitarElemento(tid)
+        cambiar()
         
     }
     onMount(()=>{
