@@ -25,6 +25,7 @@
     //FILTROS
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
+    import InfoAnimal from "$lib/components/InfoAnimal.svelte";
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
@@ -250,8 +251,8 @@
                 ...a,
                 padres: [],
                 padresserv: "",
-                padre:"",
-                pajuela:"",
+                padre: "",
+                pajuela: "",
                 observacion: "",
             };
         }
@@ -271,8 +272,8 @@
                     ...a,
                     padresserv: "",
                     padres: [],
-                    padre:"",
-                    pajuela:"",
+                    padre: "",
+                    pajuela: "",
                     observacion: "",
                 };
             }
@@ -412,23 +413,23 @@
     function onInput(campo) {
         input(campo);
     }
-    
-    function agregarPadre(id){
+
+    function agregarPadre(id) {
         for (let i = 0; i < selectanimales.length; i++) {
-            let servicio = selectanimales[i]
-            if(!servicio.padres.includes(id)){
-                selectanimales[i].padres.push(id)
+            let servicio = selectanimales[i];
+            if (!servicio.padres.includes(id)) {
+                selectanimales[i].padres.push(id);
             }
         }
     }
-    function quitarPadre(id){
-            for (let i = 0; i < selectanimales.length; i++) {
-                let servicio = selectanimales[i]
-                let idx = servicio.padres.findIndex(p=>p==id)
-                if(idx != -1){
-                    selectanimales[i].padres.splice(idx,1)
-                }
+    function quitarPadre(id) {
+        for (let i = 0; i < selectanimales.length; i++) {
+            let servicio = selectanimales[i];
+            let idx = servicio.padres.findIndex((p) => p == id);
+            if (idx != -1) {
+                selectanimales[i].padres.splice(idx, 1);
             }
+        }
     }
     async function guardarBulk() {
         if (esservicio) {
@@ -1364,7 +1365,6 @@
                             bind:listavalores={padreslist}
                             agregarElemento={agregarPadre}
                             quitarElemento={quitarPadre}
-                            
                         />
                         {#if malpadre}
                             <div class="label">
@@ -1408,6 +1408,9 @@
                                 <span class="font-semibold">
                                     {shorterWord(a.caravana)}
                                 </span>
+                            </div>
+                            <div class="flex items-start col-span-2">
+                                <InfoAnimal animal={a} />
                             </div>
                             <div>
                                 {#if cargadoanimales}
@@ -1573,16 +1576,19 @@
                                 </span>
                             </div>
                             <div class="flex items-start col-span-2">
+                                <InfoAnimal animal={a} />
+                            </div>
+                            <div class="flex items-start col-span-2">
                                 {#if cargadoanimales}
-                                    <PredictSelect  
-                                        bind:valor={selectanimales[i].padre} 
-                                        etiqueta = {"Padre"} 
-                                        bind:cadena={selectanimales[i].pajuela} 
-                                        lista = {listapadres} 
+                                    <PredictSelect
+                                        bind:valor={selectanimales[i].padre}
+                                        etiqueta={"Padre"}
+                                        bind:cadena={selectanimales[i].pajuela}
+                                        lista={listapadres}
                                     />
                                 {/if}
                             </div>
-                        
+
                             <div class="flex items-start col-span-2">
                                 <input
                                     bind:value={selectanimales[i].observacion}

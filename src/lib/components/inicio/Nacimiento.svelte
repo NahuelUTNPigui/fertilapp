@@ -4,6 +4,7 @@
     import PredictSelect from '$lib/components/PredictSelect.svelte';
     import sexos from '$lib/stores/sexos';
     import AgregarAnimal from "../eventos/AgregarAnimal.svelte";
+    import InfoAnimal from "../InfoAnimal.svelte";
     const HOY = new Date().toISOString().split("T")[0]
     //ESTE REPRESENTA EL MODAL DE NACIMIENTO EN INICIO
     //El final de guardar lo hace el inicio
@@ -20,9 +21,11 @@
         listamadres =  $bindable([]),
         animales =  $bindable([]),
         listapadres =  $bindable([]),
+        listaanimales =  $bindable([]),
         cargadoanimales = $bindable(false),
         guardarNacimiento
     } = $props()
+
     function onSelectAnimalNacimiento(esmadre){
         let a = animales.filter(an=>esmadre?an.id==nacimiento.madrenac:an.id==nacimiento.padrenac)[0]
         if(esmadre){
@@ -49,7 +52,10 @@
     }
     function oninputNacimiento(inputName){
         validarBotonNacimiento()
-       
+        nacimiento.madrenac = madrenac
+        nacimiento.nombremadrenac = nombremadrenac
+        nacimiento.padrenac = padrenac
+        nacimiento.nombrepadrenac = nombrepadrenac
         if(inputName == "FECHA"){
             if(nacimiento.fechanac == ""){
                 nacimiento.malfechanac = true
@@ -64,12 +70,14 @@
             }
             else{
                 nacimiento.malmadrenac = false
+                
             }
         }
         if(inputName == "COMBOMADRE"){
             if(nacimiento.madrenac != ""){
                 onSelectAnimalNacimiento(true)
                 nacimiento.malmadrenac = false
+                madre = animales.find(a=>a.id==nacimiento.madrenac)
             }
         }
         if(inputName == "PADRE"){
@@ -78,12 +86,18 @@
             }
             else{
                 nacimiento.malpadrenac = false
+                onSelectAnimalNacimiento(false)
+                
             }
         }
         if(inputName == "COMBOPADRE"){
             if(nacimiento.padrenac != ""){
                 onSelectAnimalNacimiento(false)
                 nacimiento.malpadrenac = false
+                padre = animales.find(a=>a.id==nacimiento.padrenac)
+                
+
+                
             }
         }
 
@@ -94,6 +108,9 @@
     let pesonac = $state("")
     let fechanac = $state("")
     let observacionnac = $state("")
+    let madre = $state({})
+    let padre = $state({})
+
     //Madre
     let etiquetamadre = "Madre"
     let madrenac = $state("")
@@ -136,14 +153,34 @@
         {/if}
     </label>
     {#if cargadoanimales}
-        <PredictSelect bind:valor={nacimiento.madrenac} etiqueta = {"Madre"} bind:cadena={nacimiento.nombremadrenac} lista = {listamadres} validarAnimal={()=>oninputNacimiento("COMBOMADRE")}>
+        <PredictSelect 
+            bind:valor={madrenac} 
+            etiqueta = {"Madre"} 
+            bind:cadena={nombremadrenac} 
+            lista = {listamadres} 
+            onelegir={()=>oninputNacimiento("COMBOMADRE")}>
             
         </PredictSelect>
+        {#if madrenac.length>0}
+            <InfoAnimal
+                bind:animal = {madre}
+            />
+        {/if}
     {/if}
     {#if cargadoanimales}
-        <PredictSelect bind:valor={nacimiento.padrenac} etiqueta = {"Padre"} bind:cadena={nacimiento.nombrepadrenac} lista = {listapadres} validarAnimal={()=>oninputNacimiento("PADRE")}>
+        <PredictSelect 
+        bind:valor={padrenac} 
+        etiqueta = {"Padre"} 
+        bind:cadena={nombrepadrenac} 
+        lista = {listapadres} 
+        onelegir={()=>oninputNacimiento("COMBOPADRE")}>
             
         </PredictSelect>
+        {#if padrenac.length>0}
+            <InfoAnimal
+                bind:animal = {padre}
+            />
+        {/if}
     {/if}
     <label class="form-control">
         <div class="label">

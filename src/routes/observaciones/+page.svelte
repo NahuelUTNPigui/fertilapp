@@ -16,6 +16,7 @@
     //FILTROS
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
+    import InfoAnimal from '$lib/components/InfoAnimal.svelte';
 
     let caber = createCaber()
     let cab = caber.cab
@@ -36,6 +37,7 @@
     let peso = $state(0)
     let usuarioid = $state("")
     //Datos observaciones
+    let veranimal = $state({})
     let idobservacion = $state("")
     let animal = $state("")
     let categoria = $state("")
@@ -86,7 +88,7 @@
             expand:"nacimiento"
         })
         animales = recordsa
-        animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
+        animales.sort((a1,a2)=>a1.caravana.toLocaleLowerCase()>a2.caravana.toLocaleLowerCase()?1:-1)
     }
     async function getObservaciones(){
         const records = await pb.collection('observaciones').getFullList({
@@ -357,6 +359,7 @@
             openNewAnimal()
         } else {
             let a = animales.filter(an=>an.id==animal)[0]
+            veranimal = a
             categoria = a.categoria
         }
     }
@@ -366,6 +369,7 @@
         if(!agregaranimal && inputName == "ANIMAL"){
             if(isEmpty(animal)){
                 malanimal = true
+                veranimal = {}
             }
             else{
                 malanimal = false
@@ -790,6 +794,11 @@
                             <div class="label">
                                 <span class="label-text-alt text-red-500">Debe seleccionar el animal</span>                    
                             </div>
+                        {/if}
+                        {#if animal.length>0}
+                            <InfoAnimal
+                                animal = {veranimal}
+                            />
                         {/if}
                     </label>
                 {:else}

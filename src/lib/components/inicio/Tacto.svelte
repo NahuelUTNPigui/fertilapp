@@ -7,6 +7,7 @@
     import tiposanimal from "$lib/stores/tiposanimal";
     import { isEmpty } from "$lib/stringutil/lib";
     import PredictSelect from "../PredictSelect.svelte";
+    import InfoAnimal from "../InfoAnimal.svelte";
     let {
         caravana = $bindable(""),
         peso = $bindable(""),
@@ -19,12 +20,14 @@
         prenadatacto = $bindable(0),
         madres = $bindable([]),
         listamadres = $bindable([]),
+        listanimales = $bindable([]),
         cargadoanimales = $bindable(false),
         guardarTacto,
     } = $props();
     let nombreanimal = $state("");
     let animaltacto = $state("");
     let option = $state(0);
+    let animal = $state({})
     const HOY = new Date().toISOString().split("T")[0];
     function validarBotonTacto() {
         tacto.botonhabilitadotacto = true;
@@ -52,6 +55,7 @@
             } else {
                 tacto.malanimaltacto = false;
                 onSelectAnimalTacto();
+                selectAnimal()
             }
         }
         if (inputName == "FECHA") {
@@ -61,6 +65,9 @@
                 tacto.malfechatacto = false;
             }
         }
+    }
+    function selectAnimal(){
+        animal = listanimales.find(a=>a.id == animaltacto)
     }
 </script>
 
@@ -74,29 +81,6 @@
         bind:fechanacimiento
     />
     {#if !agregaranimal}
-        <div class="hidden">
-            <label for="animal" class="label">
-                <span class={estilos.labelForm}>Animal</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                    select select-bordered w-full
-                    border border-gray-300 rounded-md
-                    focus:outline-none focus:ring-2 
-                    focus:ring-green-500 
-                    focus:border-green-500
-                    ${estilos.bgdark2}
-                `}
-                    bind:value={tacto.animaltacto}
-                    onchange={() => oninputTacto("ANIMAL")}
-                >
-                    {#each madres as a}
-                        <option value={a.id}>{a.caravana}</option>
-                    {/each}
-                </select>
-            </label>
-        </div>
 
         {#if cargadoanimales}
             <PredictSelect
@@ -106,6 +90,11 @@
                 bind:lista={listamadres}
                 onelegir={() => oninputTacto("ANIMAL")}
             ></PredictSelect>
+            {#if animaltacto.length >0}
+                <InfoAnimal
+                    bind:animal
+                />
+            {/if}
         {/if}
         <label for="tipo" class="label">
             <span class={estilos.labelForm}>Categoria</span>

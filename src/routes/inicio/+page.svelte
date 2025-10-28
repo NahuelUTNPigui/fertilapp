@@ -233,9 +233,18 @@
         listapadres = padres.map((item) => {
             return { id: item.id, nombre: item.caravana };
         });
+        listamadres.sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+        );
         listaanimales = animales.map((item) => {
             return { id: item.id, nombre: item.caravana };
         });
+        listaanimales.sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, undefined, { sensitivity: "base" })
+        );
+        listapadres.sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, undefined, { sensitivity: "base" })
+        );
     }
     async function getTiposTratamientos() {
         const records = await pb.collection("tipotratamientos").getFullList({
@@ -1155,7 +1164,9 @@
             bind:prenadatacto
             bind:madres
             bind:listamadres
+            bind:listanimales = {animales}
             bind:cargadoanimales
+            
             {guardarTacto}
         ></InicioTacto>
     </div>
@@ -1226,6 +1237,7 @@
             bind:cargadoanimales
             bind:agregaranimal
             bind:listaanimales
+            
             {guardarTrat}
         ></InicioTratamiento>
     </div>

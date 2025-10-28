@@ -61,13 +61,23 @@
         estadobuscar: -1,
         categoriabuscar: "",
         activosbuscar: "activos",
+        fechadesde: "",
+        fechahasta: "",
     };
     let proxyfiltros = $state({
         ...defaultfiltro,
     });
-    let proxy = createStorageProxy("listaanimales", defaultfiltro);
+    let proxy = createStorageProxy("listahistoriaanimales", defaultfiltro);
     //Datos para mostrar
+    //lista historiales
+    let historial = $state([])
+    //lista animales
     let animales = $state([]);
+    //filas es el resultado de combinar animales e historiales
+    let filas = $state([])
+    //son las filas filtrads
+    let historiarows = $state([])
+    //son las filas procesadas que se ven en la tabla
     let animalesrows = $state([]);
     let rodeos = $state([]);
     let lotes = $state([]);
@@ -89,31 +99,8 @@
     let categoriabuscar = $state("");
     let activosbuscar = $state("activos");
     let totalAnimalesEncontrados = $state(0);
-
-    //Datos animal
-    let animal = $state(null);
-    let idanimal = $state("");
-    let caravana = $state("");
-    let rp = $state("");
-    let prenada = $state(0);
-    let fechanacimiento = $state("");
-    let nacimiento = $state("");
-    let sexo = $state("H");
-    let conparicion = $state(false);
-    let peso = $state("");
-    let rodeo = $state("");
-    let lote = $state("");
-    let categoria = $state("");
-    //Datos paricion
-    let madre = $state("");
-    let padre = $state("");
-    let nombremadre = $state("");
-    let nombrepadre = $state("");
-    let observacion = $state("");
-    //Validaciones
-    let malcaravana = $state(false);
-    let malfechanacimiento = $state(false);
-    let malpeso = $state(false);
+    let fechadesde = $state("");
+    let fechahasta = $state("");
     let botonhabilitado = $state(false);
     function calcularEdad(fechaNacimiento, fechaReferencia = new Date()) {
         const nacimiento = new Date(fechaNacimiento);
@@ -179,6 +166,12 @@
         lotes = records;
         ordenarNombre(lotes);
     }
+    async function getHistorialAnimales() {
+      const recordsa = await pb.collection("historialanimales").getFullList({
+            filter: `cab='${cab.id}'`,
+            expand: "nacimiento,lote,rodeo",
+        });  
+    }
     async function getAnimales() {
         //Estaria joya que el animal venga con todos los chiches
 
@@ -190,163 +183,52 @@
         animales = recordsa;
         animales.sort((a1, a2) => (a1.caravana > a2.caravana ? 1 : -1));
 
-        animalesrows = animales;
+        //animalesrows = animales;
         madres = animales.filter((a) => a.sexo == "H");
         padres = animales.filter((a) => a.sexo == "M");
     }
-
-    function openNewModal() {
-        if (userpermisos[5]) {
-            idanimal = "";
-            botonhabilitado = false;
-            caravana = "";
-            conparicion = false;
-            peso = "";
-            sexo = "H";
-            fechanacimiento = "";
-            nombremadre = "";
-            nombrepadre = "";
-            padre = "";
-            madre = "";
-            animal = null;
-            observacion = "";
-            rp = "";
-            nuevoModal.showModal();
-        } else {
-            Swal.fire(
-                "Sin permisos",
-                "No tienes permisos para administrar animales",
-                "error",
-            );
+    function procesarFilas(){
+        animalesrows = []
+        for (let i = 0; i < historiarows.length; i++) {
+            let h = historiarows[i];
+            let ultimo_estado = h.estados[h.estados.length - 1];
+            let fila = { ...ultimo_estado };
+            animalesrows.push(fila);
         }
+        totalAnimalesEncontrados = animalesrows.length
     }
-
-    function getDetail(id) {
-        idanimal = id;
-        animal = animales.filter((a) => a.id == idanimal)[0];
-        caravana = animal.caravana;
-        fechanacimiento = animal.fechanacimiento.split(" ")[0];
-        sexo = animal.sexo;
-        if (sexo == "H") {
-            prenada = animal.prenada;
-        }
-        conparicion = animal.nacimiento != "";
-        peso = animal.peso;
-        botonhabilitado = true;
-        nacimiento = animal.nacimiento;
-        lote = animal.lote;
-        rodeo = animal.rodeo;
-        rp = animal.rp;
-        nuevoModal.showModal();
-    }
-    function gotoniveles() {
-        goto(pre + "/user/nivel");
-    }
-    //Se puede guardar un animal con su nacimiento
-    async function guardar() {
-        let verificar = await verificarNivel(cab.id);
-        if (!verificar) {
-            //Swal.fire(
-            //    "Error guardar",
-            //    `No tienes el nivel de la cuenta para tener más animales`,
-            //    "error",
-            //);
-            Swal.fire({
-                title: "Error al guardar",
-                text: "No tienes el nivel de la cuenta para tener más animales.",
-                icon: "error",
-                showCancelButton: true,
-                confirmButtonText: "Actualizar plan",
-                cancelButtonText: "Ok",
-                reverseButtons: true, // Pone "Ok" a la izquierda, estilo más natural
-                background: "#1f2937", // Fondo oscuro (modo dark opcional)
-                color: "#f3f4f6", // Texto claro
-                confirmButtonColor: "#16a34a", // Verde
-                cancelButtonColor: "#6b7280", // Gris
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Acción al presionar "Actualizar plan"
-                    goto("/user/nivel"); // Ejemplo si usás SvelteKit
-                    // o window.location.href = "/user/nivel";
+    function procesarHistorial(){
+        for(let i =0;i<animales.length;i++){
+            let a = animales[i]
+            let animalhistoria = {
+                id:a.id,
+                estados:[]
+            }
+            let fecha_inicio = a.created
+            let fecha_fin = ""
+            let hs_animal = historial.filter(h=>h.animal == a.id)
+            for (let j = 0; j < hs_animal.length; j++) {
+                let h = hs_animal
+                fecha_fin = h.created
+                let estado = {
+                    fecha_inicio,
+                    fecha_fin,
+                    ...h
                 }
-                // Si presiona "Ok" simplemente se cierra
-            });
-            return;
-        }
-        try {
-            let recordparicion = null;
-            if (conparicion) {
-                let dataparicion = {
-                    madre,
-                    padre,
-                    fecha: fechanacimiento + " 03:00:00",
-                    nombremadre,
-                    nombrepadre,
-                    observacion,
-
-                    cab: cab.id,
-                };
-                recordparicion = await pb
-                    .collection("nacimientos")
-                    .create(dataparicion);
+                animalhistoria.estados.push(estado)
+                fecha_inicio = fecha_fin
             }
-            let data = {
-                caravana,
-                active: true,
-                delete: false,
-                prenada,
-                fechanacimiento: fechanacimiento + " 03:00:00",
-                sexo,
-                peso,
-                lote,
-                rodeo,
-                rp,
-                categoria,
-                cab: cab.id,
-            };
-            if (conparicion) {
-                data.nacimiento = recordparicion.id;
+            fecha_fin = new Date().toUTCString().split("T")[0] + " 00:00:00";
+            let estado = {
+                fecha_inicio,
+                fecha_fin,
+                ...a
             }
-            let recorda = await pb.collection("animales").create(data);
-            if (conparicion) {
-                recorda.expand = {
-                    nacimiento: recordparicion,
-                };
-            }
-            if (fechanacimiento) {
-                let datapesaje = {
-                    animal: recorda.id,
-                    fecha: fechanacimiento + " 03:00:00",
-                    pesoanterior: 0,
-                    pesonuevo: peso,
-                };
-                await pb.collection("pesaje").create(datapesaje);
-            }
-
-            animales.push(recorda);
-            animales.sort((a1, a2) => (a1.caravana > a2.caravana ? 1 : -1));
-
-            madres = animales.filter((a) => a.sexo == "H");
-            padres = animales.filter((a) => a.sexo == "M");
-            filterUpdate();
-            Swal.fire(
-                "Éxito guardar",
-                "Se pudo guardar el animal con exito",
-                "success",
-            );
-            caravana = "";
-            nacimiento = "";
-            fechanacimiento = "";
-            sexo = "H";
-        } catch (e) {
-            console.error(e);
-            Swal.fire(
-                "Error guardar",
-                "Hubo un error para guardar el animal",
-                "error",
-            );
+            animalhistoria.estados.push(estado)
+            filas.push(animalhistoria)
         }
     }
+
     function setFilters() {
         buscar = proxyfiltros.buscar;
         rodeobuscar = proxyfiltros.rodeobuscar;
@@ -358,6 +240,8 @@
         estadobuscar = proxyfiltros.estadobuscar;
         categoriabuscar = proxyfiltros.categoriabuscar;
         activosbuscar = proxyfiltros.activosbuscar;
+        fechadesde = proxyfiltros.fechadesde;
+        fechahasta = proxyfiltros.fechahasta;
     }
     function setProxyFilter() {
         proxyfiltros.buscar = buscar;
@@ -370,104 +254,161 @@
         proxyfiltros.estadobuscar = estadobuscar;
         proxyfiltros.categoriabuscar = categoriabuscar;
         proxyfiltros.activosbuscar = activosbuscar;
+        proxyfiltros.fechadesde = fechadesde;
+        proxyfiltros.fechahasta = fechahasta;
+    }
+    function filtrarPorParecido(variableestado, variable) {
+        if (variable.length == 0) {
+            return true;
+        }
+        return variableestado
+            .toLocaleLowerCase()
+            .includes(variable.toLocaleLowerCase());
+    }
+    function filtrarPorIgualdad(variableestado, variable) {
+        if (variable.length == 0) {
+            return true;
+        }
+        return variableestado == variable;
+    }
+    function filtrarPorFechaEstado(estado, fechadesde, fechahasta) {
+        
+        let estado_inicio = new Date(estado.fecha_inicio);
+        let estado_fin = new Date(estado.fecha_fin);
+        let desde = new Date(fechadesde);
+        let hasta = new Date(fechahasta);
+        let no_valido = estado_fin < desde || estado_inicio > hasta;
+        return !no_valido;
+    }
+    function filtrarPorColeccion(variableestadoestado,coleccion){
+        if(coleccion.length==0){
+            return true
+        }
+        else if(coleccion[0] == "-1"){
+            return !variableestadoestado
+        }
+        else{
+            return coleccion.includes(variableestadoestado)
+        }
+    }
+    function validarEstado(estado){
+        //fecha
+        if (!filtrarPorFechaEstado(estado, fechadesde, fechahasta)) {
+            return false;
+        }
+        
+        if(!filtrarPorParecido(estado.caravana,buscar)){
+            return false
+        }
+        
+        //if (buscar != "") {
+        //    animalesrows = animalesrows.filter((a) =>
+        //        a.caravana
+        //            .toLocaleLowerCase()
+        //            .includes(buscar.toLocaleLowerCase()),
+        //    );
+        //}
+        if(!filtrarPorIgualdad(estado.sexo,sexobuscar)){
+            return false
+        }
+        
+        //if (sexobuscar != "") {
+        //    animalesrows = animalesrows.filter((a) => a.sexo == sexobuscar);
+        //}
+        if(!filtrarPorColeccion(estado.rodeo,rodeoseleccion)){
+            return false
+        }
+        
+        //if (rodeoseleccion.length != 0) {
+        //    if (rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1") {
+        //        animalesrows = animalesrows.filter((a) => !a.rodeo);
+        //    } else {
+        //        animalesrows = animalesrows.filter((a) =>
+        //            rodeoseleccion.includes(a.rodeo),
+        //        );
+        //    }
+        //}
+        if(!filtrarPorColeccion(estado.lote,loteseleccion)){
+            return false
+        }
+        
+        //if (loteseleccion.length != 0) {
+        //    if (loteseleccion.length == 1 && loteseleccion[0] == "-1") {
+        //        animalesrows = animalesrows.filter((a) => !a.lote);
+        //    } else {
+        //        animalesrows = animalesrows.filter((a) =>
+        //            loteseleccion.includes(a.lote),
+        //        );
+        //    }
+        //}
+
+        if (estadobuscar != -1  ) {
+            return (estado.prenada == estadobuscar && estado.sexo == "H")
+            //animalesrows = animalesrows.filter(
+            //    (a) => a.prenada == estadobuscar && a.sexo == "H",
+            //);
+        }
+        
+        if(!filtrarPorColeccion(estado.categoria,categoriaseleccion)){
+            return false
+        }
+        
+        //if (categoriaseleccion.length != 0) {
+        //    if (
+        //        categoriaseleccion.length == 1 &&
+        //        categoriaseleccion[0] == "-1"
+        //    ) {
+        //        animalesrows = animalesrows.filter((a) => !a.categoria);
+        //    } else {
+        //        animalesrows = animalesrows.filter((a) =>
+        //            categoriaseleccion.includes(a.categoria),
+        //        );
+        //    }
+        //}
+        if (activosbuscar == "activos" && !estado.active) {
+            return false
+            //animalesrows = animalesrows.filter((a) => a.active == true);
+
+        }
+        if (activosbuscar == "inactivos" && estado.active) {
+            return false
+            //animalesrows = animalesrows.filter((a) => a.active == false);
+
+        }
+        return true
     }
     function filterUpdate() {
         setProxyFilter();
         proxy.save(proxyfiltros);
-        animalesrows = animales;
-        totalAnimalesEncontrados = animalesrows.length;
-        if (buscar != "") {
-            animalesrows = animalesrows.filter((a) =>
-                a.caravana
-                    .toLocaleLowerCase()
-                    .includes(buscar.toLocaleLowerCase()),
-            );
-            totalAnimalesEncontrados = animalesrows.length;
-        }
-        if (sexobuscar != "") {
-            animalesrows = animalesrows.filter((a) => a.sexo == sexobuscar);
-            totalAnimalesEncontrados = animalesrows.length;
-        }
+        historiarows = [];
+        for(let i = 0;i<filas.length;i++){
 
-        if (rodeoseleccion.length != 0) {
-            if (rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1") {
-                animalesrows = animalesrows.filter((a) => !a.rodeo);
-                totalAnimalesEncontrados = animalesrows.length;
-            } else {
-                animalesrows = animalesrows.filter((a) =>
-                    rodeoseleccion.includes(a.rodeo),
-                );
-                totalAnimalesEncontrados = animalesrows.length;
+            let ha = filas[i]
+
+            let id = ha.id
+            let listaestados = []
+            let animalhistoria = {
+                id,
+                estados:[]
+            }
+            for(let j = 0;j<ha.estados.length;j++){
+                
+                let estado = ha.estados[j]
+                
+                if(validarEstado(estado)){
+                    listaestados.push(estado)
+                }
+            }
+            if(listaestados.length>0){
+                animalhistoria.estados = listaestados.map(x=>x)
+                historiarows.push(animalhistoria)
             }
         }
-        if (loteseleccion.length != 0) {
-            if (loteseleccion.length == 1 && loteseleccion[0] == "-1") {
-                animalesrows = animalesrows.filter((a) => !a.lote);
-                totalAnimalesEncontrados = animalesrows.length;
-            } else {
-                animalesrows = animalesrows.filter((a) =>
-                    loteseleccion.includes(a.lote),
-                );
-                totalAnimalesEncontrados = animalesrows.length;
-            }
-        }
-
-        if (estadobuscar != -1) {
-            animalesrows = animalesrows.filter(
-                (a) => a.prenada == estadobuscar && a.sexo == "H",
-            );
-            totalAnimalesEncontrados = animalesrows.length;
-        }
-        if (categoriaseleccion.length != 0) {
-            if (
-                categoriaseleccion.length == 1 &&
-                categoriaseleccion[0] == "-1"
-            ) {
-                animalesrows = animalesrows.filter((a) => !a.categoria);
-                totalAnimalesEncontrados = animalesrows.length;
-            } else {
-                animalesrows = animalesrows.filter((a) =>
-                    categoriaseleccion.includes(a.categoria),
-                );
-                totalAnimalesEncontrados = animalesrows.length;
-            }
-        }
-        if (activosbuscar == "activos") {
-            animalesrows = animalesrows.filter((a) => a.active == true);
-            totalAnimalesEncontrados = animalesrows.length;
-        }
-        if (activosbuscar == "inactivos") {
-            animalesrows = animalesrows.filter((a) => a.active == false);
-            totalAnimalesEncontrados = animalesrows.length;
-        }
+        
+        procesarFilas()
+        
     }
 
-    function onSelectPadre(sex) {
-        if (sex == "H") {
-            let m = madres.filter((a) => a.id == madre)[0];
-            nombremadre = m.caravana;
-        } else {
-            let p = padres.filter((a) => a.id == padre)[0];
-            nombrepadre = p.caravana;
-        }
-    }
-    function oninput(inputName) {
-        validarBoton();
-        if (inputName == "NOMBRE") {
-            if (isEmpty(caravana)) {
-                malcaravana = true;
-            } else {
-                malcaravana = false;
-            }
-        }
-    }
-
-    function validarBoton() {
-        botonhabilitado = true;
-        if (isEmpty(caravana)) {
-            botonhabilitado = false;
-        }
-    }
     onMount(async () => {
         proxyfiltros = proxy.load();
         setFilters();
@@ -479,29 +420,14 @@
         per.setPer(respermisos.permisos, usuarioid);
         userpermisos = getPermisosList(per.per.permisos);
         await getAnimales();
+        
         await getRodeos();
         await getLotes();
-        filterUpdate();
+        await getHistorialAnimales()
+        
+        procesarHistorial()
+        filterUpdate()
     });
-    function cerrarModal() {
-        idanimal = "";
-        botonhabilitado = false;
-        caravana = "";
-        conparicion = false;
-        peso = "";
-        sexo = "H";
-        fechanacimiento = "";
-        nombremadre = "";
-        nombrepadre = "";
-        padre = "";
-        madre = "";
-        animal = null;
-        rp = "";
-        observacion = "";
-        lote = "";
-        rodeo = "";
-        nuevoModal.close();
-    }
     function prepararData(item) {
         return {
             CARAVANA: item.caravana,
@@ -670,22 +596,26 @@
     {/if}
     <div class="grid grid-cols-1 lg:grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div class="">
-            <h1 class="text-2xl">Animales</h1>
+            <h1 class="text-2xl">Historial</h1>
         </div>
         <div class="flex col-span-2 gap-1 justify-start lg:justify-end">
             <div>
                 <button
-                    class={` btn btn-primary rounded-lg ${estilos.btntext} px-2 mx-1`}
-                    data-theme="forest"
-                    onclick={() => openNewModal()}
+                    class={`
+                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                        ${estilos.btnsecondary}
+                        rounded-full
+                        px-4 pt-2 pb-3
+                    `}
+                    onclick={() => goto(pre + "/animales")}
                 >
-                    <span class="text-lg m-1">Nuevo</span>
+                    <span class="text-lg font-semibold">Volver</span>
                 </button>
             </div>
             <div>
                 <Exportar
-                    titulo={`${cab.nombre}_${new Date().toLocaleDateString().replace("/", "-")}_Animales`}
-                    sheetname={"Animales"}
+                    titulo={`${cab.nombre}_${new Date().toLocaleDateString().replace("/", "-")}_Historial_Animales`}
+                    sheetname={"Historial Animales"}
                     establecimiento={cab.nombre}
                     filtros={[]}
                     confiltros={false}
@@ -779,6 +709,44 @@
                 <div
                     class="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-10 w-full my-1"
                 >
+                    <div class="">
+                        <label
+                            class="block tracking-wide mb-2"
+                            for="grid-first-name"
+                        >
+                            Fecha desde
+                        </label>
+                        <input
+                            id="fechadesde"
+                            type="date"
+                            class={`
+                            w-full md:w-1/2
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={fechadesde}
+                            onchange={filterUpdate}
+                        />
+                    </div>
+                    <div class="">
+                        <label
+                            class="block tracking-wide mb-2"
+                            for="grid-first-name"
+                        >
+                            Fecha Hasta
+                        </label>
+                        <input
+                            id="fechadesde"
+                            type="date"
+                            class={`
+                            w-full md:w-1/2
+                                input input-bordered
+                                ${estilos.bgdark2}
+                            `}
+                            bind:value={fechahasta}
+                            onchange={filterUpdate}
+                        />
+                    </div>
                     <div class="mt-1">
                         <MultiSelect
                             opciones={[
@@ -1264,385 +1232,3 @@
         {/each}
     </div>
 </Navbarr>
-<dialog
-    id="nuevoModal"
-    class="
-            modal modal-top mt-10 ml-5
-            lg:items-start
-            rounded-xl
-            lg:modal-middle
-        "
->
-    <div
-        class="
-                modal-box w-11/12 max-w-xl
-                bg-gradient-to-br from-white to-gray-100
-                dark:from-gray-900 dark:to-gray-800
-            "
-    >
-        <form method="dialog">
-            <button
-                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl"
-                >✕</button
-            >
-        </form>
-        {#if idanimal == ""}
-            <h3 class="text-lg font-bold">Nuevo Animal</h3>
-        {:else}
-            <h3 class="text-lg font-bold">Ver Animal</h3>
-        {/if}
-        <div class="form-control">
-            <label for="nombre" class="label">
-                <span class="label-text text-base">Caravana</span>
-            </label>
-            <label class="input-group">
-                <input
-                    id="nombre"
-                    type="text"
-                    class={`
-                            input 
-                            input-bordered 
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                            w-full
-                            ${estilos.bgdark2} 
-                            ${malcaravana ? "input-error" : ""}
-                        `}
-                    bind:value={caravana}
-                    oninput={() => oninput("NOMBRE")}
-                />
-                <div class={`label ${malcaravana ? "" : "hidden"}`}>
-                    <span class="label-text-alt text-red-400"
-                        >Error debe escribir la caravana del animal</span
-                    >
-                </div>
-            </label>
-            <label for="rp" class="label">
-                <span class="label-text text-base">RP:</span>
-            </label>
-            <label class="input-group">
-                <input
-                    id="rp"
-                    type="text"
-                    class={`
-                            input 
-                            input-bordered 
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                            w-full
-                            ${estilos.bgdark2} 
-                            
-                        `}
-                    bind:value={rp}
-                />
-            </label>
-            <label for="sexo" class="label">
-                <span class="label-text text-base">Sexo</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={sexo}
-                >
-                    {#each sexos as s}
-                        <option value={s.id}>{s.nombre}</option>
-                    {/each}
-                </select>
-            </label>
-            <label for="peso" class="label">
-                <span class="label-text text-base">Peso (KG)</span>
-            </label>
-            <label class="input-group">
-                <input
-                    id="peso"
-                    type="number"
-                    class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={peso}
-                />
-            </label>
-            {#if sexo == "H"}
-                <div class="m-1 mt-3">
-                    <RadioButton bind:option={prenada} deshabilitado={false} />
-                </div>
-
-                <label for="estado" class="hidden label">
-                    <span class="label-text text-base">Estado</span>
-                </label>
-                <label class="input-group hidden">
-                    <select
-                        class={`
-                                select select-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={prenada}
-                    >
-                        {#each estados as e}
-                            <option value={e.id}>{e.nombre}</option>
-                        {/each}
-                    </select>
-                </label>
-            {/if}
-            <label for="categoria" class="label">
-                <span class="label-text text-base">Categoria</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={categoria}
-                >
-                    {#each categorias.filter((c) => c.sexo == sexo) as r}
-                        <option value={r.id}>{r.nombre}</option>
-                    {/each}
-                </select>
-            </label>
-            <label for="rodeo" class="label">
-                <span class="label-text text-base">Rodeo</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={rodeo}
-                >
-                    {#each rodeos as r}
-                        <option value={r.id}>{r.nombre}</option>
-                    {/each}
-                </select>
-            </label>
-            <label for="lote" class="label">
-                <span class="label-text text-base">Lote</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                            select select-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={lote}
-                >
-                    {#each lotes as r}
-                        <option value={r.id}>{r.nombre}</option>
-                    {/each}
-                </select>
-            </label>
-            <label for="fechanacimiento" class="label">
-                <span class="label-text text-base">Fecha nacimiento</span>
-            </label>
-            <label class="input-group">
-                <input
-                    id="fechanacimiento"
-                    type="date"
-                    max={HOY}
-                    class={`
-                            input input-bordered w-full
-                            border border-gray-300 rounded-md
-                            focus:outline-none focus:ring-2 
-                            focus:ring-green-500 focus:border-green-500
-                            ${estilos.bgdark2}
-                        `}
-                    bind:value={fechanacimiento}
-                />
-            </label>
-            <div class="form-group mt-3">
-                <span class="label-text text-base">Con nacimiento</span>
-                <br />
-                <input
-                    type="checkbox"
-                    disabled={idanimal != ""}
-                    class="toggle"
-                    bind:checked={conparicion}
-                />
-            </div>
-            {#if idanimal == "" && conparicion}
-                <label for="nombremadre" class="label">
-                    <span class="label-text text-base">Caravana madre</span>
-                </label>
-                <label class="input-group">
-                    <input
-                        id="nombremadre"
-                        type="text"
-                        class={`
-                                input 
-                                input-bordered 
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                w-full 
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={nombremadre}
-                    />
-                </label>
-                <label for="madre" class="label">
-                    <span class="label-text text-base">Madre</span>
-                </label>
-                <label class="input-group">
-                    <select
-                        class={`
-                                select select-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={madre}
-                        onchange={() => onSelectPadre("F")}
-                    >
-                        {#each madres as m}
-                            <option value={m.id}>{m.caravana}</option>
-                        {/each}
-                    </select>
-                </label>
-                <label for="nombrepadre" class="label">
-                    <span class="label-text text-base">Caravana padre</span>
-                </label>
-                <label class="input-group">
-                    <input
-                        id="nombrepadre"
-                        type="text"
-                        class={`
-                                input 
-                                input-bordered 
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                                w-full
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={nombrepadre}
-                    />
-                </label>
-                <label for="madre" class="label">
-                    <span class="label-text text-base">Padre</span>
-                </label>
-                <label class="input-group">
-                    <select
-                        class={`
-                                select select-bordered w-full
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={padre}
-                        onchange={() => onSelectPadre("M")}
-                    >
-                        {#each padres as p}
-                            <option value={p.id}>{p.caravana}</option>
-                        {/each}
-                    </select>
-                </label>
-
-                <label class="form-control">
-                    <div class="label">
-                        <span class="label-text">Observacion</span>
-                    </div>
-                    <input
-                        id="observacion"
-                        type="text"
-                        class={`
-                                input 
-                                input-bordered 
-                                border border-gray-300 rounded-md
-                                focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                                w-full
-                                ${estilos.bgdark2}
-                            `}
-                        bind:value={observacion}
-                    />
-                </label>
-            {/if}
-            {#if idanimal != "" && nacimiento != ""}
-                {#each [animal.expand.nacimiento] as n}
-                    <table class="table table-lg w-full">
-                        <thead>
-                            <tr>
-                                <th class="text-base">Fecha</th>
-                                <th class="text-base">Madre - Padre</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-base"
-                                    >{new Date(
-                                        n.fecha,
-                                    ).toLocaleDateString()}</td
-                                >
-                                <td class="text-base"
-                                    >{n.nombremadre} , {n.nombrepadre}</td
-                                >
-                            </tr>
-                        </tbody>
-                    </table>
-                    <label class="form-control">
-                        <div class="label">
-                            <span class="label-text">Observacion</span>
-                        </div>
-                        <input
-                            id="observacion"
-                            type="text"
-                            class={`
-                                    input 
-                                    input-bordered 
-                                    border border-gray-300 rounded-md
-                                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
-                                    w-full
-                                    ${estilos.bgdark2}
-                                `}
-                            bind:value={observacion}
-                        />
-                    </label>
-                {/each}
-            {/if}
-        </div>
-        <div class="modal-action justify-end">
-            <form method="dialog">
-                <!-- if there is a button, it will close the modal -->
-                {#if idanimal == ""}
-                    <button
-                        class="btn btn-error text-white"
-                        onclick={cerrarModal}>Cancelar</button
-                    >
-                    <button
-                        class="btn btn-success text-white"
-                        disabled={!botonhabilitado}
-                        onclick={guardar}>Guardar</button
-                    >
-                {:else}
-                    <button
-                        class="btn btn-error text-white"
-                        onclick={cerrarModal}>Cerrar</button
-                    >
-                {/if}
-            </form>
-        </div>
-    </div>
-</dialog>

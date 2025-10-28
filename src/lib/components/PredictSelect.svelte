@@ -15,9 +15,7 @@
     let listarow = $state(lista)
     let isOpen = $state(false)
     let nombre = $state("")
-    if(valor != ""){
-        nombre = cadena
-    }
+    
     function cambioCadena(){
         if(onwrite){
             onwrite(cadena)
@@ -55,12 +53,13 @@
             validarAnimal()
         }
     }
-    $effect(()=>{
-        if(valor.length !=0){
-            cadena = listarow.filter(l=>l.id==valor)[0].nombre
-            nombre = cadena
-        }
-    })
+    //si me arrepiento
+    //$effect(()=>{
+    //    if(valor.length !=0){
+    //        cadena = listarow.filter(l=>l.id==valor)[0].nombre
+    //        nombre = cadena
+    //    }
+    //})
     onMount(()=>{
         if(valor.length !=0){
             cadena = listarow.filter(l=>l.id==valor)[0].nombre

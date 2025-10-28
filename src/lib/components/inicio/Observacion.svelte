@@ -8,7 +8,9 @@
     import { isEmpty } from "$lib/stringutil/lib";
     import categorias from "$lib/stores/categorias";
     import PredictSelect from "../PredictSelect.svelte";
+    import InfoAnimal from "../InfoAnimal.svelte";
     const HOY = new Date().toISOString().split("T")[0];
+
     let {
         caravana = $bindable(""),
         peso = $bindable(""),
@@ -25,6 +27,8 @@
     } = $props();
     let nombreanimal = $state("");
     let animalobs = $state("");
+    let animal = $state("")
+    let botonhabilitadoobs = $state(false)
     function validarBotonObs() {
         observacion.botonhabilitadoobs = true;
         if (!agregaranimal && isEmpty(observacion.animalobs)) {
@@ -33,9 +37,11 @@
         if (isEmpty(observacion.fechaobs)) {
             observacion.botonhabilitadoobs = false;
         }
+        botonhabilitadoobs = observacion.botonhabilitadoobs
     }
     function onSelectAnimalObs() {
         let a = animales.filter((an) => an.id == observacion.animalobs)[0];
+        animal = a
         if (a) {
             observacion.categoriaobs = a.categorias;
         } else {
@@ -73,36 +79,6 @@
         bind:fechanacimiento
     />
     {#if !agregaranimal}
-        <div class="hidden">
-            <label for="animal" class="label">
-                <span class="label-text text-base">Animal</span>
-            </label>
-            <label class="input-group">
-                <select
-                    class={`
-                    select select-bordered w-full
-                    border border-gray-300 rounded-md
-                    focus:outline-none focus:ring-2 
-                    focus:ring-green-500 
-                    focus:border-green-500
-                    ${estilos.bgdark2}
-                `}
-                    bind:value={observacion.animalobs}
-                    onchange={() => oninputObs("ANIMAL")}
-                >
-                    {#each animales as a}
-                        <option value={a.id}>{a.caravana}</option>
-                    {/each}
-                </select>
-                {#if observacion.malanimalobs}
-                    <div class="label">
-                        <span class="label-text-alt text-red-500"
-                            >Debe seleccionar el animal</span
-                        >
-                    </div>
-                {/if}
-            </label>
-        </div>
         {#if cargadoanimales}
             <PredictSelect
                 bind:valor={animalobs}
@@ -111,6 +87,11 @@
                 bind:lista={listaanimales}
                 onelegir={() => oninputObs("ANIMAL")}
             ></PredictSelect>
+            {#if animalobs.length>0}
+                <InfoAnimal
+                    bind:animal
+                />
+            {/if}
         {/if}
         <label for="categoria" class="label">
             <span class="label-text text-base">Categoria</span>
@@ -184,7 +165,7 @@
         <!-- if there is a button, it will close the modal -->
         <button
             class="btn btn-success text-white"
-            disabled={!observacion.botonhabilitadoobs}
+            disabled={!botonhabilitadoobs}
             onclick={guardarObservacion}>Guardar</button
         >
     </form>

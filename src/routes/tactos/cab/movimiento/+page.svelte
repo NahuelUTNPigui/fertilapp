@@ -18,9 +18,11 @@
     import RadioButton from "$lib/components/RadioButton.svelte";
     import MultiSelect from '$lib/components/MultiSelect.svelte';
     import { shorterWord } from "$lib/stringutil/lib";
+    
     //FILTROS
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
+    import InfoAnimal from "$lib/components/InfoAnimal.svelte";
     let ruta = import.meta.env.VITE_RUTA
     let pre = import.meta.env.VITE_PRE
     const pb = new PocketBase(ruta);
@@ -905,65 +907,6 @@
                     />
             </div>
         </div>
-        <div class="hidden w-full grid grid-cols-1 justify-items-start " >
-            <div class="flex overflow-x-auto">
-                <table class="table table-lg w-full w-11/12" >
-                    <thead>
-                        <tr>
-                            <th class="text-base ">Caravana</th>
-                            <th class="text-base "><span>Estado</span><br> anterior</th>
-                            <th class="text-base ">Estado Nuevo</th>
-                            <th class="text-base ">Observación</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each selectanimales as a,i}
-                            <tr>
-                                <td class="text-base">{a.caravana}</td>
-                                <td class="text-base ">{getEstadoNombre(a.prenada)}</td>
-                                <td>
-                                    <label class="input-group ">
-                                        <select 
-                                            class={`
-                                                select select-bordered w-full
-                                                rounded-md
-                                                focus:outline-none focus:ring-2 
-                                                focus:ring-green-500 
-                                                focus:border-green-500
-                                                ${estilos.bgdark2}
-                                            `}
-                                            bind:value={selectanimales[i].estadonuevo}
-                                        >
-                                                
-                                            {#each estados as e}
-                                                <option value={e.id}>{e.nombre}</option>
-                                            {/each}
-                                        </select>
-                                    </label>
-                                </td>
-                                <td class="">
-                                    <input
-                                    bind:value={selectanimales[i].observacion}
-                                    class={`
-                                        h-12 border border-gray-300 
-                                        w-full
-                                        rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 
-                                        focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `}
-                                    />
-                                </td>
-                                
-                                
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-        </div>
         <div class="block  justify-items-center mx-1">
             {#each selectanimales as a,i}
             <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
@@ -972,9 +915,15 @@
                         <div class="flex items-start col-span-2">
                             <span >Caravana:</span> 
                             <span class="font-semibold">
-                              {a.caravana}
+                              {shorterWord(a.caravana)}
                             </span>
                         </div>
+                        <div class="flex items-start col-span-2">
+                            <InfoAnimal
+                                animal={a}
+                            />
+                        </div>
+                        
                         <div class="flex items-start col-span-2">
                             <span >Estado actual:</span> 
                             <span class="font-semibold">
