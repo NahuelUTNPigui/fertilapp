@@ -41,6 +41,8 @@
     let categoriaseleccion = $state([]);
     let categoria = $state("");
     let sexo = $state("");
+    let raza = $state("");
+    let color = $state("");
 
     let lotes = $state([]);
     let rodeos = $state([]);
@@ -102,6 +104,16 @@
                 a.caravana
                     .toLocaleLowerCase()
                     .includes(buscar.toLocaleLowerCase()),
+            );
+        }
+        if (raza != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.raza.toLocaleLowerCase().includes(raza.toLocaleLowerCase()),
+            );
+        }
+        if (color != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.color.toLocaleLowerCase().includes(color.toLocaleLowerCase()),
             );
         }
         if (sexo != "") {
@@ -701,33 +713,48 @@
                         {filterUpdate}
                     />
                 </div>
-                <div class="hidden">
-                    <label for="categorias" class="label">
-                        <span class="label-text text-base">Categorias</span>
+                <div class="my-0 py-0">
+                    <label for="raza" class="label mb-0">
+                        <span class="label-text text-base">Raza</span>
                     </label>
                     <label class="input-group">
-                        <select
+                        <input
+                            type="text"
                             class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                            bind:value={categoria}
-                            onchange={filterUpdate}
-                        >
-                            <option value="">Todos</option>
-                            {#each categorias as r}
-                                <option value={r.id}>{r.nombre}</option>
-                            {/each}
-                        </select>
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={raza}
+                            oninput={filterUpdate}
+                        />
                     </label>
                 </div>
-                <button class="btn btn-neutral mt-2" onclick={limpiar}>
-                    Limpiar
-                </button>
+                <div class="my-0 py-0">
+                    <label for="color" class="label mb-0">
+                        <span class="label-text text-base">Color</span>
+                    </label>
+                    <label class="input-group">
+                        <input
+                            type="text"
+                            class={`
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={color}
+                            oninput={filterUpdate}
+                        />
+                    </label>
+                </div>
             </div>
         {/if}
     </div>
@@ -818,6 +845,16 @@
                         class="text-base mx-1 px-1 border-b dark:border-gray-600"
                         >Sexo</th
                     >
+                    <th
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div class="flex flex-row justify-between">Raza</div>
+                    </th>
+                    <th
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div class="flex flex-row justify-between">Color</div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -875,6 +912,12 @@
                             >{a.expand?.lote?.nombre || ""}</td
                         >
                         <td class="text-base mx-1 px-0">{a.sexo}</td>
+                        <td>
+                            {a.raza}
+                        </td>
+                        <td>
+                            {a.color}
+                        </td>
                     </tr>
                 {/each}
             </tbody>
@@ -1034,6 +1077,18 @@
                                     : ""}
                             </span>
                         </div>
+                        <div class="flex items-start">
+                                <span>Raza:</span>
+                                <span class="font-semibold">
+                                    {a.raza}
+                                </span>
+                            </div>
+                            <div class="flex items-start">
+                                <span>Color:</span>
+                                <span class="font-semibold">
+                                    {a.color}
+                                </span>
+                            </div>
                     </div>
                 </div>
             </div>

@@ -170,14 +170,20 @@
     }
     async function getHistorialAnimales() {
         let historial = []
-        for(let i = 0;i<animales.length;i++){
-            let a = animales[i]
-            const recordsa = await pb.collection("historialanimales").getFullList({
-                filter: `animal='${a.id}'`,
-                
-            });
-            historial = historial.concat(recordsa)
-        }
+        const recordsa = await pb.collection("historialanimales").getFullList({
+            filter: `animal.cab.user='${cab.id}'`,
+            expand:"animal,animal.cab"
+            
+        });
+        historial = recordsa
+        //for(let i = 0;i<animales.length;i++){
+        //    let a = animales[i]
+        //    const recordsa = await pb.collection("historialanimales").getFullList({
+        //        filter: `animal='${a.id}'`,
+        //        
+        //    });
+        //    historial = historial.concat(recordsa)
+        //}
         
     }
     async function getAnimales() {
@@ -223,6 +229,7 @@
                 )                
         ;
     }
+    //es solamente la clave porque es el contador del ultimo estado de la aplicacion
     function acumularContador(contador, clave, peso, lista) {
         if (!contador[clave]) {
             contador[clave] = {
@@ -239,7 +246,7 @@
         let movimientos_lotes = [];
         let movimientos_rodeos = [];
         let movimientos_categorias = [];
-        let primer_estado = estados[0];
+        
         if (estados.length == 1) {
             let estado_inicio = estados[0];
             let movimiento_lote = {
@@ -434,12 +441,13 @@
 
         for (let i = 0; i < historiarows.length; i++) {
             let h = historiarows[i];
-            let primer_estado = h.estados[0];
+
             let ultimo_estado = h.estados[h.estados.length - 1];
             let fila = { ...ultimo_estado };
             let peso = ultimo_estado.peso ? ultimo_estado.peso : 0;
             let movimientos = calcularMovimientos(h.estados)
             //lote
+            //ultimo_estado
             acumularContador(contadorlotes, ultimo_estado.lote, peso, lotes);
             //rodeos
             acumularContador(contadorrodeos, ultimo_estado.rodeo, peso, rodeos);

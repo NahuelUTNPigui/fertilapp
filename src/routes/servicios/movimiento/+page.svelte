@@ -52,6 +52,8 @@
     let categoria = $state("");
     let sexo = $state("H");
     let estado = $state("");
+    let raza = $state("");
+    let color = $state("");
     let rodeoseleccion = $state([]);
     let loteseleccion = $state([]);
     let categoriaseleccion = $state([]);
@@ -63,6 +65,8 @@
         categoria: "",
         sexo: "",
         estado: "",
+        raza: "",
+        color: "",
         rodeoseleccion: [],
         loteseleccion: [],
         categoriaseleccion: [],
@@ -135,6 +139,8 @@
         rodeo = proxyfiltros.rodeo;
         categoria = proxyfiltros.categoria;
         sexo = proxyfiltros.sexo;
+        raza = proxyfiltros.raza;
+        color = proxyfiltros.color;
         estado = proxyfiltros.estado;
         rodeoseleccion = proxyfiltros.rodeoseleccion;
         loteseleccion = proxyfiltros.loteseleccion;
@@ -147,6 +153,8 @@
         proxyfiltros.rodeo = rodeo;
         proxyfiltros.categoria = categoria;
         proxyfiltros.sexo = sexo;
+        proxyfiltros.raza = raza;
+        proxyfiltros.color = color;
         proxyfiltros.estado = estado;
         proxyfiltros.rodeoseleccion = rodeoseleccion;
         proxyfiltros.loteseleccion = loteseleccion;
@@ -168,6 +176,16 @@
                 a.caravana
                     .toLocaleLowerCase()
                     .includes(buscar.toLocaleLowerCase()),
+            );
+        }
+        if (raza != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.raza.toLocaleLowerCase().includes(raza.toLocaleLowerCase()),
+            );
+        }
+        if (color != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.color.toLocaleLowerCase().includes(color.toLocaleLowerCase()),
             );
         }
         if (sexo != "") {
@@ -921,57 +939,49 @@
                         {filterUpdate}
                     />
                 </div>
-                <div class="hidden">
-                    <label for="rodeos" class="label">
-                        <span class="label-text text-base">Rodeos</span>
+                <div class="my-0 py-0">
+                    <label for="raza" class="label mb-0">
+                        <span class="label-text text-base">Raza</span>
                     </label>
                     <label class="input-group">
-                        <select
+                        <input
+                            type="text"
                             class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                            bind:value={rodeo}
-                            onchange={filterUpdate}
-                        >
-                            <option value="">Todos</option>
-                            {#each rodeos as r}
-                                <option value={r.id}>{r.nombre}</option>
-                            {/each}
-                        </select>
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={raza}
+                            oninput={filterUpdate}
+                        />
                     </label>
                 </div>
-                <div class="hidden">
-                    <label for="lotes" class="label">
-                        <span class="label-text text-base">Lotes</span>
+                <div class="my-0 py-0">
+                    <label for="color" class="label mb-0">
+                        <span class="label-text text-base">Color</span>
                     </label>
                     <label class="input-group">
-                        <select
+                        <input
+                            type="text"
                             class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `}
-                            bind:value={lote}
-                            onchange={filterUpdate}
-                        >
-                            <option value="">Todos</option>
-                            {#each lotes as r}
-                                <option value={r.id}>{r.nombre}</option>
-                            {/each}
-                        </select>
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={color}
+                            oninput={filterUpdate}
+                        />
                     </label>
                 </div>
-                <button class="btn btn-neutral" onclick={limpiar}>
-                    Limpiar
-                </button>
+                
             </div>
         {/if}
     </div>
@@ -1047,6 +1057,9 @@
                     <th class="text-base">Peso</th>
                     <th class="text-base">Rodeo</th>
                     <th class="text-base">Lote</th>
+                    <th class="text-base">Raza</th>
+                    <th class="text-base">Color</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -1104,6 +1117,12 @@
                         >
                         <td class="text-base">{a.expand?.lote?.nombre || ""}</td
                         >
+                        <td>
+                            {a.raza}
+                        </td>
+                        <td>
+                            {a.color}
+                        </td>
                     </tr>
                 {/each}
             </tbody>
@@ -1261,6 +1280,18 @@
                                         ? a.expand.rodeo.nombre
                                         : ""
                                     : ""}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Raza:</span>
+                            <span class="font-semibold">
+                                {a.raza}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Color:</span>
+                            <span class="font-semibold">
+                                {a.color}
                             </span>
                         </div>
                     </div>

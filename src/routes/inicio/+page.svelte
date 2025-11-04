@@ -44,6 +44,7 @@
     import InicioTratamiento from "$lib/components/inicio/Tratamiento.svelte";
     import InicioServicio from "$lib/components/inicio/Servicio.svelte";
     import InicioObservacion from "$lib/components/inicio/Observacion.svelte";
+    import { goto } from "$app/navigation";
     import { dolar } from "$lib/stores/dolarprecio.svelte";
     import { getDolarPrice } from "$lib/stores/dolar";
     let ruta = import.meta.env.VITE_RUTA;

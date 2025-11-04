@@ -1,49 +1,54 @@
 <script>
     import Navbarr from "$lib/components/Navbarr.svelte";
-    import PocketBase from 'pocketbase'
-    import Swal from 'sweetalert2';
-    import { onMount } from 'svelte';
-    import { slide } from 'svelte/transition';
-    import estilos from '$lib/stores/estilos';
-    import { createCaber } from '$lib/stores/cab.svelte';
+    import PocketBase from "pocketbase";
+    import Swal from "sweetalert2";
+    import { onMount } from "svelte";
+    import { slide } from "svelte/transition";
+    import estilos from "$lib/stores/estilos";
+    import { createCaber } from "$lib/stores/cab.svelte";
     import categorias from "$lib/stores/categorias";
     import sexos from "$lib/stores/sexos";
-    import {capitalize} from "$lib/stringutil/lib"
-    import {guardarHistorial} from "$lib/historial/lib"
+    import { capitalize } from "$lib/stringutil/lib";
+    import { guardarHistorial } from "$lib/historial/lib";
     import MultiSelect from "$lib/components/MultiSelect.svelte";
-    import { getEstadoNombre,getEstadoColor } from "$lib/components/estadosutils/lib";
-    import { getSexoNombre } from '$lib/stringutil/lib';
+    import {
+        getEstadoNombre,
+        getEstadoColor,
+    } from "$lib/components/estadosutils/lib";
+    import { getSexoNombre } from "$lib/stringutil/lib";
     import { shorterWord } from "$lib/stringutil/lib";
     //FILTROS
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
-    let ruta = import.meta.env.VITE_RUTA
-    let pre = import.meta.env.VITE_PRE
+    let ruta = import.meta.env.VITE_RUTA;
+    let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
-    const HOY = new Date().toISOString().split("T")[0]
+    const HOY = new Date().toISOString().split("T")[0];
     const today = new Date();
-    const DESDE = new Date(today.getFullYear(), today.getMonth() - 1, 1);    
+    const DESDE = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    let caber = createCaber()
-    let cab = caber.cab
+    let caber = createCaber();
+    let cab = caber.cab;
 
     //boton
-    let textoboton = $state("Mover")
+    let textoboton = $state("Mover");
     //Datos animales
-    let animales = $state([])
-    let animalesrows = $state([])
+    let animales = $state([]);
+    let animalesrows = $state([]);
     //Filtros
-    let buscar = $state("")
-    let lote = $state("")
-    let rodeo = $state("")
-    let loteseleccion = $state([])
-    let rodeoseleccion = $state([])
-    let categoriaseleccion = $state([])
-    let categoria = $state("")
-    let sexo = $state("")
+    let buscar = $state("");
+    let lote = $state("");
+    let rodeo = $state("");
+    let loteseleccion = $state([]);
+    let rodeoseleccion = $state([]);
+    let categoriaseleccion = $state([]);
+    let categoria = $state("");
+    let sexo = $state("");
+    let raza = $state("");
+    let color = $state("");
 
-    let lotes = $state([])
-    let rodeos = $state([])
+    let lotes = $state([]);
+    let rodeos = $state([]);
 
     let defaultfiltro = {
         buscar: "",
@@ -54,46 +59,48 @@
         sexo: "",
         lote: "",
         rodeo: "",
+        raza: "",
+        color: "",
     };
     let proxyfiltros = $state({
         ...defaultfiltro,
     });
     let proxy = createStorageProxy("pesajesanimales", defaultfiltro);
 
-    let tipos = $state([])
-    let isOpenFilter = $state(false)
+    let tipos = $state([]);
+    let isOpenFilter = $state(false);
     //Seleccionados
-    let selectanimales = $state([])
-    let selecthashmap = $state({})
-    let todos = $state(false)
-    let algunos = $state(false)
-    let ninguno = $state(true)
+    let selectanimales = $state([]);
+    let selecthashmap = $state({});
+    let todos = $state(false);
+    let algunos = $state(false);
+    let ninguno = $state(true);
 
     //movimiento
-    let fecha = $state("")
-    let nuevospesos = $state({})
+    let fecha = $state("");
+    let nuevospesos = $state({});
 
     //Seleecionar
-    let selectcategoria = $state(true)
-    let selectlote = $state(false)
-    let selectrodeo = $state(false)
-    let selecttratamiento = $state(false)
+    let selectcategoria = $state(true);
+    let selectlote = $state(false);
+    let selectrodeo = $state(false);
+    let selecttratamiento = $state(false);
 
-    function clickFilter(){
-        isOpenFilter = !isOpenFilter
+    function clickFilter() {
+        isOpenFilter = !isOpenFilter;
     }
-    function limpiar(){
-        selectanimales = []
-        let lista = []
-        for (const [key, value ] of Object.entries(selecthashmap)) {
-            lista.push(key)
+    function limpiar() {
+        selectanimales = [];
+        let lista = [];
+        for (const [key, value] of Object.entries(selecthashmap)) {
+            lista.push(key);
         }
-        for(let i = 0;i<lista.length;i++){
-            selecthashmap[lista[i]] = null
+        for (let i = 0; i < lista.length; i++) {
+            selecthashmap[lista[i]] = null;
         }
-        algunos = false
-        todos = false
-        ninguno = true
+        algunos = false;
+        todos = false;
+        ninguno = true;
     }
     function setFilters() {
         buscar = proxyfiltros.buscar;
@@ -104,6 +111,8 @@
         sexo = proxyfiltros.sexo;
         lote = proxyfiltros.lote;
         rodeo = proxyfiltros.rodeo;
+        raza = proxyfiltros.raza;
+        color = proxyfiltros.color;
     }
 
     function setProxyFilter() {
@@ -115,6 +124,8 @@
         proxyfiltros.sexo = sexo;
         proxyfiltros.lote = lote;
         proxyfiltros.rodeo = rodeo;
+        proxyfiltros.color = color;
+        proxyfiltros.raza = raza;
     }
 
     function limpiarFiltros() {
@@ -122,230 +133,252 @@
 
         setFilters();
         filterUpdate();
-    }   
-    function filterUpdate(){
+    }
+    function filterUpdate() {
         setProxyFilter();
         proxy.save(proxyfiltros);
-        animalesrows = animales
-        if(buscar != ""){
-            animalesrows = animalesrows.filter(a=>a.caravana.toLocaleLowerCase().includes(buscar.toLocaleLowerCase()))
+        animalesrows = animales;
+        if (buscar != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.caravana
+                    .toLocaleLowerCase()
+                    .includes(buscar.toLocaleLowerCase()),
+            );
         }
-        if(sexo != ""){
-            animalesrows = animalesrows.filter(a=>a.sexo == sexo)
+        if (raza != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.raza.toLocaleLowerCase().includes(raza.toLocaleLowerCase()),
+            );
         }
-        if(rodeoseleccion.length != 0){
-            if(rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1"){
-                animalesrows = animalesrows.filter(a=>!a.rodeo)
-            }
-            else{
-                animalesrows = animalesrows.filter(a=>rodeoseleccion.includes(a.rodeo))
-                
+        if (color != "") {
+            animalesrows = animalesrows.filter((a) =>
+                a.color.toLocaleLowerCase().includes(color.toLocaleLowerCase()),
+            );
+        }
+        if (sexo != "") {
+            animalesrows = animalesrows.filter((a) => a.sexo == sexo);
+        }
+        if (rodeoseleccion.length != 0) {
+            if (rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1") {
+                animalesrows = animalesrows.filter((a) => !a.rodeo);
+            } else {
+                animalesrows = animalesrows.filter((a) =>
+                    rodeoseleccion.includes(a.rodeo),
+                );
             }
         }
-        if(loteseleccion.length != 0){
-            if(loteseleccion.length == 1 && loteseleccion[0] == "-1"){
-                animalesrows = animalesrows.filter(a=>!a.lote)
+        if (loteseleccion.length != 0) {
+            if (loteseleccion.length == 1 && loteseleccion[0] == "-1") {
+                animalesrows = animalesrows.filter((a) => !a.lote);
+            } else {
+                animalesrows = animalesrows.filter((a) =>
+                    loteseleccion.includes(a.lote),
+                );
             }
-            else{
-                animalesrows = animalesrows.filter(a=>loteseleccion.includes(a.lote))
-            }
-            
         }
-        if(categoriaseleccion.length != 0){
-            if(categoriaseleccion.length == 1 && categoriaseleccion[0] == "-1"){
-                animalesrows = animalesrows.filter(a=>!a.categoria)
+        if (categoriaseleccion.length != 0) {
+            if (
+                categoriaseleccion.length == 1 &&
+                categoriaseleccion[0] == "-1"
+            ) {
+                animalesrows = animalesrows.filter((a) => !a.categoria);
+            } else {
+                animalesrows = animalesrows.filter((a) =>
+                    categoriaseleccion.includes(a.categoria),
+                );
             }
-            else{
-                animalesrows = animalesrows.filter(a=>categoriaseleccion.includes(a.categoria))
-            }
-            
         }
-        if(categoria != ""){
-            animalesrows = animalesrows.filter(a=>a.categoria == categoria)
+        if (categoria != "") {
+            animalesrows = animalesrows.filter((a) => a.categoria == categoria);
         }
-
     }
 
-    function ordenarNombre(lista){
-        lista.sort((r1,r2)=>r1.nombre.toLocaleLowerCase()>r2.nombre.toLocaleLowerCase()?1:-1)
+    function ordenarNombre(lista) {
+        lista.sort((r1, r2) =>
+            r1.nombre.toLocaleLowerCase() > r2.nombre.toLocaleLowerCase()
+                ? 1
+                : -1,
+        );
     }
 
-    function clickAnimal(id){
-        
-        if(selecthashmap[id]){
-            if(todos){
-                todos = false
-                algunos = true
+    function clickAnimal(id) {
+        if (selecthashmap[id]) {
+            if (todos) {
+                todos = false;
+                algunos = true;
             }
-            delete selecthashmap[id]
-        }
-        else{
-            if(ninguno){
-                algunos = true
-                ninguno =  false
+            delete selecthashmap[id];
+        } else {
+            if (ninguno) {
+                algunos = true;
+                ninguno = false;
             }
-            let a = animales.filter(an=>an.id==id)[0]
+            let a = animales.filter((an) => an.id == id)[0];
             selecthashmap[id] = {
-                ...a
-            }
+                ...a,
+            };
         }
-        
     }
 
-    function clickTodos(){
-        if(todos){
-            todos = false
-            ninguno = true
-            algunos = false
-            selecthashmap = {}
-        }
-        else if(ninguno){
-            ninguno = false
-            todos = true
-            for(let i = 0;i<animalesrows.length;i++){
-                let a = animalesrows[i]
+    function clickTodos() {
+        if (todos) {
+            todos = false;
+            ninguno = true;
+            algunos = false;
+            selecthashmap = {};
+        } else if (ninguno) {
+            ninguno = false;
+            todos = true;
+            for (let i = 0; i < animalesrows.length; i++) {
+                let a = animalesrows[i];
                 selecthashmap[animalesrows[i].id] = {
-                    ...a
-                }
+                    ...a,
+                };
             }
+        } else if (algunos) {
+            selecthashmap = {};
+            algunos = false;
+            todos = false;
+            ninguno = true;
         }
-        else if (algunos){
-            selecthashmap = {}
-            algunos = false
-            todos = false
-            ninguno = true
-        }
-        
     }
 
-    async function getLotes(){
-        const records = await pb.collection('lotes').getFullList({
-            filter:`active = true && cab ~ '${cab.id}'`,
-            sort: 'nombre',
+    async function getLotes() {
+        const records = await pb.collection("lotes").getFullList({
+            filter: `active = true && cab ~ '${cab.id}'`,
+            sort: "nombre",
         });
-        lotes = records
-        ordenarNombre(lotes)
+        lotes = records;
+        ordenarNombre(lotes);
     }
-    async function getRodeos(){
-        const records = await pb.collection('rodeos').getFullList({
-            filter:`active = true && cab ~ '${cab.id}'`,
-            sort: 'nombre',
+    async function getRodeos() {
+        const records = await pb.collection("rodeos").getFullList({
+            filter: `active = true && cab ~ '${cab.id}'`,
+            sort: "nombre",
         });
-        rodeos = records
+        rodeos = records;
         //ordenarNombre(rodeos)
     }
-    async function getTipos(){
-        const records = await pb.collection('tipotratamientos').getFullList({
-            filter : `(cab='${cab.id}' || generico = true) && active = true`,
-            sort: '-created',
+    async function getTipos() {
+        const records = await pb.collection("tipotratamientos").getFullList({
+            filter: `(cab='${cab.id}' || generico = true) && active = true`,
+            sort: "-created",
         });
-        tipos = records
-        tipos.sort((tp1,tp2)=>tp1.nombre>tp2.nombre?1:-1)
+        tipos = records;
+        tipos.sort((tp1, tp2) => (tp1.nombre > tp2.nombre ? 1 : -1));
     }
-    async function getAnimales(){
+    async function getAnimales() {
         const recordsa = await pb.collection("animales").getFullList({
-            filter:`active=true && delete=false && cab='${cab.id}'`,
-            expand:"rodeo,lote"
-        })
-        
-        animales = recordsa
-        animales.sort((a1,a2)=>a1.caravana>a2.caravana?1:-1)
-        animalesrows = animales
-        filterUpdate()
-    }
-    function openNewModal(){
-        
-        if(ninguno){
-            Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            return
-        }
-        selectanimales = []
-        for (const [key, value ] of Object.entries(selecthashmap)) {
-            if(value != null){
-                selectanimales.push({...value,pesonuevo:value.peso})
-            }
-        }
-        if(selectanimales.length==0){
-            Swal.fire("Error pesaje","No hay animales seleccionados","error")
-            return
-        }
-        nuevoModal.showModal()   
-        
+            filter: `active=true && delete=false && cab='${cab.id}'`,
+            expand: "rodeo,lote",
+        });
 
+        animales = recordsa;
+        animales.sort((a1, a2) => (a1.caravana > a2.caravana ? 1 : -1));
+        animalesrows = animales;
+        filterUpdate();
     }
-    async function crearPesaje(){
-        let errores = false
-        let pesajeserror = []
-        for(let i = 0;i<selectanimales.length ;i++){
-            
-            let ps = selectanimales[i]
-            
-            try{
+    function openNewModal() {
+        if (ninguno) {
+            Swal.fire("Error pesaje", "No hay animales seleccionados", "error");
+            return;
+        }
+        selectanimales = [];
+        for (const [key, value] of Object.entries(selecthashmap)) {
+            if (value != null) {
+                selectanimales.push({ ...value, pesonuevo: value.peso });
+            }
+        }
+        if (selectanimales.length == 0) {
+            Swal.fire("Error pesaje", "No hay animales seleccionados", "error");
+            return;
+        }
+        nuevoModal.showModal();
+    }
+    async function crearPesaje() {
+        let errores = false;
+        let pesajeserror = [];
+        for (let i = 0; i < selectanimales.length; i++) {
+            let ps = selectanimales[i];
+
+            try {
                 let dataupdate = {
-                    peso:ps.pesonuevo
-                }
-                let data ={
-                    pesonuevo:ps.pesonuevo,
-                    pesoanterior:ps.peso,
-                    fecha:fecha+" 03:00:00",
-                    animal:ps.id
-                }
-                await guardarHistorial(pb,selectanimales[i].id)
-                let r = await pb.collection('animales').update(selectanimales[i].id, dataupdate);
-                await pb.collection("pesaje").create(data)
-            }
-            catch(err){
-                pesajeserror.push(ps.id)
-                console.error(err)
-                errores = true
-            }
-        }
-        if(errores){
-            Swal.fire("Error pesaje","Hubo algun error en algun pesaje","error")
-        }
-        else{
-            Swal.fire("Éxito pesaje","Se lograron registar todos los pesajes","success")
-        }
-        
-        for(let i = 0;i<selectanimales.length;i++){
-            let ps = selectanimales[i]
-            let i_error = pesajeserror.findIndex(pid=>pid==ps.id)
-            if(i_error == -1){
-                
-                delete selecthashmap[ps.id]
+                    peso: ps.pesonuevo,
+                };
+                let data = {
+                    pesonuevo: ps.pesonuevo,
+                    pesoanterior: ps.peso,
+                    fecha: fecha + " 03:00:00",
+                    animal: ps.id,
+                };
+                await guardarHistorial(pb, selectanimales[i].id);
+                let r = await pb
+                    .collection("animales")
+                    .update(selectanimales[i].id, dataupdate);
+                await pb.collection("pesaje").create(data);
+            } catch (err) {
+                pesajeserror.push(ps.id);
+                console.error(err);
+                errores = true;
             }
         }
-        selectanimales =[]
-        
-        await getAnimales()
-        filterUpdate()
-        
-        
-        
+        if (errores) {
+            Swal.fire(
+                "Error pesaje",
+                "Hubo algun error en algun pesaje",
+                "error",
+            );
+        } else {
+            Swal.fire(
+                "Éxito pesaje",
+                "Se lograron registar todos los pesajes",
+                "success",
+            );
+        }
+
+        for (let i = 0; i < selectanimales.length; i++) {
+            let ps = selectanimales[i];
+            let i_error = pesajeserror.findIndex((pid) => pid == ps.id);
+            if (i_error == -1) {
+                delete selecthashmap[ps.id];
+            }
+        }
+        selectanimales = [];
+
+        await getAnimales();
+        filterUpdate();
     }
-    onMount(async ()=>{
+    onMount(async () => {
         proxyfiltros = proxy.load();
         setFilters();
-        await getAnimales()
-        await getRodeos()
-        await getLotes()
-        await getTipos()
-    })
+        await getAnimales();
+        await getRodeos();
+        await getLotes();
+        await getTipos();
+    });
 </script>
+
 <Navbarr>
     <div class="grid grid-cols-3 mx-1 lg:mx-10 mt-1 w-11/12">
         <div>
-            <h1 class="text-2xl">Pesajes </h1>
+            <h1 class="text-2xl">Pesajes</h1>
         </div>
         <div class="flex col-span-2 gap-1 justify-end">
-            <button class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" onclick={()=>openNewModal()}>
-                <span  class="text-xl">{capitalize("nuevo")}</span>
+            <button
+                class={`btn btn-primary rounded-lg ${estilos.btntext}`}
+                data-theme="forest"
+                onclick={() => openNewModal()}
+            >
+                <span class="text-xl">{capitalize("nuevo")}</span>
             </button>
-            <a class={`btn btn-primary rounded-lg ${estilos.btntext}`} data-theme="forest" href={pre+"/pesajes/lista"}>
-                <span  class="text-xl">Ultimos</span>
+            <a
+                class={`btn btn-primary rounded-lg ${estilos.btntext}`}
+                data-theme="forest"
+                href={pre + "/pesajes/lista"}
+            >
+                <span class="text-xl">Ultimos</span>
             </a>
         </div>
-        
     </div>
     <div
         class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10"
@@ -368,34 +401,42 @@
         </div>
     </div>
     <div class="w-11/12 m-1 mb-2 lg:mx-10 rounded-lg bg-transparent">
-        <button 
-            aria-label="Filtrar" 
-            class="w-full"
-            onclick={clickFilter}
-        >
+        <button aria-label="Filtrar" class="w-full" onclick={clickFilter}>
             <div class="flex justify-between items-center px-1">
                 <h1 class="font-semibold text-lg py-2">Filtros</h1>
-                <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter? 'transform rotate-180':''}`}
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class={`h-5 w-5 transition-all duration-300 ${isOpenFilter ? "transform rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                    />
                 </svg>
-            </div> 
+            </div>
         </button>
         <div>
             <span class="text-lg my-1"
-                >Total de animales seleccionados: {Object.keys(selecthashmap).length}</span
+                >Total de animales seleccionados: {Object.keys(selecthashmap)
+                    .length}</span
             >
         </div>
         {#if isOpenFilter}
-            <div transition:slide class="grid grid-cols-1 lg:grid-cols-4  m-1 gap-2 w-11/12" >
+            <div
+                transition:slide
+                class="grid grid-cols-1 lg:grid-cols-4 m-1 gap-2 w-11/12"
+            >
                 <div>
-                    <label for = "sexo" class="label">
+                    <label for="sexo" class="label">
                         <span class="label-text text-base">Sexo</span>
                     </label>
-                    <label class="input-group ">
-                        <select 
+                    <label class="input-group">
+                        <select
                             class={`
                                 select select-bordered w-full
                                 rounded-md
@@ -407,76 +448,98 @@
                             bind:value={sexo}
                             onchange={filterUpdate}
                         >
-                                <option value="">Todos</option>
-                                {#each sexos as s}
-                                    <option value={s.id}>{s.nombre}</option>
-                                {/each}
+                            <option value="">Todos</option>
+                            {#each sexos as s}
+                                <option value={s.id}>{s.nombre}</option>
+                            {/each}
                         </select>
                     </label>
                 </div>
                 <div class="mt-0">
                     <MultiSelect
-                        opciones={[{id:"-1",nombre:"Sin rodeo"}].concat(rodeos)}
+                        opciones={[{ id: "-1", nombre: "Sin rodeo" }].concat(
+                            rodeos,
+                        )}
                         bind:valores={rodeoseleccion}
                         etiqueta="Rodeos"
-                        filterUpdate = {filterUpdate}
+                        {filterUpdate}
                     />
                 </div>
                 <div class="mt-0">
                     <MultiSelect
-                        opciones={[{id:"-1",nombre:"Sin lote"}].concat(lotes)}
+                        opciones={[{ id: "-1", nombre: "Sin lote" }].concat(
+                            lotes,
+                        )}
                         bind:valores={loteseleccion}
                         etiqueta="Lotes"
-                        filterUpdate = {filterUpdate}
+                        {filterUpdate}
                     />
                 </div>
                 <div class="">
                     <MultiSelect
-                        opciones={[{id:"-1",nombre:"Sin categoria"}].concat(categorias)}
+                        opciones={[
+                            { id: "-1", nombre: "Sin categoria" },
+                        ].concat(categorias)}
                         bind:valores={categoriaseleccion}
                         etiqueta="Categorias"
-                        
-                        filterUpdate = {filterUpdate}
+                        {filterUpdate}
                     />
                 </div>
-                <div class="hidden">
-                    <label for = "categorias" class="label">
-                        <span class="label-text text-base">Categorias</span>
+                <div class="my-0 py-0">
+                    <label for="raza" class="label mb-0">
+                        <span class="label-text text-base">Raza</span>
                     </label>
-                    <label class="input-group ">
-                        <select 
+                    <label class="input-group">
+                        <input
+                            type="text"
                             class={`
-                                select select-bordered w-full
-                                rounded-md
-                                focus:outline-none 
-                                focus:ring-2 
-                                focus:ring-green-500 focus:border-green-500
-                                ${estilos.bgdark2}
-                            `} 
-                            bind:value={categoria}
-                            onchange={filterUpdate}
-                        >
-                                <option value="">Todos</option>
-                                {#each categorias as r}
-                                    <option value={r.id}>{r.nombre}</option>    
-                                {/each}
-                        </select>
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={raza}
+                            oninput={filterUpdate}
+                        />
                     </label>
                 </div>
-                <button class="btn btn-neutral" onclick={limpiar}>
-                    Limpiar
-                </button>
-            
+                <div class="my-0 py-0">
+                    <label for="color" class="label mb-0">
+                        <span class="label-text text-base">Color</span>
+                    </label>
+                    <label class="input-group">
+                        <input
+                            type="text"
+                            class={`
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                            bind:value={color}
+                            oninput={filterUpdate}
+                        />
+                    </label>
+                </div>
+                
             </div>
         {/if}
     </div>
 
-    <div class="hidden w-full md:grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-11/12 overflow-x-auto" >
-        <table class="table table-lg w-full " >
+    <div
+        class="hidden w-full md:grid grid-cols-1 justify-items-center mx-1 lg:mx-10 lg:w-11/12 overflow-x-auto"
+    >
+        <table class="table table-lg w-full">
             <thead>
                 <tr>
                     <th class="px-1 p-0 m-0">
-                        <button    
+                        <button
                             aria-label="Todos"
                             onclick={clickTodos}
                             class={`
@@ -486,29 +549,62 @@
                             `}
                         >
                             {#if todos}
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="size-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
+                                </svg>
                             {/if}
                             {#if ninguno}
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="size-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
+                                </svg>
                             {/if}
                             {#if algunos}
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>      
-                            {/if}                        
-                          
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="size-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
+                                </svg>
+                            {/if}
                         </button>
                     </th>
-                    <th class="text-base mx-1 px-1 ">Caravana</th>
+                    <th class="text-base mx-1 px-1">Caravana</th>
                     <th class="text-base mx-1 px-1">Categoria</th>
                     <th class="text-base mx-1 px-1">Peso</th>
                     <th class="text-base mx-1 px-1">Rodeo</th>
                     <th class="text-base mx-1 px-1">Lote</th>
-                    
+                    <th class="text-base mx-1 px-1">Raza</th>
+                    <th class="text-base mx-1 px-1">Color</th>
                 </tr>
             </thead>
             <tbody>
@@ -517,20 +613,42 @@
                         <td class="px-1 p-0 m-0">
                             <button
                                 aria-label="fila"
-                                onclick={()=>clickAnimal(a.id)}
+                                onclick={() => clickAnimal(a.id)}
                                 class={`
                                     font-medium bg-transparent rounded-lg
                                     px-3 py-3 text-base
-                                    ${selecthashmap[a.id]?estilos.danger:estilos.primario}
+                                    ${selecthashmap[a.id] ? estilos.danger : estilos.primario}
                                 `}
                             >
                                 {#if selecthashmap[a.id]}
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                    </svg>                                  
-                                {:else}             
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="size-6"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
+                                    </svg>
+                                {:else}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="size-6"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
                                     </svg>
                                 {/if}
                             </button>
@@ -538,17 +656,26 @@
                         <td class="text-base mx-1 px-0">{a.caravana}</td>
                         <td class="text-base mx-1 px-0">{a.categoria}</td>
                         <td class="text-base mx-1 px-0">{a.peso}</td>
-                        <td class="text-base mx-1 px-0">{a.expand?.rodeo?.nombre||''}</td>
-                        <td class="text-base mx-1 px-0">{a.expand?.lote?.nombre||''}</td>
-                        
+                        <td class="text-base mx-1 px-0"
+                            >{a.expand?.rodeo?.nombre || ""}</td
+                        >
+                        <td class="text-base mx-1 px-0"
+                            >{a.expand?.lote?.nombre || ""}</td
+                        >
+                        <td>
+                            {a.raza}
+                        </td>
+                        <td>
+                            {a.color}
+                        </td>
                     </tr>
                 {/each}
             </tbody>
         </table>
     </div>
-    <div class="block  md:hidden justify-items-center mx-1">
+    <div class="block md:hidden justify-items-center mx-1">
         <div class="w-full flex justify-start">
-            <button    
+            <button
                 aria-label="Todos"
                 onclick={clickTodos}
                 class={`
@@ -558,129 +685,199 @@
                 `}
             >
                 {#if todos}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-6"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
                     </svg>
                 {/if}
                 {#if ninguno}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-6"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
                     </svg>
                 {/if}
                 {#if algunos}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>      
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-6"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
+                    </svg>
                 {/if}
-                                 
-                <span class="mt-1">
-                    Seleccionar todos 
-                </span>
+
+                <span class="mt-1"> Seleccionar todos </span>
             </button>
-            
-           
         </div>
-        
+
         {#each animalesrows as a}
-        <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
-            <div class="block p-4">
-                <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-medium">
-                        <button
-                            aria-label="fila"
-                            onclick={()=>clickAnimal(a.id)}
-                            class={`
+            <div
+                class="card w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900"
+            >
+                <div class="block p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="font-medium">
+                            <button
+                                aria-label="fila"
+                                onclick={() => clickAnimal(a.id)}
+                                class={`
                                 font-medium bg-transparent rounded-lg
                                 px-3 py-3 text-base
-                                ${selecthashmap[a.id]?estilos.danger:estilos.primario}
+                                ${selecthashmap[a.id] ? estilos.danger : estilos.primario}
                             `}
-                        >
-                            {#if selecthashmap[a.id]}
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>                                  
-                            {:else}             
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                            {/if}
-                        </button>
-                        {a.caravana}
-                    </h3>
-                    {#if a.sexo == "H" && a.prenada != 1}
-                        <div class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}>{getEstadoNombre(a.prenada)}</div>
-                    {/if}
-                </div>
-                <div class="grid grid-cols-2 gap-y-2">
-                    <div class="flex items-start">
-                      <span class="font-semibold">{getSexoNombre(a.sexo)}</span>
+                            >
+                                {#if selecthashmap[a.id]}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="size-6"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
+                                    </svg>
+                                {:else}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="size-6"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                        />
+                                    </svg>
+                                {/if}
+                            </button>
+                            {a.caravana}
+                        </h3>
+                        {#if a.sexo == "H" && a.prenada != 1}
+                            <div
+                                class={`badge badge-outline badge-${getEstadoColor(a.prenada)}`}
+                            >
+                                {getEstadoNombre(a.prenada)}
+                            </div>
+                        {/if}
                     </div>
-                    <div class="flex items-start">
-                      <span >Categoría:</span> 
-                      <span class="font-semibold">
-                        {a.categoria}
-                      </span>
-                      
-                    </div>
-                    <div class="flex items-start">
-                        <span >Peso:</span> 
-                        <span class="font-semibold">
-                          {a.peso}
-                        </span>
-                        
-                      </div>
-                    <div class="flex items-start">
-                      <span >Lote:</span>
-                      <span class="font-semibold">
-                        {
-                            a.expand?
-                            a.expand.lote?
-                            a.expand.lote.nombre
-                            :""
-                            :""
-
-                        }
-                      </span> 
-                    </div>
-                    <div class="flex items-start">
-                        
-                      <span >Rodeo:</span> 
-                      <span class="font-semibold">
-                        {
-                            a.expand?
-                            a.expand.rodeo?
-                            a.expand.rodeo.nombre
-                            :""
-                            :""
-
-                        }
-                      </span>
-                      
+                    <div class="grid grid-cols-2 gap-y-2">
+                        <div class="flex items-start">
+                            <span class="font-semibold"
+                                >{getSexoNombre(a.sexo)}</span
+                            >
+                        </div>
+                        <div class="flex items-start">
+                            <span>Categoría:</span>
+                            <span class="font-semibold">
+                                {a.categoria}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Peso:</span>
+                            <span class="font-semibold">
+                                {a.peso}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Lote:</span>
+                            <span class="font-semibold">
+                                {a.expand
+                                    ? a.expand.lote
+                                        ? a.expand.lote.nombre
+                                        : ""
+                                    : ""}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Rodeo:</span>
+                            <span class="font-semibold">
+                                {a.expand
+                                    ? a.expand.rodeo
+                                        ? a.expand.rodeo.nombre
+                                        : ""
+                                    : ""}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Raza:</span>
+                            <span class="font-semibold">
+                                {a.raza}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Color:</span>
+                            <span class="font-semibold">
+                                {a.color}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         {/each}
     </div>
 </Navbarr>
-<dialog id="nuevoModal" class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle">
-    <div 
+<dialog
+    id="nuevoModal"
+    class="modal modal-top mt-10 ml-5 lg:items-start rounded-xl lg:modal-middle"
+>
+    <div
         class="
             modal-box w-11/12 max-w-xl
-            bg-gradient-to-br from-white to-gray-100 
+            bg-gradient-to-br from-white to-gray-100
             dark:from-gray-900 dark:to-gray-800
             "
     >
         <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl">✕</button>
+            <button
+                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 rounded-xl"
+                >✕</button
+            >
         </form>
-        
+
         <h3 class="text-lg font-bold">Movimiento</h3>
-        <label for = "fechapesaje" class="label">
+        <label for="fechapesaje" class="label">
             <span class="label-text text-base">Fecha </span>
         </label>
-        <label class="input-group ">
-            <input id ="fechapesaje" type="date" max={HOY}  
+        <label class="input-group">
+            <input
+                id="fechapesaje"
+                type="date"
+                max={HOY}
                 class={`
                     input input-bordered w-full
                     border border-gray-300 rounded-md
@@ -691,94 +888,86 @@
                 `}
                 bind:value={fecha}
             />
-            
         </label>
-        <div class="hidden w-full grid grid-cols-1 justify-items-center overflow-x-auto" >
-            <table class="table table-lg w-full " >
+        <div
+            class="hidden w-full grid grid-cols-1 justify-items-center overflow-x-auto"
+        >
+            <table class="table table-lg w-full">
                 <thead>
                     <tr>
                         <th class="text-base p-0">Caravana</th>
                         <th class="text-base p-0">Peso anterior</th>
-                        <th class="text-base ">Peso nuevo</th>
+                        <th class="text-base">Peso nuevo</th>
                     </tr>
-                    
                 </thead>
                 <tbody>
-                    {#each selectanimales as a,i}
+                    {#each selectanimales as a, i}
                         <tr>
                             <td class="text-base p-0">{a.caravana}</td>
                             <td class="text-base p-0">{a.peso}</td>
                             <td class="">
                                 <label class="input-group">
-
-                                
                                     <input
-                                    
-                                    bind:value={selectanimales[i].pesonuevo}
-                                    
-                                    class={`
+                                        bind:value={selectanimales[i].pesonuevo}
+                                        class={`
                                         input input-bordered w-full
                                         border border-gray-300 rounded-md
                                         focus:outline-none focus:ring-2 
                                         focus:ring-green-500 focus:border-green-500
                                         ${estilos.bgdark2}
                                     `}
-                                    
                                     />
                                 </label>
-                              </td>
-                            
+                            </td>
                         </tr>
                     {/each}
                 </tbody>
             </table>
         </div>
-        <div class="block  justify-items-center mx-1">
-            {#each selectanimales as a,i}
-            <div class="card  w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900">
-                <div class="block p-4">
-                    <div class="grid grid-cols-2 gap-y-2">
-                        <div class="flex items-start col-span-2">
-                            <span >Caravana:</span> 
-                            <span class="font-semibold">
-                              {shorterWord(a.caravana)}
-                            </span>
-                        </div>
-                        <div class="flex items-start col-span-2">
-                            <span >Peso:</span> 
-                            <span class="font-semibold">
-                              {a.peso}
-                            </span>
-                        </div>
-                        <div class="flex items-start col-span-2">
-                            <label class="input-group">
-
-                                
-                                <input
-                                
-                                bind:value={selectanimales[i].pesonuevo}
-                                
-                                class={`
+        <div class="block justify-items-center mx-1">
+            {#each selectanimales as a, i}
+                <div
+                    class="card w-full shadow-xl p-2 hover:bg-gray-200 dark:hover:bg-gray-900"
+                >
+                    <div class="block p-4">
+                        <div class="grid grid-cols-2 gap-y-2">
+                            <div class="flex items-start col-span-2">
+                                <span>Caravana:</span>
+                                <span class="font-semibold">
+                                    {shorterWord(a.caravana)}
+                                </span>
+                            </div>
+                            <div class="flex items-start col-span-2">
+                                <span>Peso:</span>
+                                <span class="font-semibold">
+                                    {a.peso}
+                                </span>
+                            </div>
+                            <div class="flex items-start col-span-2">
+                                <label class="input-group">
+                                    <input
+                                        bind:value={selectanimales[i].pesonuevo}
+                                        class={`
                                     input input-bordered w-full
                                     border border-gray-300 rounded-md
                                     focus:outline-none focus:ring-2 
                                     focus:ring-green-500 focus:border-green-500
                                     ${estilos.bgdark2}
                                 `}
-                                
-                                />
-                            </label>
+                                    />
+                                </label>
+                            </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
             {/each}
         </div>
-        <div class="modal-action justify-start ">
-            <form method="dialog" >
-                <button class="btn btn-success text-white" onclick={crearPesaje} >Crear pesaje</button>
-                <button class="btn btn-error text-white" >Cancelar</button>
+        <div class="modal-action justify-start">
+            <form method="dialog">
+                <button class="btn btn-success text-white" onclick={crearPesaje}
+                    >Crear pesaje</button
+                >
+                <button class="btn btn-error text-white">Cancelar</button>
             </form>
         </div>
     </div>

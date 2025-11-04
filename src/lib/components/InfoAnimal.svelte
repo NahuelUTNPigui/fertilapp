@@ -101,10 +101,10 @@
     </div>
 </div>
 {:else}
-<dir class="flex justify-start mx-0 px-0">
+    <div class="flex justify-start mx-0 px-0">
         <button 
         class={`${estilos.basico} ${estilos.chico} ${estilos.primario}`} 
             onclick={()=>verAnimal = true}
         >Ver animal</button>
-    </dir>
+    </div>
 {/if}

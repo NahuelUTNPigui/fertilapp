@@ -222,24 +222,19 @@
 
         cargado = true;
     }
-    function caravanaPadre(valor){
-        let ps = borrados.filter((p) => p.id == valor)
-        if(ps.length>0){
-            return ps[0].caravana
+    function caravanaPadre(valor) {
+        let ps = borrados.filter((p) => p.id == valor);
+        if (ps.length > 0) {
+            return ps[0].caravana;
+        } else {
+            return "No está";
         }
-        else{
-            return "No está"
-        }
-
     }
     function getNombrePadres(p_padres) {
         let ids = p_padres.split(",");
 
         let nombres = ids.reduce(
-            (acc, valor) =>
-                shorterWord(caravanaPadre(valor)) +
-                " , " +
-                acc,
+            (acc, valor) => shorterWord(caravanaPadre(valor)) + " , " + acc,
             "",
         );
 
@@ -319,9 +314,15 @@
                         >
                             <td
                                 class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b dark:border-gray-600"
-                                >{new Date(
-                                    s.fechadesde,
-                                ).toLocaleDateString()}</td
+                                >{s.fechadesde
+                                    ? new Date(
+                                          s.fechadesde,
+                                      ).toLocaleDateString()
+                                    : s.fechainseminacion
+                                      ? new Date(
+                                            s.fechainseminacion,
+                                        ).toLocaleDateString()
+                                      : ""}</td
                             >
                             <td
                                 class="text-base ml-3 pl-3 mr-1 pr-1 lg:ml-10 border-b dark:border-gray-600"

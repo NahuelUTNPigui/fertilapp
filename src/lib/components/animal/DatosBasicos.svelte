@@ -17,7 +17,8 @@
 
     import { guardarHistorial } from "$lib/historial/lib";
     import PredictSelect from "../PredictSelect.svelte";
-    import { shorterWord } from "$lib/stringutil/lib";
+    import { shorterWord,capitalize } from "$lib/stringutil/lib";
+    import InfoAnimal from "../InfoAnimal.svelte";
     let {
         caravana=$bindable(""),
         rodeo=$bindable(""),
@@ -26,10 +27,14 @@
         peso=$bindable(""),
         sexo=$bindable(""),
         nacimiento=$bindable({}),
+        padreobj=$bindable({}),
+        madreobj=$bindable({}),
         fechanacimiento=$bindable(""),
         categoria=$bindable(""),
         prenada=$bindable(0),
         rp=$bindable(""),
+        raza=$bindable(""),
+        color=$bindable(""),
         modohistoria = $bindable(),
         irPadre,
         userpermisos=$bindable([])
@@ -229,6 +234,18 @@
             const recordparicion = await pb
                 .collection("nacimientos")
                 .create(dataparicion);
+            if(padre !=""){
+                padreobj={id:padre,caravana:nombrepadre}
+            }
+            else{
+                padreobj={id:-1}
+            }
+            if(madre !=""){
+                madreobj={id:madre,caravana:nombremadre}
+            }
+            else{
+                madreobj={id:-1}
+            }
             let datanimal = {
                 nacimiento: recordparicion.id,
                 fechanacimiento: fecha + " 03:00:00",
@@ -307,6 +324,18 @@
             const recordparicion = await pb
                 .collection("nacimientos")
                 .update(idnacimiento, data);
+            if(padre !=""){
+                padreobj={id:padre,caravana:nombrepadre}
+            }
+            else{
+                padreobj={id:-1}
+            }
+            if(madre !=""){
+                madreobj={id:madre,caravana:nombremadre}
+            }
+            else{
+                madreobj={id:-1}
+            }
             await pb.collection("historialanimales").create(datahistorial);
         } catch (err) {
             console.error(err);
@@ -331,6 +360,8 @@
             lote,
             prenada,
             categoria,
+            raza,
+            color,
             rp,
         };
         //let datahistorial = {
@@ -625,10 +656,54 @@
             </label>
         {:else}
             <label
-                for="lote"
+                for="categoria"
                 class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
             >
-                {categoria}
+                {capitalize(categoria)}
+            </label>
+        {/if}
+    </div>
+    <div class="mb-1 lg:mb-0 col-span-2 lg:col-span-1">
+        <label for="raza" class="label">
+            <span class="label-text text-base">Raza</span>
+        </label>
+        {#if modoedicion}
+            <label class="input-group">
+                <input
+                    id="raza"
+                    type="text"
+                    class={`input input-bordered w-full ${estilos.bgdark2}`}
+                    bind:value={raza}
+                />
+            </label>
+        {:else}
+            <label
+                for="raza"
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+            >
+                {shorterWord(raza)}
+            </label>
+        {/if}
+    </div>
+    <div class="mb-1 lg:mb-0 col-span-2 lg:col-span-1">
+        <label for="peso" class="label">
+            <span class="label-text text-base">Color</span>
+        </label>
+        {#if modoedicion}
+            <label class="input-group">
+                <input
+                    id="color"
+                    type="text"
+                    class={`input input-bordered w-full ${estilos.bgdark2}`}
+                    bind:value={color}
+                />
+            </label>
+        {:else}
+            <label
+                for="color"
+                class={`block text-lg font-medium text-gray-700 dark:text-gray-300 mb-1 p-1`}
+            >
+                {shorterWord(color)}
             </label>
         {/if}
     </div>
@@ -756,40 +831,38 @@
             </label>
         </div>
     </div>
-    <div class="grid grid-cols-2 lg:grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 lg:gap-6 mx-1 mb-2">
         <div>
             <label for="nombremadre" class="label">
                 <span class="label-text text-base"
-                    >Madre: {nombremadre}</span
+                    >Madre: {nombremadre}
+                    </span
                 >
             </label>
-            <a
-                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
-                href={`${pre}/animales/${madre}`}
-                data-sveltekit-reload
-            >
-                Visitar perfil
-            </a>
-            <button
-                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm text-gray-700 dark:text-gray-300 mb-1"
-                onclick={async ()=>await irPadre(madre)}
-                
-            >
-                Boton Visitar perfil
-            </button>
+            
+            {#if madreobj.id != -1 }
+                <div class="flex justify-start mx-0 px-0">
+                    <button 
+                    class={`${estilos.basico} ${estilos.chico} ${estilos.primario}`} 
+                        onclick={async ()=>await irPadre(madreobj.id)}
+                    >Ver animal</button>
+                </div>
+            {/if}
         </div>
 
-        <div>
+        <div >
             <label for="nombrepadre" class="label">
                 <span class="label-text text-base">Padre: {nombrepadre}</span>
             </label>
-            <a
-                class="hidden cursor-pointer hover:font-bold hover:text-xl text-start px-1 block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                href={`${pre}/animales/${padre}`}
-                data-sveltekit-reload
-            >
-                Visitar perfil
-            </a>
+            
+            {#if padreobj.id != -1}
+                <div class="flex justify-start mx-0 px-0">
+                    <button 
+                    class={`${estilos.basico} ${estilos.chico} ${estilos.primario}`} 
+                        onclick={async ()=>await irPadre(padreobj.id)}
+                    >Ver animal</button>
+                </div>
+            {/if}
         </div>
     </div>
 {:else}

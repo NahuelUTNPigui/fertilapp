@@ -61,6 +61,8 @@
         estadobuscar: -1,
         categoriabuscar: "",
         activosbuscar: "activos",
+        raza:"",
+        color:""
     };
     let proxyfiltros = $state({
         ...defaultfiltro,
@@ -86,6 +88,8 @@
     let sexobuscar = $state("");
     let lotebuscar = $state("");
     let estadobuscar = $state("");
+    let raza  =$state("")
+    let color  =$state("")
     let categoriabuscar = $state("");
     let activosbuscar = $state("activos");
     let totalAnimalesEncontrados = $state(0);
@@ -301,7 +305,7 @@
                 lote,
                 rodeo,
                 rp,
-                categoria,
+                categoria:categoria?"":sexo=="M"?"ternero":"ternera",
                 cab: cab.id,
             };
             if (conparicion) {
@@ -349,6 +353,8 @@
     }
     function setFilters() {
         buscar = proxyfiltros.buscar;
+        raza = proxyfiltros.raza;
+        color = proxyfiltros.color;
         rodeobuscar = proxyfiltros.rodeobuscar;
         rodeoseleccion = proxyfiltros.rodeoseleccion;
         loteseleccion = proxyfiltros.loteseleccion;
@@ -361,6 +367,8 @@
     }
     function setProxyFilter() {
         proxyfiltros.buscar = buscar;
+        proxyfiltros.raza = raza
+        proxyfiltros.color = color
         proxyfiltros.rodeobuscar = rodeobuscar;
         proxyfiltros.rodeoseleccion = rodeoseleccion;
         proxyfiltros.loteseleccion = loteseleccion;
@@ -370,45 +378,61 @@
         proxyfiltros.estadobuscar = estadobuscar;
         proxyfiltros.categoriabuscar = categoriabuscar;
         proxyfiltros.activosbuscar = activosbuscar;
+        
+
     }
     function filterUpdate() {
         setProxyFilter();
         proxy.save(proxyfiltros);
         animalesrows = animales;
-        totalAnimalesEncontrados = animalesrows.length;
+        
         if (buscar != "") {
             animalesrows = animalesrows.filter((a) =>
                 a.caravana
                     .toLocaleLowerCase()
                     .includes(buscar.toLocaleLowerCase()),
             );
-            totalAnimalesEncontrados = animalesrows.length;
+            
+        }
+        if(raza != ""){
+            animalesrows = animalesrows.filter((a) =>
+                a.raza
+                    .toLocaleLowerCase()
+                    .includes(raza.toLocaleLowerCase()),
+            );
+        }
+        if(color != ""){
+            animalesrows = animalesrows.filter((a) =>
+                a.color
+                    .toLocaleLowerCase()
+                    .includes(color.toLocaleLowerCase()),
+            );
         }
         if (sexobuscar != "") {
             animalesrows = animalesrows.filter((a) => a.sexo == sexobuscar);
-            totalAnimalesEncontrados = animalesrows.length;
+         
         }
 
         if (rodeoseleccion.length != 0) {
             if (rodeoseleccion.length == 1 && rodeoseleccion[0] == "-1") {
                 animalesrows = animalesrows.filter((a) => !a.rodeo);
-                totalAnimalesEncontrados = animalesrows.length;
+         
             } else {
                 animalesrows = animalesrows.filter((a) =>
                     rodeoseleccion.includes(a.rodeo),
                 );
-                totalAnimalesEncontrados = animalesrows.length;
+         
             }
         }
         if (loteseleccion.length != 0) {
             if (loteseleccion.length == 1 && loteseleccion[0] == "-1") {
                 animalesrows = animalesrows.filter((a) => !a.lote);
-                totalAnimalesEncontrados = animalesrows.length;
+         
             } else {
                 animalesrows = animalesrows.filter((a) =>
                     loteseleccion.includes(a.lote),
                 );
-                totalAnimalesEncontrados = animalesrows.length;
+         
             }
         }
 
@@ -416,7 +440,7 @@
             animalesrows = animalesrows.filter(
                 (a) => a.prenada == estadobuscar && a.sexo == "H",
             );
-            totalAnimalesEncontrados = animalesrows.length;
+         
         }
         if (categoriaseleccion.length != 0) {
             if (
@@ -424,22 +448,23 @@
                 categoriaseleccion[0] == "-1"
             ) {
                 animalesrows = animalesrows.filter((a) => !a.categoria);
-                totalAnimalesEncontrados = animalesrows.length;
+         
             } else {
                 animalesrows = animalesrows.filter((a) =>
                     categoriaseleccion.includes(a.categoria),
                 );
-                totalAnimalesEncontrados = animalesrows.length;
+         
             }
         }
         if (activosbuscar == "activos") {
             animalesrows = animalesrows.filter((a) => a.active == true);
-            totalAnimalesEncontrados = animalesrows.length;
+         
         }
         if (activosbuscar == "inactivos") {
             animalesrows = animalesrows.filter((a) => a.active == false);
-            totalAnimalesEncontrados = animalesrows.length;
+         
         }
+        totalAnimalesEncontrados = animalesrows.length;
     }
 
     function onSelectPadre(sex) {
@@ -521,6 +546,8 @@
                 : "",
             SEXO: item.sexo == "M" ? "Macho" : "Hembra",
             PESO: item.peso,
+            RAZA: item.raza,
+            COLOR: item.color,
             RODEO: item.expand
                 ? item.expand.rodeo
                     ? item.expand.rodeo.nombre
@@ -836,6 +863,52 @@
                             {filterUpdate}
                         />
                     </div>
+                    <div class="my-0 py-0">
+                        <label for="raza" class="label mb-0">
+                            <span class="label-text text-base">Raza</span>
+                        </label>
+                        <label class="input-group">
+                            <input
+                                type="text"
+                                class={`
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                                bind:value={raza}
+                                oninput={filterUpdate}
+                            />
+                                
+                            
+                        </label>
+                    </div>
+                    <div class="my-0 py-0">
+                        <label for="color" class="label mb-0">
+                            <span class="label-text text-base">Color</span>
+                        </label>
+                        <label class="input-group">
+                            <input
+                                type="text"
+                                class={`
+                                        input input-bordered w-full
+                                        rounded-md
+                                        focus:outline-none focus:ring-2 
+                                        focus:ring-green-500 
+                                        focus:border-green-500
+                                        
+                                        ${estilos.bgdark2}
+                                    `}
+                                bind:value={color}
+                                oninput={filterUpdate}
+                            />
+                                
+                            
+                        </label>
+                    </div>
                     <div>
                         <label for="estado" class="label">
                             <span class="label-text text-base">Estado</span>
@@ -1128,6 +1201,16 @@
                     >
                         <div class="flex flex-row justify-between">Edad</div>
                     </th>
+                    <th
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div class="flex flex-row justify-between">Raza</div>
+                    </th>
+                    <th
+                        class="text-base p-3 border-b dark:border-gray-600 hover:cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800"
+                    >
+                        <div class="flex flex-row justify-between">Color</div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -1165,7 +1248,7 @@
                             </div>
                         </td>
                         <td class="text-base p-3"> {a.sexo}</td>
-                        <td class="text-base p-3"> {a.categoria}</td>
+                        <td class="text-base p-3"> {capitalize(a.categoria)}</td>
                         <td class="text-base p-3">
                             {#if a.sexo == "H"}
                                 {getEstadoNombre(a.prenada)}
@@ -1191,6 +1274,13 @@
                             {a.fechanacimiento != ""
                                 ? calcularEdad(a.fechanacimiento)
                                 : "-"}
+                        </td>
+                        
+                        <td>
+                            {a.raza}
+                        </td>
+                        <td>
+                            {a.color}
                         </td>
                     </tr>
                 {/each}
@@ -1234,7 +1324,7 @@
                             <div class="flex items-start">
                                 <span>Categoría:</span>
                                 <span class="font-semibold">
-                                    {a.categoria}
+                                    {capitalize(a.categoria)}
                                 </span>
                             </div>
                             <div class="flex items-start">
@@ -1255,6 +1345,18 @@
                                             ? a.expand.rodeo.nombre
                                             : ""
                                         : ""}
+                                </span>
+                            </div>
+                            <div class="flex items-start">
+                                <span>Raza:</span>
+                                <span class="font-semibold">
+                                    {a.raza}
+                                </span>
+                            </div>
+                            <div class="flex items-start">
+                                <span>Color:</span>
+                                <span class="font-semibold">
+                                    {a.color}
                                 </span>
                             </div>
                         </div>
@@ -1374,6 +1476,7 @@
             </label>
             {#if sexo == "H"}
                 <div class="m-1 mt-3">
+                    Estado
                     <RadioButton bind:option={prenada} deshabilitado={false} />
                 </div>
 
@@ -1397,10 +1500,10 @@
                     </select>
                 </label>
             {/if}
-            <label for="categoria" class="label">
+            <label for="categoria" class="hidden label">
                 <span class="label-text text-base">Categoria</span>
             </label>
-            <label class="input-group">
+            <label class="hidden  input-group">
                 <select
                     class={`
                             select select-bordered w-full

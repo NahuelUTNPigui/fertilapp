@@ -1,5 +1,5 @@
 <script>
-    import { browser } from "$app/environment";
+    
     import Navbarr from "$lib/components/Navbarr.svelte";
     import PocketBase from "pocketbase";
     import { onMount } from "svelte";
@@ -16,6 +16,8 @@
     import { guardarHistorial } from "$lib/historial/lib";
     import Acciones from "$lib/components/animal/Acciones.svelte";
     import { createCaber } from "$lib/stores/cab.svelte";
+    import { createStorageProxy } from "$lib/filtros/filtros";
+    import { navegarAPadre } from "$lib/geneologia/lib";
     //PERMISOS
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
@@ -29,8 +31,10 @@
     import Pesajes from "$lib/components/animal/Pesajes.svelte";
     import HistoriaClinica from "$lib/components/animal/HistoriaClinica.svelte";
     import tiponoti from "$lib/stores/tiponoti";
-    import Servicios from "$lib/components/animal/Servicios.svelte";
+    import Servicios from  "$lib/components/animal/Servicios.svelte";
     import SelectTab from "$lib/components/animal/SelectTab.svelte";
+    
+    
     let esdev = import.meta.env.VITE_DEV == "si";
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
@@ -44,6 +48,7 @@
     let userpermisos = $state([]);
 
     // Datos
+    let animal =  $state({})
     let slug = $state("");
     let caravana = $state("");
     let usuarioid = $state("");
@@ -51,6 +56,8 @@
     let fechanacimiento = $state("");
     let sexo = $state("");
     let nacimiento = $state("");
+    let padre = $state({})
+    let madre = $state({})
     let rodeo = $state("");
     let lote = $state("");
     let peso = $state(0);
@@ -59,12 +66,18 @@
     let pariciones = $state([]);
     let fechafall = $state("");
     let motivobaja = $state("");
+    let raza = $state("")
+    let color = $state("")
     let connacimiento = $state(false);
     let nacimientoobj = $state({});
     let tactos = $state([]);
     let prenada = $state(0);
     let modohistoria = $state(false);
-
+    //Geneologia
+    const genealogiaStorage = createStorageProxy('genealogia_arbol', {
+        progenitores: [],
+        posicionActual: -1
+    });
     async function getPariciones(id) {
         const recordpariciones = await pb
             .collection("nacimientos")
@@ -81,6 +94,26 @@
         });
 
         tactos = recordtactos;
+    }
+    async function getMadre(id) {
+        if(id==""){
+            madre = {id:-1}
+        }
+        else{
+            const record = await pb.collection('animales').getOne(id, {expand:"lote,rodeo"});
+            madre = record
+        }
+        
+    }
+    async function getPadre(id) {
+        if(id==""){
+            padre = {id:-1}
+        }
+        else{
+            const record = await pb.collection('animales').getOne(id, {expand:"lote,rodeo"});
+            padre = record
+        }
+        
     }
     async function darBaja(fechafallecimiento, motivo) {
         if (!userpermisos[5]) {
@@ -183,13 +216,20 @@
         //Revisar si esta en la cabaña
         //Lo idea seria poder ver los datos del animaal este donde este
         let recordxiste = await pb.collection("animales").getFullList({
-            filter: `active=true && cab='${cab.id}' && id='${_id}'`,
+            filter: `cab='${cab.id}' && id='${_id}'`,
+            expand:"lote,rodeo,nacimiento",
             skipTotal: true,
         });
         if (recordxiste.length > 0) {
-            goto(`${pre}/animales/${_id}`);
-            slug = $page.params.slug;
-            await perfilAnimal(_id)
+            genealogiaStorage.save({progenitores:[],posicionActual:-1})
+            padre = recordxiste[0]
+            navegarAPadre(animal.id,animal.caravana,animal)
+            
+            navegarAPadre(padre.id,padre.caravana,padre)
+
+            goto(`${pre}/animales/geneologia`);
+            //slug = $page.params.slug;
+            //await perfilAnimal(_id)
             //window.location.reload();
         } else {
             Swal.fire(
@@ -208,7 +248,10 @@
                 const recorda = await pb.collection("animales").getOne(slug, {
                     expand: "nacimiento",
                 });
+                animal = recorda
                 caravana = recorda.caravana;
+                color = recorda.raza;
+                raza = recorda.color;
                 active = recorda.active;
                 fechanacimiento = recorda.fechanacimiento.split(" ")[0];
 
@@ -218,6 +261,8 @@
                     connacimiento = true
                     nacimiento = recorda.nacimiento;
                     nacimientoobj = recorda.expand.nacimiento;
+                    await getMadre(recorda.expand.nacimiento.madre)
+                    await getPadre(recorda.expand.nacimiento.padre)
                 }
                 peso = recorda.peso;
                 sexo = recorda.sexo;
@@ -299,10 +344,15 @@
                     bind:sexo
                     bind:caravana
                     bind:connacimiento
+                    bind:raza
+                    bind:color
                     bind:nacimiento={nacimientoobj}
+                    bind:padreobj={padre}
+                    bind:madreobj={madre}
                     bind:fechanacimiento
                     bind:modohistoria
                     bind:userpermisos
+
                     {irPadre}
                 />
             </CardAnimal>
