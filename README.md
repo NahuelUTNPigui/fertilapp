@@ -18,3 +18,9 @@
     pnpm run build --mode production
     npm run build --mode production
 ```
+* Para hacer  anda el environment
+```
+    Modificas de nombre el archivo .env copy.dev a .env.local
+
+    
+```
