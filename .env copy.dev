@@ -1,1 +1,2 @@
 VITE_RUTA="http://localhost:9991"
+VITE_DEV ="si"
