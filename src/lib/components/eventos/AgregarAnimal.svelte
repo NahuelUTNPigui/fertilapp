@@ -2,6 +2,7 @@
     import estilos from "$lib/stores/estilos";
     import sexos from "$lib/stores/sexos";
     import categorias from "$lib/stores/categorias";
+    
     let {
         caravana=$bindable(""),
         peso=$bindable(""),
@@ -12,6 +13,9 @@
         confechanac =  $bindable(false)
     } = $props()
     let malcaravana = $state(false)
+    function onlyPositiveNumber(_peso){
+        return Math.max(0,_peso)
+    }
     function onChangeAgregar(){
         
         if(caravana == ""){
@@ -77,7 +81,7 @@
                 <input id ="peso" type="number"  
                     class={`input input-bordered w-full ${estilos.bgdark2}`}
                     bind:value={peso}
-                    
+                    oninput={()=>peso= onlyPositiveNumber(peso)}
                 />
                 
             </label>

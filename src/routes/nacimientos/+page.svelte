@@ -12,7 +12,9 @@
     import PredictSelect from '$lib/components/PredictSelect.svelte';
     import{verificarNivel} from "$lib/permisosutil/lib"
     import AgregarAnimal from '$lib/components/eventos/AgregarAnimal.svelte';
+    import { goto } from '$app/navigation';
     //Filtros
+    
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from '$lib/filtros/Limpiar.svelte';
     //Permisos
@@ -23,12 +25,14 @@
     import { createPer } from "$lib/stores/permisos.svelte";
     import { getPermisosList } from "$lib/permisosutil/lib";
     import RadioButton from "$lib/components/RadioButton.svelte";
+    import CustomDate from '$lib/components/CustomDate.svelte';
     
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0]
+    let pre = import.meta.env.VITE_PRE;
     const today = new Date();
     const DESDE = new Date(today.getFullYear(), today.getMonth() - 1, 1);    
     const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -103,11 +107,13 @@
                 id:item.id,nombre:item.caravana
             }
         })
+        listamadres.sort((a1,a2)=>a1.nombre.toLocaleLowerCase()<a2.nombre.toLocaleLowerCase()?-1:1)
         listapadres = padres.map(item=>{
             return {
                 id:item.id,nombre:item.caravana
             }
         })
+        listapadres.sort((a1,a2)=>a1.nombre.toLocaleLowerCase()<a2.nombre.toLocaleLowerCase()?-1:1)
     }
     async function getNacimientos(){
         const recordsn = await pb.collection("nacimientosall").getFullList({
@@ -538,6 +544,19 @@
                     {prepararData}
                 />
             </div>
+            <div class="hidden">
+                <button
+                    class={`
+                        bg-transparent border rounded-lg focus:outline-none transition-colors duration-200
+                        ${estilos.btnsecondary}
+                        rounded-full
+                        px-4 pt-2 pb-3
+                    `} 
+                    onclick={() => goto(pre+"/nacimientos/reporte")}
+                >
+                    <span class="text-lg font-semibold">Estadísticas</span>
+                </button>
+            </div>
         </div>
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 m-1 gap-2 lg:gap-10 mb-2 mt-1 mx-1 lg:mx-10 w-11/12" >
@@ -583,6 +602,9 @@
         {#if isOpenFilter}
             <div transition:slide>
                 <div class="grid grid-cols-1 lg:grid-cols-2 mb-2 lg:mb-3 gap-1" >
+                    <CustomDate
+                        bind:fecha={fechadesde}
+                    />
                     <div class="">
                         <label class="block tracking-wide  mb-2" for="grid-first-name">
                           Fecha desde

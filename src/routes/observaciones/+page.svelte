@@ -17,7 +17,7 @@
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
     import InfoAnimal from '$lib/components/InfoAnimal.svelte';
-
+    import PredictSelect from '$lib/components/PredictSelect.svelte';
     let caber = createCaber()
     let cab = caber.cab
     let ruta = import.meta.env.VITE_RUTA
@@ -29,6 +29,7 @@
     const HASTA = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     let animales = $state([])
+    let animalesactivos = $derived(animales.filter(a=>a.active).map(a=>({id:a.id,nombre:a.caravana})))
     let observaciones = $state([])
     let observacionesrow = $state([])
     let caravana = $state("")
@@ -36,15 +37,18 @@
     let sexo = $state("")
     let peso = $state(0)
     let usuarioid = $state("")
+    let cargadoanimales = $state(false)
     //Datos observaciones
     let veranimal = $state({})
     let idobservacion = $state("")
     let animal = $state("")
+    let cadenaanimal = $state("")
     let categoria = $state("")
     let fecha = $state("")
     let observacion = $state("")
     let totalObservacionesEncontradas = $state(0)
     let nombreanimal = $state("")
+    
     //Validacioones
     let malanimal = $state(false)
     let malfecha = $state(false)
@@ -89,6 +93,7 @@
         })
         animales = recordsa
         animales.sort((a1,a2)=>a1.caravana.toLocaleLowerCase()>a2.caravana.toLocaleLowerCase()?1:-1)
+        cargadoanimales = true
     }
     async function getObservaciones(){
         const records = await pb.collection('observaciones').getFullList({
@@ -108,6 +113,8 @@
         malanimal = false
         malfecha = false
         nombreanimal = ""
+        animal = ""
+        cadenaanimal = ""
         nuevoModal.showModal()
     }
 
@@ -117,6 +124,7 @@
             sexo = ""
             peso = 0
             botonhabilitadoAnimal = false
+            animal = ""
             nuevoModal.showModal()
         } else{
             Swal.fire("Sin permisos","No tienes permisos para crear eventos","error")
@@ -768,11 +776,24 @@
                 <AgregarAnimal bind:agregaranimal bind:caravana = {caravananuevo} bind:categoria = {categorianuevo} bind:sexo = {sexonuevo} bind:peso = {pesonuevo} bind:fechanacimiento = {fechanacimientonuevo}/>
             {/if}
             {#if !agregaranimal}
+                {#if idobservacion != ""}
                 <label for = "animal" class="label">
                     <span class="label-text text-base">Animal</span>
                 </label>
+                {/if}
                 {#if idobservacion == ""}
-                    <label class="input-group ">
+                    {#if cargadoanimales}
+                    <PredictSelect
+                        lista={animalesactivos}
+                        etiqueta = {"Animal"}
+                        bind:valor={animal}
+                        bind:cadena={cadenaanimal}
+                        onelegir={()=>oninput("ANIMAL")}
+        
+
+                    />
+                    {/if}
+                    <label class="hidden input-group ">
                         <select 
                             class={`
                                 select select-bordered w-full
@@ -853,10 +874,24 @@
             <div class="label">
                 <span class="label-text">Observacion</span>                    
             </div>
+            <textarea
+                class={`
+                    input 
+                    input-bordered 
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                    w-full
+                    ${estilos.bgdark2}
+                `}
+                
+                bind:value={observacion}
+            >
+            </textarea>
             <input 
                 id ="observacion" 
                 type="text"  
                 class={`
+                    hidden
                     input 
                     input-bordered 
                     border border-gray-300 rounded-md

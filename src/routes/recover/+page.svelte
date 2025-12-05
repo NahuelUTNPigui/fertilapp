@@ -15,12 +15,30 @@
     function volver(){
         goto(pre+"/login")
     }
+    async function existeEmailUsuario(pb,useremail) {
+        const resultList = await pb.collection('users').getList(1, 1, {
+            filter: `name='${useremail}'`,
+            skipTotal:true
+        });
+        if(resultList.items.length>0){
+            return true
+        }
+        else{
+            return false
+        }
+    }
     async function reset(){
         if(isEmpty(usuariomail)){
             Swal.fire('Error recuperar', 'Email vacio', 'error');
             return
         }
+
         const pb = new PocketBase(ruta);
+        let emailExiste = await existeEmailUsuario(pb,usuariomail)
+        if(!emailExiste){
+            Swal.fire("Error login","No existe un usuario con ese correo","error")
+            return
+        }
         try{
             await pb.collection('users').requestPasswordReset(usuariomail);
             Swal.fire("Correo enviado","Se envió un correo con las instrucciones","success")

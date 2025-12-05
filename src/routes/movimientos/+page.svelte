@@ -1,4 +1,5 @@
 <script>
+    import CustomModalMove from "$lib/components/movimientos/CustomModalMove.svelte";
     import Navbarr from "$lib/components/Navbarr.svelte";
     import PocketBase from "pocketbase";
     import Swal from "sweetalert2";
@@ -18,7 +19,8 @@
         getEstadoNombre,
         getEstadoColor,
     } from "$lib/components/estadosutils/lib";
-    import { getSexoNombre } from "$lib/stringutil/lib";
+    import { getSexoNombre,capitalize } from "$lib/stringutil/lib";
+    
     let ruta = import.meta.env.VITE_RUTA;
     const pb = new PocketBase(ruta);
     const HOY = new Date().toISOString().split("T")[0];
@@ -54,6 +56,8 @@
     let todos = $state(false);
     let algunos = $state(false);
     let ninguno = $state(true);
+    //movimientos
+    let listaanimales = $state([]);
     //movimiento
     let nuevacategoria = $state("");
     let nuevolote = $state("");
@@ -236,6 +240,24 @@
         animalesrows = animales;
     }
     function openNewModal() {
+        listaanimales = [];
+        for (const [key, value] of Object.entries(selecthashmap)) {
+            if (value != null) {
+                listaanimales.push(value);
+            }
+        }
+        if (listaanimales.length == 0) {
+            Swal.fire(
+                "Error movimiento",
+                "No hay animales seleccionados",
+                "error",
+            );
+            nuevorodeo = "";
+            nuevolote = "";
+            nuevacategoria = "";
+        } else {
+            nuevoModal.showModal();
+        }
         if (userpermisos[3]) {
             nuevoModal.showModal();
         } else {
@@ -904,7 +926,7 @@
                             </button>
                         </td>
                         <td class="text-base mx-1 px-0">{a.caravana}</td>
-                        <td class="text-base mx-1 px-0">{a.categoria}</td>
+                        <td class="text-base mx-1 px-0">{capitalize(a.categoria)}</td>
                         <td class="text-base mx-1 px-0"
                             >{a.expand?.rodeo?.nombre || ""}</td
                         >
@@ -1054,7 +1076,8 @@
                         <div class="flex items-start">
                             <span>Categoría:</span>
                             <span class="font-semibold">
-                                {a.categoria}
+                                
+                                {capitalize(a.categoria)}
                             </span>
                         </div>
                         <div class="flex items-start">
@@ -1078,17 +1101,17 @@
                             </span>
                         </div>
                         <div class="flex items-start">
-                                <span>Raza:</span>
-                                <span class="font-semibold">
-                                    {a.raza}
-                                </span>
-                            </div>
-                            <div class="flex items-start">
-                                <span>Color:</span>
-                                <span class="font-semibold">
-                                    {a.color}
-                                </span>
-                            </div>
+                            <span>Raza:</span>
+                            <span class="font-semibold">
+                                {a.raza}
+                            </span>
+                        </div>
+                        <div class="flex items-start">
+                            <span>Color:</span>
+                            <span class="font-semibold">
+                                {a.color}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1119,7 +1142,7 @@
             </p>
         </div>
 
-        <div class="form-control gap-1">
+        <div class="hidden form-control gap-1">
             <div class="collapse">
                 <input
                     type="radio"
@@ -1368,6 +1391,25 @@
                 </div>
             </div>
         </div>
+        <CustomModalMove
+            bind:nuevacategoria
+            bind:nuevolote
+            bind:nuevorodeo
+            bind:tipotratamiento
+            bind:fecha
+            bind:motivo
+            bind:fechabaja
+            bind:codigo
+            bind:malcodigo
+            bind:listaanimales
+            {categorias}
+            {lotes}
+            {rodeos}
+            {tipos}
+            {HOY}
+            {oninput}
+            {onChangeCollapse}
+        />
         <div class="modal-action justify-start">
             <form method="dialog">
                 <button

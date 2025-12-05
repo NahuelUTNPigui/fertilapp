@@ -403,6 +403,7 @@
                             ${estilos.bgdark2}
                         `}
                         bind:value={pesonuevo}
+                        oninput={()=>pesonuevo = Math.max(pesonuevo,0)}
                     />
                 </div>
             </div>

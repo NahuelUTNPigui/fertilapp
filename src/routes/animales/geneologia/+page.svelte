@@ -14,8 +14,13 @@
     import estados from "$lib/stores/estados";
     import sexos from "$lib/stores/sexos";
     import categorias from "$lib/stores/categorias";
+    import tipostacto from "$lib/stores/tipostacto";
+    import {
+        getEstadoNombre,
+        getEstadoColor,
+    } from "$lib/components/estadosutils/lib";
     import { shorterWord, capitalize,getWholeWordButLastLetter } from "$lib/stringutil/lib";
-
+    
     const genealogiaStorage = createStorageProxy("genealogia_arbol", {
         progenitores: [],
         posicionActual: -1,
@@ -62,6 +67,25 @@
     let caber = createCaber();
     let cab = caber.cab;
     let cargado = $state(false);
+    function getTipoNombre(_tipo){
+        let c_idx = tipostacto.findIndex(c=>c.id==_tipo)
+        if (c_idx ==-1){
+            return ""
+        }
+        else {
+            return tipostacto[c_idx].nombre
+        }
+    }
+    function getCategoriaNombre(_cate){
+        let c_idx = categorias.findIndex(c=>c.id==_cate)
+        if (c_idx ==-1){
+            return ""
+        }
+        else {
+            return categorias[c_idx].nombre
+        }
+    }
+    
     function getNombrePadres(p_padres) {
         let ids = p_padres.split(",");
 

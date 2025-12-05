@@ -19,6 +19,7 @@
     import PredictSelect from "../PredictSelect.svelte";
     import { shorterWord,capitalize } from "$lib/stringutil/lib";
     import InfoAnimal from "../InfoAnimal.svelte";
+    
     let {
         caravana=$bindable(""),
         rodeo=$bindable(""),
@@ -532,6 +533,7 @@
                     type="number"
                     class={`input input-bordered w-full ${estilos.bgdark2}`}
                     bind:value={peso}
+                    oninput={()=>peso = Math.max(0,peso)}
                 />
             </label>
         {:else}

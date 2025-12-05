@@ -35,15 +35,15 @@
     let nombremadre = $state("");
     let nombrepadre = $state("");
     //juntos
-    let madre = $state({})
-    let padre = $state({})
-    let botonhabilitadoins =$state(false)
-    let botonhabilitadoser =$state(false)
+    let madre = $state({});
+    let padre = $state({});
+    let botonhabilitadoins = $state(false);
+    let botonhabilitadoser = $state(false);
     //inseminacion
     let idanimalins = $state("");
     let padreins = $state("");
-    let pajuelains = $state("")
-    
+    let pajuelains = $state("");
+
     //Servicio
     let idanimalser = $state("");
     let padreser = $state("");
@@ -58,7 +58,6 @@
     const HOY = new Date().toISOString().split("T")[0];
 
     function validarBotonIns() {
-        
         inseminacion.botonhabilitadoins = true;
         if (!agregaranimal && isEmpty(inseminacion.idanimalins)) {
             inseminacion.botonhabilitadoins = false;
@@ -69,7 +68,7 @@
         if (isEmpty(inseminacion.fechainseminacion)) {
             inseminacion.botonhabilitadoins = false;
         }
-        botonhabilitadoins = inseminacion.botonhabilitadoins
+        botonhabilitadoins = inseminacion.botonhabilitadoins;
     }
     function validarBotonSer() {
         servicio.botonhabilitadoser = true;
@@ -79,12 +78,12 @@
         //if(servicio.idanimalser==""){
         //    servicio.botonhabilitadoser = false
         //}
-        botonhabilitadoser = servicio.botonhabilitadoser
+        botonhabilitadoser = servicio.botonhabilitadoser;
     }
 
     function onSelectAnimalIns() {
         let a = madres.filter((an) => an.id == inseminacion.idanimalins)[0];
-        madre = a
+        madre = a;
         if (a) {
             inseminacion.categoriains = a.categoria;
         } else {
@@ -93,7 +92,7 @@
     }
     function onSelectAnimalSer() {
         let a = madres.filter((an) => an.id == servicio.idanimalser)[0];
-        madre = a
+        madre = a;
         if (a) {
             servicio.categoriaser = a.categoria;
         } else {
@@ -102,11 +101,10 @@
     }
     function onSelectPadreIns() {
         let p = animales.filter((item) => item.id == padreins)[0];
-        padre = p
-        
+        padre = p;
+
         inseminacion.pajuelains = p.caravana;
-        inseminacion.padreins = p.id
-        
+        inseminacion.padreins = p.id;
     }
 
     function oninputIns(campo) {
@@ -211,10 +209,8 @@
                     bind:lista={listamadres}
                     onelegir={() => oninputSer("ANIMAL")}
                 ></PredictSelect>
-                {#if idanimalser.length>0}
-                    <InfoAnimal
-                        bind:animal = {madre}
-                    />
+                {#if idanimalser.length > 0}
+                    <InfoAnimal bind:animal={madre} />
                 {/if}
             {/if}
             <label for="categoria" class="label">
@@ -244,7 +240,11 @@
             </label>
             <label class="input-group">
                 {#if cargadoanimales}
-                    <MultipleToros toros={padres} bind:valor={servicio.padreser} bind:listavalores={servicio.padreserlista} />
+                    <MultipleToros
+                        toros={padres}
+                        bind:valor={servicio.padreser}
+                        bind:listavalores={servicio.padreserlista}
+                    />
                 {/if}
             </label>
         </div>
@@ -343,6 +343,7 @@
                     disabled={!botonhabilitadoser}
                     onclick={guardarServicio}>Guardar</button
                 >
+                <button class="btn btn-error text-white">Cerrar</button>
             </form>
         </div>
     </div>
@@ -365,10 +366,8 @@
                     bind:lista={listamadres}
                     onelegir={() => oninputIns("ANIMAL")}
                 ></PredictSelect>
-                {#if idanimalins.length>0}
-                    <InfoAnimal
-                        bind:animal = {madre}
-                    />
+                {#if idanimalins.length > 0}
+                    <InfoAnimal bind:animal={madre} />
                 {/if}
             {/if}
             <label for="tipo" class="label">
@@ -399,12 +398,10 @@
                 etiqueta={"Padre"}
                 bind:cadena={pajuelains}
                 lista={listapadres}
-                onelegir = {()=>oninputIns("PADRE")}
+                onelegir={() => oninputIns("PADRE")}
             />
-            {#if padreins.length>0}
-                <InfoAnimal
-                    bind:animal = {padre}
-                />
+            {#if padreins.length > 0}
+                <InfoAnimal bind:animal={padre} />
             {/if}
         {/if}
         <label for="fechainseminacion" class="label">
@@ -484,6 +481,8 @@
                 disabled={!botonhabilitadoins}
                 onclick={guardarInseminacion}>Guardar</button
             >
+            
+            <button class="btn btn-error text-white">Cerrar</button>
         </form>
     </div>
 {/if}

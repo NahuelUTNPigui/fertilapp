@@ -28,10 +28,9 @@
     } = $props();
     let nombreanimal = $state("");
     let animaltrat = $state("");
-    let animal = $state({})
-    let botonhabilitadotrat = $state(false)
+    let animal = $state({});
+    let botonhabilitadotrat = $state(false);
     function validarBotonTrat() {
-        
         tratamiento.botonhabilitadotrat = true;
         if (!agregaranimal && isEmpty(tratamiento.animaltrat)) {
             tratamiento.botonhabilitadotrat = false;
@@ -43,11 +42,11 @@
         if (isEmpty(tratamiento.fechatrat)) {
             tratamiento.botonhabilitadotrat = false;
         }
-        botonhabilitadotrat = tratamiento.botonhabilitadotrat
+        botonhabilitadotrat = tratamiento.botonhabilitadotrat;
     }
     function onSelectAnimalTrat() {
         let a = animales.filter((an) => an.id == tratamiento.animaltrat)[0];
-        animal = a
+        animal = a;
         if (a) {
             tratamiento.categoriatrat = a.categoria;
         } else {
@@ -122,19 +121,15 @@
             </label>
         </div>
         {#if cargadoanimales}
-            <PredictSelect 
-                bind:valor={animaltrat} 
-                etiqueta = {"Animal"} 
-                bind:cadena={nombreanimal} 
-                lista = {listaanimales} 
-                onelegir={()=>oninputTrat("ANIMAL")}
-                >
-                
-            </PredictSelect>
-            {#if animaltrat.length>0}
-                <InfoAnimal
-                    bind:animal
-                />
+            <PredictSelect
+                bind:valor={animaltrat}
+                etiqueta={"Animal"}
+                bind:cadena={nombreanimal}
+                lista={listaanimales}
+                onelegir={() => oninputTrat("ANIMAL")}
+            ></PredictSelect>
+            {#if animaltrat.length > 0}
+                <InfoAnimal bind:animal />
             {/if}
         {/if}
         <label for="categoria" class="label">
@@ -238,5 +233,6 @@
             disabled={!botonhabilitadotrat}
             onclick={guardarTrat}>Guardar</button
         >
+        <button class="btn btn-error text-white">Cerrar</button>
     </form>
 </div>

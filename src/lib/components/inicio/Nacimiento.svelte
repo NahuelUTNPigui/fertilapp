@@ -206,5 +206,10 @@
     <form method="dialog" >
       <!-- if there is a button, it will close the modal -->
       <button class="btn btn-success text-white" disabled={!nacimiento.botonhabilitadonac}  onclick={guardarNacimiento} >Guardar</button>
+      <button
+            class="btn btn-error text-white"
+            
+            >Cerrar</button
+        >
     </form>
 </div>

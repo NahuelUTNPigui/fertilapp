@@ -43,3 +43,17 @@ export function shorterWord(cadena){
     ? cadena.substring(0, maxLongitud) + sufijo
     : cadena;
 }
+export function diasEntreFechas(startDate, endDate) {
+  const date1 = new Date(startDate);
+  const date2 = new Date(endDate);
+
+  const time1 = date1.getTime();
+  const time2 = date2.getTime();
+
+  const differenceInMilliseconds = Math.abs(time2 - time1); // Use Math.abs for absolute difference
+
+  const millisecondsPerDay = 1000 * 60 * 60 * 24;
+  const daysDifference = Math.round(differenceInMilliseconds / millisecondsPerDay);
+
+  return daysDifference;
+}

@@ -146,10 +146,24 @@
     <div class="label">
         <span class="label-text">Observacion</span>
     </div>
+    <textarea
+        class={`
+            input 
+            input-bordered 
+            border border-gray-300 rounded-md
+            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+            w-full
+            ${estilos.bgdark2}
+        `}
+        
+        bind:value={observacion.observacionobs}
+    >
+    </textarea>
     <input
         id="observacionobs"
         type="text"
         class={`
+            hidden
             input 
             input-bordered 
             border border-gray-300 rounded-md
@@ -167,6 +181,11 @@
             class="btn btn-success text-white"
             disabled={!botonhabilitadoobs}
             onclick={guardarObservacion}>Guardar</button
+        >
+        <button
+            class="btn btn-error text-white"
+            
+            >Cerrar</button
         >
     </form>
 </div>

@@ -20,6 +20,7 @@
     //FILTROS
     import { createStorageProxy } from "$lib/filtros/filtros";
     import Limpiar from "$lib/filtros/Limpiar.svelte";
+    import InfoAnimal from "$lib/components/InfoAnimal.svelte";
     let ruta = import.meta.env.VITE_RUTA;
     let pre = import.meta.env.VITE_PRE;
     const pb = new PocketBase(ruta);
@@ -79,6 +80,7 @@
     //movimiento
     let fecha = $state("");
     let nuevospesos = $state({});
+    let pesogeneral = $state("")
 
     //Seleecionar
     let selectcategoria = $state(true);
@@ -294,6 +296,12 @@
             return;
         }
         nuevoModal.showModal();
+    }
+    function cambioPesoGeneral() {
+        pesogeneral = Math.max(0,pesogeneral)
+        for (let i = 0; i < selectanimales.length; i++) {
+            selectanimales[i].pesonuevo = pesogeneral;
+        }
     }
     async function crearPesaje() {
         let errores = false;
@@ -889,41 +897,25 @@
                 bind:value={fecha}
             />
         </label>
-        <div
-            class="hidden w-full grid grid-cols-1 justify-items-center overflow-x-auto"
-        >
-            <table class="table table-lg w-full">
-                <thead>
-                    <tr>
-                        <th class="text-base p-0">Caravana</th>
-                        <th class="text-base p-0">Peso anterior</th>
-                        <th class="text-base">Peso nuevo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each selectanimales as a, i}
-                        <tr>
-                            <td class="text-base p-0">{a.caravana}</td>
-                            <td class="text-base p-0">{a.peso}</td>
-                            <td class="">
-                                <label class="input-group">
-                                    <input
-                                        bind:value={selectanimales[i].pesonuevo}
-                                        class={`
-                                        input input-bordered w-full
-                                        border border-gray-300 rounded-md
-                                        focus:outline-none focus:ring-2 
-                                        focus:ring-green-500 focus:border-green-500
-                                        ${estilos.bgdark2}
-                                    `}
-                                    />
-                                </label>
-                            </td>
-                        </tr>
-                    {/each}
-                </tbody>
-            </table>
-        </div>
+        <label for="fechapesaje" class="label">
+            <span class="label-text text-base">Peso general </span>
+        </label>
+        <label class="input-group">
+            <input
+                id="pesogeneral"
+                type="text"
+                class={`
+                    input input-bordered w-full
+                    border border-gray-300 rounded-md
+                    focus:outline-none focus:ring-2 
+                    focus:ring-green-500 
+                    focus:border-green-500
+                    ${estilos.bgdark2} 
+                `}
+                bind:value={pesogeneral}
+                oninput={cambioPesoGeneral}
+            />
+        </label>
         <div class="block justify-items-center mx-1">
             {#each selectanimales as a, i}
                 <div
@@ -932,6 +924,9 @@
                     <div class="block p-4">
                         <div class="grid grid-cols-2 gap-y-2">
                             <div class="flex items-start col-span-2">
+                                <InfoAnimal
+                                    animal={a}
+                                />
                                 <span>Caravana:</span>
                                 <span class="font-semibold">
                                     {shorterWord(a.caravana)}
@@ -947,6 +942,7 @@
                                 <label class="input-group">
                                     <input
                                         bind:value={selectanimales[i].pesonuevo}
+                                        oninput={ ()=>selectanimales[i].pesonuevo = Math.max(0,selectanimales[i].pesonuevo)}
                                         class={`
                                     input input-bordered w-full
                                     border border-gray-300 rounded-md

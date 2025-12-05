@@ -14,6 +14,7 @@
     import { goto } from "$app/navigation";
     import { createCaber } from "$lib/stores/cab.svelte";
     import { createUserer } from "$lib/stores/user.svelte";
+    
     //filtros
     import { createStorageProxy } from "$lib/filtros/filtros";
 
@@ -1471,8 +1472,11 @@
                             focus:ring-green-500 focus:border-green-500
                             ${estilos.bgdark2}
                         `}
+                    
                     bind:value={peso}
+                    oninput={()=>peso=>Math.max(0,peso)}
                 />
+
             </label>
             {#if sexo == "H"}
                 <div class="m-1 mt-3">

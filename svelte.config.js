@@ -25,6 +25,7 @@ const config = {
 				"/inicio/vet",
 				"/login",
 				"/nacimientos",
+				"/nacimientos/reporte",
 				"/rodeos",
 				"/rol",
 				"/tactos/cab",

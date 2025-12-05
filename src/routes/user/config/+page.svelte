@@ -211,7 +211,7 @@
                             for="nombre"
                             class={`block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                         >
-                            Nombre de usuario:
+                            Nombre de usuario
                         </label>
                         {#if !modoedicion}
                             <label
@@ -240,7 +240,7 @@
                             for="nombre"
                             class={`block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                         >
-                            Nombre:
+                            Nombre
                         </label>
                         {#if !modoedicion}
                             <label
@@ -269,7 +269,7 @@
                             for="apellido"
                             class={`block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                         >
-                            Apellido:
+                            Apellido
                         </label>
                         {#if !modoedicion}
                             <label
@@ -298,7 +298,7 @@
                             for="mail"
                             class={`block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                         >
-                            Correo:
+                            Correo
                         </label>
                         <label
                             for="mail"
@@ -312,7 +312,7 @@
                             for="codigo "
                             class={`mt-2 block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                         >
-                            Codigo de colaboracion:
+                            Codigo de colaboracion
                         </label>
                         <label
                             for="codigo"
@@ -433,7 +433,7 @@
                         for="nivel "
                         class={`mt-2 block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                     >
-                        Nivel:
+                        Nivel
                     </label>
                     <label
                         for="nivel"
@@ -447,7 +447,7 @@
                         for="animales "
                         class={`mt-2 block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                     >
-                        Animales en la cuenta:
+                        Animales en la cuenta
                     </label>
                     <label
                         for="animales"
@@ -461,7 +461,7 @@
                         for="esta "
                         class={`mt-2 block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1`}
                     >
-                        Establecimientos en la cuenta:
+                        Establecimientos en la cuenta
                     </label>
                     <label
                         for="esta"

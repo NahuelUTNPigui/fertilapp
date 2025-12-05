@@ -1,6 +1,6 @@
 <script>
     import estilos from "$lib/stores/estilos";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
 
     let {
         lista=$bindable([]),
@@ -12,6 +12,9 @@
         validarAnimal=()=>{},
         size="w-4/5"
     } = $props()
+
+    let containerPredict = $state(null)
+
     let listarow = $state(lista)
     let isOpen = $state(false)
     let nombre = $state("")
@@ -60,7 +63,19 @@
     //        nombre = cadena
     //    }
     //})
+    function handleClickOutside(e){
+        
+        if (containerPredict && !containerPredict.contains(e.target)) {
+         
+            isOpen = false;
+        }
+        
+    }
+    onDestroy(()=>{
+        document.removeEventListener("click",handleClickOutside)
+    })
     onMount(()=>{
+        document.addEventListener("click",handleClickOutside)
         if(valor.length !=0){
             cadena = listarow.filter(l=>l.id==valor)[0].nombre
             nombre = cadena
@@ -69,7 +84,7 @@
     
     
 </script>
-<div class="w-full">
+<div class="w-full" bind:this={containerPredict}>
     
     <label for = "" class="label">
         <span class="label-text text-base">{etiqueta} </span>

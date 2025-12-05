@@ -12,6 +12,7 @@
     import { getPermisosMessage, getPermisosList } from "$lib/permisosutil/lib";
     import Swal from "sweetalert2";
     import { oscuro } from "$lib/stores/oscuro";
+    
 
     let ruta = import.meta.env.VITE_RUTA;
     const pb = new PocketBase(ruta);
@@ -241,12 +242,30 @@
         return getWholeWordButLastLetter(nombres);
     }
     function oninputSer(campo) {
-        fechaparto = addDays(fechadesdeserv, 280).toISOString().split("T")[0];
+        if (fechadesdeserv.length > 0) {
+            try {
+                fechaparto = addDays(fechadesdeserv, 280)
+                    .toISOString()
+                    .split("T")[0];
+            } catch (err) {
+                fechaparto = "";
+            }
+        } else {
+            fechaparto = "";
+        }
     }
     function oninputIns(campo) {
-        fechaparto = addDays(fechainseminacion, 280)
-            .toISOString()
-            .split("T")[0];
+        if (fechainseminacion.length > 0) {
+            try {
+                fechaparto = addDays(fechainseminacion, 280)
+                    .toISOString()
+                    .split("T")[0];
+            } catch (err) {
+                fechaparto = "";
+            }
+        } else {
+            fechaparto = "";
+        }
     }
     onMount(async () => {
         id = $page.params.slug;
@@ -507,7 +526,8 @@
                         {/if}
                     </label>
                 </div>
-                <div>
+                
+                <div >
                     <label for="fechadesde" class="label">
                         <span class="label-text text-base">Fecha desde</span>
                     </label>

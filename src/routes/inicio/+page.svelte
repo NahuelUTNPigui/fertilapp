@@ -1,4 +1,5 @@
 <script>
+    import CustomDate from "$lib/components/CustomDate.svelte";
     import Navbarr from "$lib/components/Navbarr.svelte";
     import Swal from "sweetalert2";
     import PocketBase from "pocketbase";
@@ -87,7 +88,21 @@
     let classbutton =
         "w-full flex items-center justify-center space-x-4 bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 dark:bg-green-700 dark:hover:bg-green-600";
     //Tacto
-    let tacto = $state({});
+    let tacto = $state({
+        fechatacto: "",
+        observaciontacto: "",
+        animaltacto: "",
+        cadenatacto: "",
+        //Tipo animal
+        categoriatacto: "",
+        prenadatacto: 0,
+        //tipo tacto
+        tipotacto: "",
+        //Validaciones
+        malfechatacto: "",
+        malanimaltacto: "",
+        botonhabilitadotacto: false,
+    });
     let prenadatacto = $state(0);
     //Nacimiento
     let nacimiento = $state({});
@@ -235,16 +250,20 @@
             return { id: item.id, nombre: item.caravana };
         });
         listamadres.sort((a, b) =>
-          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+            a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }),
         );
         listaanimales = animales.map((item) => {
             return { id: item.id, nombre: item.caravana };
         });
         listaanimales.sort((a, b) =>
-          a.nombre.localeCompare(b.nombre, undefined, { sensitivity: "base" })
+            a.nombre.localeCompare(b.nombre, undefined, {
+                sensitivity: "base",
+            }),
         );
         listapadres.sort((a, b) =>
-          a.nombre.localeCompare(b.nombre, undefined, { sensitivity: "base" })
+            a.nombre.localeCompare(b.nombre, undefined, {
+                sensitivity: "base",
+            }),
         );
     }
     async function getTiposTratamientos() {
@@ -984,6 +1003,8 @@
     </div>
     {#if esdev}
         premisos {JSON.stringify(permisos, null, 2)}
+        <br />
+        
     {/if}
     {#if cab.exist}
         <CardBase titulo="Bienvenido a Creciente Fértil" cardsize="max-w-5xl">
@@ -1111,12 +1132,11 @@
             </div>
 
             <div
-                class="mt-2 w-full bg-blue-100 dark:bg-blue-900/40  text-blue-900 dark:text-blue-300 text-center py-2 px-3"
+                class="mt-2 w-full bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-300 text-center py-2 px-3"
             >
                 <p class="text-lg">
-                    
                     <button
-                        onclick={() => goto(pre+"/user/nivel")}
+                        onclick={() => goto(pre + "/user/nivel")}
                         class="ml-2 underline font-semibold hover:text-blue-600 dark:hover:text-blue-200"
                     >
                         Puedes mejorar tu plan ahora →
@@ -1165,9 +1185,8 @@
             bind:prenadatacto
             bind:madres
             bind:listamadres
-            bind:listanimales = {animales}
+            bind:listanimales={animales}
             bind:cargadoanimales
-            
             {guardarTacto}
         ></InicioTacto>
     </div>
@@ -1238,7 +1257,6 @@
             bind:cargadoanimales
             bind:agregaranimal
             bind:listaanimales
-            
             {guardarTrat}
         ></InicioTratamiento>
     </div>

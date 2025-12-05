@@ -8,6 +8,7 @@
     import { isEmpty } from "$lib/stringutil/lib";
     import PredictSelect from "../PredictSelect.svelte";
     import InfoAnimal from "../InfoAnimal.svelte";
+    import CustomDate from "../CustomDate.svelte";
     let {
         caravana = $bindable(""),
         peso = $bindable(""),
@@ -125,6 +126,8 @@
 
         <RadioButton bind:option={prenadatacto} deshabilitado={false} />
     </div>
+    <!--<CustomDate etiqueta="Fecha prueba" bind:fecha = {tacto.fechatacto} onchange = {() => oninputTacto("FECHA")}/>-->
+    
     <label for="fecha" class="label">
         <span class={estilos.labelForm}>Fecha tacto</span>
     </label>
@@ -200,6 +203,12 @@
             class="btn btn-success text-white"
             disabled={!tacto.botonhabilitadotacto}
             onclick={guardarTacto}>Guardar</button
+        >
+        
+        <button
+            class="btn btn-error text-white"
+            
+            >Cerrar</button
         >
     </form>
 </div>

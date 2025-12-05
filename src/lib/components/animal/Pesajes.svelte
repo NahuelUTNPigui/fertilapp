@@ -199,6 +199,7 @@
             if (isEmpty(pesonuevo)) {
                 malpeso = true;
             } else {
+                pesonuevo = Math.max(0,pesonuevo)
                 malpeso = false;
             }
         }
