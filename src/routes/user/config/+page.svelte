@@ -153,12 +153,14 @@
             title: "¿Seguro que deseas eliminar la cuenta?",
             html,
             showDenyButton: true,
-            showCancelButton: false,
-            confirmButtonText: "Confirmación",
-            denyButtonText: `Cancelar`,
+            showCancelButton: true,
+            showConfirmButton: false,
+            //confirmButtonText: "Confirmación",
+            cancelButtonText: `Cancelar`,
+            denyButtonText: `Eliminar`
         }).then(async (result) => {
             /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
+            if (result.isDenied) {
                 Swal.fire("Eliminada!", "", "success");
                 let data = { active: false };
                 const record = await pb

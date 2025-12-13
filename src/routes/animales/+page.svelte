@@ -2,6 +2,7 @@
     //En esta pagina solo se van a crear y ver animales
     //Se pueden crear nuevos animales con un nacimientos
     import Navbarr from "$lib/components/Navbarr.svelte";
+    import NavegacionBottom from "$lib/components/NavegacionBottom.svelte";
     import Exportar from "$lib/components/Exportar.svelte";
     import PocketBase from "pocketbase";
     import { slide } from "svelte/transition";
@@ -1366,6 +1367,7 @@
             </div>
         {/each}
     </div>
+    
 </Navbarr>
 <dialog
     id="nuevoModal"

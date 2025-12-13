@@ -1,7 +1,7 @@
 <script>
   import Oscuro from "./Oscuro.svelte";
   import PocketBase from "pocketbase";
-  
+
   import { enabled } from "$lib/stores/enabled";
   import { onMount, onDestroy } from "svelte";
   import { usuario } from "$lib/stores/usuario";
@@ -10,6 +10,7 @@
   import { createDarker } from "$lib/stores/dark.svelte";
   import { page } from "$app/stores";
   import { createCaber } from "$lib/stores/cab.svelte";
+  import NavegacionBottom from "./NavegacionBottom.svelte";
   //SVG
   import Animal from "$lib/svgs/animal.svelte";
   import Estable from "$lib/svgs/estable.svelte";
@@ -22,11 +23,16 @@
   import Servicio from "$lib/svgs/servicio.svelte";
   import Tacto from "$lib/svgs/tacto.svelte";
   import Tratamiento from "$lib/svgs/tratamiento.svelte";
-
+  //tamaño
+  let innerWidth = $state(0);
+  let innerHeight = $state(0);
   let { children } = $props();
+
   let pageurl = $page.url.pathname;
   let ruta = import.meta.env.VITE_RUTA;
   let pre = import.meta.env.VITE_PRE;
+  let esCelu = $derived(innerWidth <= 1100);
+
   const pb = new PocketBase(ruta);
   let darker = createDarker();
   let leido = $state(true);
@@ -96,7 +102,7 @@
   let containerNoti = $state(null); // referencia al div principal
   let openNoti = $state(false);
   function toggleNoti() {
-    openNoti
+    openNoti;
   }
   function handleClickOutsideNoti(event) {
     if (!containerNoti.contains(event.target)) {
@@ -116,6 +122,9 @@
   function cambiarEstablecimiento() {
     goto(pre + "/establecimientos");
   }
+  function verManual() {
+    goto(pre + "/manual");
+  }
   let checked = $state("");
   function handleClick() {
     checked == "checked" ? (checked = "") : (checked = "checked");
@@ -132,9 +141,8 @@
     }
   }
   async function leerNotis() {
-    
     leido = true;
-    
+
     for (let i = 0; i < notificaciones.length; i++) {
       try {
         let data = { leido: true };
@@ -145,14 +153,14 @@
         console.error(err);
       }
     }
-    
   }
   let bgnav = "bg-green-500";
   let classtext = `text-lg px-2 font-extrabold`;
-  let classnavbarr = `navbar ${bgnav}`;
+  let classnavbarr = `navbar ${bgnav} fixed top-0 left-0 right-0 z-50`;
   let classtextnavbar = `text-white font-extrabold dark:text-gray-700`;
 </script>
 
+<svelte:window bind:innerWidth bind:innerHeight />
 <div
   class="drawer min-h-screen dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800"
 >
@@ -192,7 +200,6 @@
       </div>
 
       <div class="flex mr-1 pr-1 lg:mr-5 lg:pr-5">
- 
         <details class="dropdown dropdown-end">
           <summary
             class={`btn m-0 p-0 bg-transparent hover:bg-transparent ${classtextnavbar} border-none`}
@@ -205,10 +212,7 @@
                 ></span>
               {/if}
 
-              <span class={` px-2`}
-                >{nombreusuario}
-                
-              </span>
+              <span class={` px-2`}>{nombreusuario} </span>
             </div>
           </summary>
 
@@ -225,7 +229,7 @@
           </ul>
         </details>
 
-        <details class="dropdown dropdown-end" >
+        <details class="dropdown dropdown-end">
           <summary class={`btn btn-square btn-ghost ${classtextnavbar}`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -251,6 +255,7 @@
                   >Establecimientos</button
                 >
               </li>
+              <li><button onclick={verManual}>Manual</button></li>
               <li><button onclick={salir}>Salir</button></li>
             </ul>
           </div>
@@ -258,11 +263,18 @@
         <Oscuro></Oscuro>
       </div>
     </div>
-    {@render children()}
+    <main class="py-16">
+
+      
+      {@render children()}
+      {#if esCelu}
+        <NavegacionBottom />
+      {/if}
+    </main>
   </div>
 
   <div
-    class="drawer-side overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800"
+    class="drawer-side overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800 pt-16"
   >
     <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
     ></label>
@@ -284,7 +296,7 @@
 
       <!--Inicio-->
       <li
-        class={`mt-0 ${pageurl.includes("inicio") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
+        class={`${esCelu ? "hidden" : ""} mt-0 ${pageurl.includes("inicio") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
       >
         <a class={`pb-0 ${classtext}`} href={pre + "/inicio"}>
           <svg
@@ -308,7 +320,7 @@
       </li>
       <!--Establecimiento-->
       <li
-        class={`${pageurl.includes("establecimiento") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
+        class={`${esCelu ? "hidden" : ""} ${pageurl.includes("establecimiento") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
       >
         <a class={`py-0 ${classtext}`} href={pre + "/establecimiento"}>
           <Estable size="size-12" margenes=""></Estable>
@@ -320,7 +332,7 @@
       </li>
       <!--Animales-->
       <li
-        class={`${cab.exist ? "" : "disabled"}  ${pageurl.includes("animales") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
+        class={`${esCelu ? "hidden" : ""} ${cab.exist ? "" : "disabled"}  ${pageurl.includes("animales") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
       >
         {#if cab.exist}
           <a class={`py-0 ${classtext}`} href={pre + "/animales"}>
@@ -663,7 +675,7 @@
       </li>
       <!--Manual-->
       <li
-        class={`${cab.exist ? "" : "disabled"} ${pageurl.includes("manual") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
+        class={`hidden ${cab.exist ? "" : "disabled"} ${pageurl.includes("manual") ? "bg-green-400 text-green-900 dark:bg-green-900 dark:text-green-200 bg-opacity-25" : ""} rounded-full`}
       >
         {#if cab.exist}
           <a class={`py-0 ${classtext}`} href={pre + "/manual"}>

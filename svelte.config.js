@@ -28,6 +28,8 @@ const config = {
 				"/nacimientos/reporte",
 				"/rodeos",
 				"/rol",
+				"/notfind",
+				"/opciones",
 				"/tactos/cab",
 				"/tactos/cab/movimiento",
 				"/tactos/vet",
