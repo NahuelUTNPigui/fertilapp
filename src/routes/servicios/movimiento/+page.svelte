@@ -1110,7 +1110,7 @@
                         </td>
                         <td class="text-base">{shorterWord(a.caravana)}</td>
                         <td class="text-base">{getEstadoNombre(a.prenada)}</td>
-                        <td class="text-base">{a.categoria}</td>
+                        <td class="text-base">{capitalize(a.categoria)}</td>
                         <td class="text-base">{a.peso}</td>
                         <td class="text-base"
                             >{a.expand?.rodeo?.nombre || ""}</td

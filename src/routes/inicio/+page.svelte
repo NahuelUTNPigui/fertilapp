@@ -87,6 +87,7 @@
     //Datos cabaña
     let classbutton =
         "w-full flex items-center justify-center space-x-4 bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 dark:bg-green-700 dark:hover:bg-green-600";
+        //"w-full flex items-center justify-center space-x-4 bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 dark:bg-green-700 dark:hover:bg-green-600";
     //Tacto
     let tacto = $state({
         fechatacto: "",
@@ -946,7 +947,7 @@
             filter: `animal.cab='${cab.id}'`,
         });
         let recordservicios = await pb.collection("servicios").getList(1, 1, {
-            filter: `cab='${cab.id}'`,
+            filter: `cab='${cab.id}' && active = True`,
         });
         const recordslotes = await pb.collection("lotes").getList(1, 1, {
             filter: `active=True && cab='${cab.id}'`,
@@ -1079,13 +1080,13 @@
                     Acciones rapidas
                 </h2>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
+                    <div class="flex items-center gap-2">
                         <a class={classbutton} href={pre + "/establecimiento"}>
                             <Estable></Estable>
                             Ir a establecimiento
                         </a>
                     </div>
-                    <div>
+                    <div class="flex items-center gap-2">
                         <button class={classbutton} onclick={openNewModalTacto}>
                             <Tacto></Tacto>
                             Nuevo tacto

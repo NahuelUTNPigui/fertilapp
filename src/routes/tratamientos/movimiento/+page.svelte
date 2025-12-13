@@ -725,7 +725,7 @@
                         <td class="text-base mx-1 px-0"
                             >{shorterWord(a.caravana)}</td
                         >
-                        <td class="text-base mx-1 px-0">{a.categoria}</td>
+                        <td class="text-base mx-1 px-0">{capitalize(a.categoria)}</td>
                         <td class="text-base mx-1 px-0">{a.peso}</td>
                         <td class="text-base mx-1 px-0"
                             >{a.expand?.rodeo?.nombre || ""}</td

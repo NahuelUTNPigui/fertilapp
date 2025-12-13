@@ -783,7 +783,7 @@
                         <td class="text-base mx-1 px-1"
                             >{getEstadoNombre(a.prenada)}</td
                         >
-                        <td class="text-base mx-1 px-1">{a.categoria}</td>
+                        <td class="text-base mx-1 px-1">{capitalize(a.categoria)}</td>
                         <td class="text-base mx-1 px-1">{a.peso}</td>
                         <td class="text-base mx-1 px-1"
                             >{a.expand?.rodeo?.nombre || ""}</td
